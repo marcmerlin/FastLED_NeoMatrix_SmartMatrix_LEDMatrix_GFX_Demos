@@ -876,7 +876,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 20:
 
       triple();
-      if (flip && flip2 || flip && flip3 ) adjuster();
+      if ((flip && flip2) || (flip && flip3) ) adjuster();
       break;
     case 21:
 
@@ -1111,7 +1111,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
 
     case 59:
-      fireball;
+      fireball();
       if (flip2 && flip) ringer();
       if (flip3) bkringer();
 
@@ -1907,7 +1907,7 @@ void bubbles2() {
       xfire[u] = random(MIDLX / 2, MIDLX * 3 / 2 );
       yfire[u]  = random(MIDLY / 2, MIDLY * 3 / 2);
       fcolor[u] = random8(); //color
-      fcount[u] = random(3, 2 + MIDLX >> 1 ); //radius
+      fcount[u] = random(3, 2 + (MIDLX >> 1) ); //radius
       fpeed[u] = random(1, 4); //speed
       xslope[u] = random(12, 52) + random(4) * 64; //angle avoiding square
       if (random8() > 128) {
@@ -2952,10 +2952,10 @@ void hypnoduck() {
   if (flip2) quash = -20; else quash = 20;//spin speed and direction
 
 
-  zeds.DrawCircle(driftx, drifty, 8 + MIDLX >> 1, CHSV(h , 255, 255));
+  zeds.DrawCircle(driftx, drifty, 8 + (MIDLX >> 1), CHSV(h , 255, 255));
 
 
-  for (int jj = 00; jj < counter % 320; jj += 5)
+  for (uint32_t jj = 00; jj < counter % 320; jj += 5)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
@@ -2989,7 +2989,7 @@ void hypnoduck2()
   }
 
 
-  for (int jj = 50; jj < 100 + (counter % 400); jj += 5)
+  for (uint32_t jj = 50; jj < 100 + (counter % 400); jj += 5)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
@@ -3057,7 +3057,7 @@ void hypnoduck4()
     else
       zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CRGB::White);
   }
-  for (int jj = 890; jj > 166 - (counter % 160); jj -= 5)
+  for (uint32_t jj = 890; jj > 166 - (counter % 160); jj -= 5)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
@@ -3814,7 +3814,7 @@ void audioprocess()
 void fakenoise()
 {
   faudio[0] = random(1, MIDLY);
-  for (byte i = i; i < MATRIX_WIDTH; i++) {
+  for (byte i = 0; i < MATRIX_WIDTH; i++) {
     faudio[i] = faudio[i - 1] + random(10) - 7;
     faudio[i] = constrain(faudio[i ], 1, MATRIX_HEIGHT - 2);
   }
