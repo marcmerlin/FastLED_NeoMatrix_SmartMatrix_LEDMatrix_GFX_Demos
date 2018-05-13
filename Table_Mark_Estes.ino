@@ -1,44 +1,34 @@
 // code by Mark Estes
 // this version has audio input turned off unless you are specific matrix size
 
-#include <EasyTransfer.h>// used for exchange with 2nd arduino for audio processing
 #include <SPI.h>
 
-#define USE_OCTOWS2811
-#include<OctoWS2811.h>       //https://www.pjrc.com/teensy/td_libs_OctoWS2811.html
 #include <FastLED.h>        //https://github.com/FastLED/FastLED
 #include <LEDMatrix.h>    //https://github.com/Jorgen-VikingGod/LEDMatrix
 
+#define MATRIX_TILE_WIDTH   8 // width of EACH NEOPIXEL MATRIX (not total display)
+#define MATRIX_TILE_HEIGHT  32 // height of each matrix
+#define MATRIX_TILE_H       3  // number of matrices arranged horizontally
+#define MATRIX_TILE_V       1  // number of matrices arranged vertically
+#define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
+#define MATRIX_PANEL        (MATRIX_WIDTH*MATRIX_HEIGHT)
 
-// for transfer of data from other arduino
-EasyTransfer ETin;
-struct RECEIVE_DATA_STRUCTURE {
-  byte audio[32];
-};
-RECEIVE_DATA_STRUCTURE music;
+#define MATRIX_WIDTH        (MATRIX_TILE_WIDTH*MATRIX_TILE_H)
+#define MATRIX_HEIGHT       (MATRIX_TILE_HEIGHT*MATRIX_TILE_V)
+
+#define NUM_LEDS            (MATRIX_WIDTH*MATRIX_HEIGHT)
 
 #define MAXPOW              150  // useful when not using octo for output
 #define DATA_PIN            11   //used when running single pin
 #define COLOR_ORDER         GRB
 #define CHIPSET             WS2812
-#define MATRIX_WIDTH        64//43//21 -adio or 29 - mce1 or 43 mce-2 or 
-#define MATRIX_HEIGHT       64//43// 21 or 29 or 43
-#define MATRIX_TYPE         HORIZONTAL_ZIGZAG_MATRIX
 #define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
 #define MIDLX               (MATRIX_WIDTH/2)
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           (114)// max number of patterns
-#define NUM_STRIPS 8
 
-const int ledsPerStrip = 512;
 
-DMAMEM int displayMemory[ledsPerStrip * 6];
-int drawingMemory[ledsPerStrip * 6];
-
-const int config = WS2811_GRB | WS2811_800kHz;
-
-OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
-cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> zeds;//define the 2 d matrix called zeds, everything is drawn to this then mapped to leds
+cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> zeds;
 
 // yes, I use a lot of global variables, likey some of these are redundant or not even used...
 
@@ -52,7 +42,7 @@ boolean adio, ringme = false, blackringme = false;
 int waiter[mpatterns];
 boolean flip = true, flip2 = false, flip3 = true, mixit = false, rimmer[MATRIX_WIDTH * 2], xbouncer[MATRIX_WIDTH * 2], ybouncer[MATRIX_WIDTH * 2];
 byte ccoolloorr, why1, why2, why3, eeks1, eeks2, eeks3, h = 0, oldpattern, howmany, xhowmany, kk;
-unsigned long lasttest, lastmillis, dwell = 20000,  longhammer;
+unsigned long lasttest, lastmillis, dwell = 5000,  longhammer;
 float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle;
 byte raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
 byte shifty = 6, pattern = 109, poffset;
@@ -61,8 +51,9 @@ int directn = 1, quash = 5;
 
 void setup()
 {
-  leds.begin();
-  FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(zeds[0], zeds.Size()).setCorrection(TypicalSMD5050);
+  //FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(zeds[0], zeds.Size()).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<WS2811_PORTA,3>(zeds[0], 256).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(32);
 
 
   //  FastLED.setMaxPowerInMilliWatts(MAXPOW);//24000 works
@@ -77,7 +68,7 @@ void setup()
   // digitalWrite(50, LOW);    // sets the sleeper guard module to off
   //Serial1.begin(57600);
   // ETin.begin(details(music), &Serial1);
-  Serial.begin(57600);
+  Serial.begin(115200);
   Serial.println("Reset");
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
@@ -102,7 +93,6 @@ void setup()
   smile2();// make one frame of the smile 2 pattern
   spititout();//put a smile  on the screen
   delay(1000);
-  // showme();//useful when trying to figure out your matrix wiring
   //zoro();//helpful with matrix mapping and wiring
   //delay(60000);//helpful with pixel mapping
 }
@@ -3758,6 +3748,7 @@ void swirl5() {// both directions not round
 
 void audioprocess()
 {
+#if 0
   longhammer = millis();//zzz top
   if (adio)
     fakenoise();
@@ -3792,6 +3783,7 @@ void audioprocess()
       faudio[qq * 2 ] = (music.audio[qq + 8] + music.audio[qq + 7]) >> 1;
     }
   }
+#endif
 }
 
 void fakenoise()
@@ -3806,32 +3798,6 @@ void fakenoise()
 
 }
 
-void showme()
-{
-  for (int me = 0; me < 512; me += 8) {
-    for (byte p = 0; p < 8; p++) {
-      leds.setPixel(me + p * 512, 20, 16, 0);
-      if (me > 16) leds.setPixel(me - 16 + p * 512, 0, 9, 16);
-    }
-    leds.show();
-    //delay(5);
-  }
-}
-
 void spititout() {
-  int me;
-  for (int row = 0; row < MATRIX_HEIGHT; row ++) {
-    for (int col = 0; col < MATRIX_WIDTH; col++) {
-      if (row % 2 == 0) //even
-        me = row * 16  + int(row / 32) * 1536 + (col % 16) + int(col / 16) * 512 ;
-      else//odd
-        me = (row + 1) * 16   + int(row / 32) * 1536 - 1 - (col % 16) + int(col / 16) * 512;
-      leds.setPixel(me, zeds(col, row).red / 2, zeds(col, row).green / 2, zeds(col, row).blue / 2);
-      //leds.setPixel(4090, 255, 255, 0);
-      // leds.setPixel(4090 - 512, 0, 255, 255);
-      // leds.setPixel(4090 - 1024, 255, 0, 255);
-    }
-  }
-  leds.show();
+  FastLED.show();
 }
-
