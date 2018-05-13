@@ -53,6 +53,9 @@ cLEDSprites Sprites(&leds);
 #define maxx (MATRIX_WIDTH - MY_SPRITE_WIDTH - 1)
 #define maxy (MATRIX_HEIGHT - MY_SPRITE_HEIGHT -1)
 
+// How long before the pill appears?
+uint8_t pacman_loops = 3;
+
 #define POWER_PILL_SIZE	4
 const uint8_t PowerPillData[] = 
 {
@@ -387,7 +390,7 @@ void setup()
 #endif
 
     // Rate is a divider, higher rate is slower.
-    SprPacmanRight.SetPositionFrameMotionOptions(0/*X*/, -10/*Y*/, 0/*Frame*/, 4/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_DETECT_EDGE);
+    SprPacmanRight.SetPositionFrameMotionOptions(0/*X*/, -10/*Y*/, 0/*Frame*/, 4/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_DETECT_COLLISION);
     Sprites.AddSprite(&SprPacmanRight);
     SprPinky.SetPositionFrameMotionOptions(     0 /*X*/, -62/*Y*/, 0/*Frame*/, 2/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_Y_KEEPIN | SPRITE_DETECT_EDGE);
     Sprites.AddSprite(&SprPinky);
@@ -506,21 +509,22 @@ void loop()
 	Serial.println("Pacman hit bottom/right wall");
 	SprPacmanRight.SetMotion(-1, 1, 0, 0);
 	inmaze = 4;
-	SprPill.SetPositionFrameMotionOptions(3 /*X*/, MATRIX_HEIGHT - 7/*Y*/, 0/*Frame*/, 0/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/);
-	Sprites.AddSprite(&SprPill);
+	if (pacman_loops == 0) {
+	    SprPill.SetPositionFrameMotionOptions(3 /*X*/, MATRIX_HEIGHT - 7/*Y*/, 0/*Frame*/, 0/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 0/*YChange*/, 0/*YRate*/, 0);
+	    Sprites.AddSprite(&SprPill);
+	} else { pacman_loops--; }
     }
     else if (pcmrx <= 1 && inmaze == 4) {
 	Serial.println("Pacman hit bottom/left wall");
 	SprPacmanRight.SetMotion(0, 0, 1, 1);
-	inmaze = 5;
+	inmaze = 1;
     }
 
-    else if (pcmry >= maxy && inmaze == 5) {
-	SprPacmanRight.SetMotion(0, 0, -1, 1);
-	Serial.println("Pacman hit top/left wall2");
+    if (inmaze<6 && SprPacmanRight.GetFlags() & SPRITE_COLLISION)
+    {
+	Serial.println("Pill Collision");
 	inmaze = 6;
 	ginmaze = 6;
-	Serial.println("Pill Collision");
 	Sprites.RemoveSprite(&SprPinky);
 	Sprites.RemoveSprite(&SprPacmanRight);
 	Sprites.RemoveSprite(&SprPill);
@@ -549,10 +553,7 @@ void loop()
 	SprPacmanLeft.SetMotion(0, 0, -1, 1);
 	inmaze = 10;
     }
-    else if (pcmly <= -MY_SPRITE_HEIGHT && inmaze == 10) {
-	Serial.println("Pacman left the building, stopping");
-	delay(10000);
-    }
+
 
     if (py >= maxy && !pinmaze) pinmaze = 1;
     if (py >= maxy && pinmaze == 1) {
@@ -573,26 +574,35 @@ void loop()
     else if (px <= 1 && pinmaze == 4) {
 	Serial.println("Pinky hit bottom/left wall");
 	SprPinky.SetMotion(0, 0, 1, 1);
-	pinmaze = 5;
+	pinmaze = 1;
     }
 
     if (!ghostdead && SprGhost.GetFlags() & SPRITE_COLLISION)
     {
 	Serial.println("Ghost killed");
 	Sprites.RemoveSprite(&SprGhost);
-	Spr200.SetPositionFrameMotionOptions(SprGhost.m_X, SprGhost.m_Y, 0, 0, 0, 0, 0, 0);
+	Spr200.SetPositionFrameMotionOptions(SprGhost.m_X+1, SprGhost.m_Y, 0, 0, 0, 0, 0, 0);
 	Sprites.AddSprite(&Spr200);
 
 	ghostdead = true;
-	SprEyes.SetPositionFrameMotionOptions(SprGhost.m_X, SprGhost.m_Y, 0, 0, 0, 0, -1, 3, SPRITE_DETECT_EDGE | SPRITE_X_KEEPIN |  SPRITE_Y_KEEPIN );
+	SprEyes.SetPositionFrameMotionOptions(SprGhost.m_X, SprGhost.m_Y, 0, 0, 0, 0, -1, 3, 0);
 	Sprites.AddSprite(&SprEyes);
+    }
+
+    if (ghostdead && SprEyes.m_Y < 1) {
+	Serial.println("Eye Bounce #1");
+	SprEyes.m_Y = 1;
+	SprEyes.SetMotion(0, 0, 1, 3);
+    }
+    else if (SprEyes.m_Y > MATRIX_HEIGHT) {
+	Serial.println("Ghost eyes left the building, stopping");
+	delay(10000);
     }
 
     Sprites.RenderSprites();
     FastLED.show();
-    delay(50);
+    delay(30);
 
     
 }
 // vim:sts=4:sw=4
-
