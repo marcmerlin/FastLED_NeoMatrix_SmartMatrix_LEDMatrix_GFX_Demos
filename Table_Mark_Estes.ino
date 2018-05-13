@@ -25,7 +25,7 @@
 #define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
 #define MIDLX               (MATRIX_WIDTH/2)
 #define MIDLY               (MATRIX_HEIGHT/2)
-#define mpatterns           (114)// max number of patterns
+#define mpatterns           113// max number of patterns
 
 
 cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> zeds;
@@ -87,11 +87,13 @@ void setup()
     waiter[i] = 10;
   whatami();//this prints out the current status of stuff
   smile2();// make one frame of the smile 2 pattern
-  spititout();//put a smile  on the screen
+  FastLED.show();
   delay(1000);
   //zoro();//helpful with matrix mapping and wiring
   //delay(60000);//helpful with pixel mapping
 }
+
+char readchar;
 
 void loop()
 {
@@ -151,11 +153,11 @@ void loop()
 
   runpattern();//got generate a updted screen
   counter++;//increment the counter which is used for many things
-  spititout();//map the 2 d screen to the 8 outpus and make it happen.
+  FastLED.show();
   delay(waiter[pattern]);//frame rate control
-  if (millis() > lastmillis + dwell)//when to change patterns
+  if (Serial.available()) readchar = Serial.read(); else readchar = 0;
+  if (readchar > 31 || millis() > lastmillis + dwell)//when to change patterns
   {
-    //  digitalWrite(50, HIGH);    // sets the reset module to on, when I has some stalls, I added a cheap small extra arduino to pound the reset pin if it did not get tickled every so often, this was the tickle
     Serial.print("  Actual FPS: ");
     Serial.print (fps, 2);
     Serial.print("  delta: ");
@@ -169,18 +171,45 @@ void loop()
 
 void newpattern()//generates all the randomness for each new pattern
 {
+  int16_t new_pattern = 0;
+
   targetfps = random(20, 30);
   bfade = random(1, 8);
   dot = random(2, 6);// controls the size of a circle in many animations
   adjunct = (random(3, 11));//controls which screen wide effect is used if any
-  if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
+
+  if (readchar) {
+    while ((readchar >= '0') && (readchar <= '9')) {
+      new_pattern = 10 * new_pattern + (readchar - '0');
+      readchar = 0;
+      if (Serial.available()) readchar = Serial.read();
+    }
+
+    if (new_pattern) {
+      Serial.print("Got new pattern via serial ");
+      Serial.println(new_pattern);
+      pattern = new_pattern;
+    } else {
+      Serial.print("Got serial char ");
+      Serial.println(readchar);
+    }
+  }
+
+
+  if (readchar == 'n') { pattern++; Serial.println("Serial => next"); }
+  else if (readchar == 'p') { pattern--; Serial.println("Serial => previous"); }
+  else if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
     pattern = random(mpatterns);
     if (!adio)//this skips the audio based patterns unless audio is enabled
       while (pattern >= 29 && pattern <= 44)
         pattern = random(mpatterns);
   }
-  else
+  else if (!new_pattern)
     pattern ++;
+
+  // wrap around from 0 to last pattern.
+  if (pattern >= 250) pattern = mpatterns-1;
+  if (pattern >= mpatterns) pattern = 0;
 
   dwell = 1000 * (random(20, 40));//set how long the pattern will play
 
@@ -651,7 +680,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(10, 20);
       bfade = 10;//lots
       break;
-    case 112:
+    case mpatterns-1:
       Serial.print("seasick5");
       targetfps = random(10, 20);
       //bfade = 10;//lots
@@ -1398,7 +1427,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       bubbles2();
       break;
 
-    case 112:
+    case mpatterns-1:
       seasick5();
       mixit = true;//after  you get here the first time, it all gets random.
       break;
@@ -3794,6 +3823,4 @@ void fakenoise()
 
 }
 
-void spititout() {
-  FastLED.show();
-}
+// vim:sts=2:sw=2
