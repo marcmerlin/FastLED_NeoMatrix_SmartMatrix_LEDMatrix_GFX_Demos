@@ -45,7 +45,7 @@ byte ccoolloorr, why1, why2, why3, eeks1, eeks2, eeks3, h = 0, oldpattern, howma
 unsigned long lasttest, lastmillis, dwell = 5000,  longhammer;
 float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle;
 byte raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
-byte shifty = 6, pattern = 109, poffset;
+byte shifty = 6, pattern = 0, poffset;
 byte sinewidth, mstep, faudio[64], inner, bfade = 6;
 int directn = 1, quash = 5;
 
@@ -77,11 +77,7 @@ void setup()
 
 
   hue = random8();//get a starting point for the color progressions
-  adio = true;//enable the audio process and the patterns that use it, but only for the matri that has it , which is not of the ones on the following list
-  if (MATRIX_WIDTH == 21)  adio = false;
-  if (MATRIX_WIDTH == 29)  adio = false;
-  if (MATRIX_WIDTH == 64)  adio = false;
-  if (MATRIX_WIDTH == 32)  adio = false;
+  adio = false; // turn off audio
   if (!adio) mscale = 2.2;
   fakenoise();// probably not used anymore, was he for faking audio patterns without an audio processor
   digitalWrite(12, HIGH);
@@ -160,7 +156,7 @@ void loop()
   if (millis() > lastmillis + dwell)//when to change patterns
   {
     //  digitalWrite(50, HIGH);    // sets the reset module to on, when I has some stalls, I added a cheap small extra arduino to pound the reset pin if it did not get tickled every so often, this was the tickle
-    Serial.print("Actual FPS: ");
+    Serial.print("  Actual FPS: ");
     Serial.print (fps, 2);
     Serial.print("  delta: ");
     Serial.print(targetfps - fps, 1);
@@ -179,7 +175,7 @@ void newpattern()//generates all the randomness for each new pattern
   adjunct = (random(3, 11));//controls which screen wide effect is used if any
   if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
     pattern = random(mpatterns);
-    if (!adio)//this skips the audio based patterns unless audio is inables
+    if (!adio)//this skips the audio based patterns unless audio is enabled
       while (pattern >= 29 && pattern <= 44)
         pattern = random(mpatterns);
   }
@@ -231,6 +227,9 @@ void newpattern()//generates all the randomness for each new pattern
 
 void whatami()// set some parameters specific to the pattern and send some data to the serial port for trouble shooting/ tweaking
 {
+  Serial.print("Pattern ");
+  Serial.print(pattern);
+  Serial.print(" ");
   lastmillis = millis();
   switch (pattern)
   {
@@ -664,8 +663,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       blackringme = false;
       break;
   }
-  Serial.print("  Eff ");
-  Serial.print(pattern);
   Serial.print(", Time (s) ");
   Serial.print((dwell) / 1000, 1);
   Serial.print(", Step ");
@@ -681,7 +678,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
   Serial.print(" pre waiter  " );
   Serial.print(waiter[pattern]);
   Serial.print(" target FPS   " );
-  Serial.println(targetfps);
+  Serial.print(targetfps);
 
 }
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
@@ -801,7 +798,6 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       if (ringme)ringer();
       else
         starer();
-      mixit = true;//after  you get here the first time, it all gets random.
       break;
     case 12:
       fuzzy();
@@ -3748,10 +3744,10 @@ void swirl5() {// both directions not round
 
 void audioprocess()
 {
-#if 0
   longhammer = millis();//zzz top
-  if (adio)
+  //if (adio)
     fakenoise();
+#if 0
   else {
     while (ETin.receiveData() == false)
     {
