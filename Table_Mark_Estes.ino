@@ -53,7 +53,7 @@ int directn = 1, quash = 5;
 #define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-4, 10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 73, 77, 80, 105, 110
+4, 10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 73, 77, 80, 105, 110,
 1, 22, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
@@ -214,21 +214,20 @@ void newpattern()//generates all the randomness for each new pattern
     if (new_pattern) {
       Serial.print("Got new pattern via serial ");
       Serial.println(new_pattern);
-      pattern = new_pattern;
+      local_pattern = new_pattern;
     } else {
       Serial.print("Got serial char ");
       Serial.println(readchar);
     }
   }
 
-
   if (readchar == 'n') { local_pattern++; Serial.println("Serial => next"); }
   else if (readchar == 'p') { local_pattern--; Serial.println("Serial => previous"); }
   else if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
-    pattern = random(mpatterns);
+    local_pattern = random(mpatterns);
     if (!adio)//this skips the audio based patterns unless audio is enabled
       while (pattern >= 29 && pattern <= 44)
-        pattern = random(mpatterns);
+        local_pattern = random(mpatterns);
   }
   else if (!new_pattern) {
     local_pattern ++;
@@ -236,14 +235,20 @@ void newpattern()//generates all the randomness for each new pattern
 
 #ifdef BESTPATTERNS
   // wrap around from 0 to last pattern.
-  if (local_pattern >= 250) local_pattern = numbest-1;
-  if (local_pattern >= numbest) local_pattern = 0;
+  if (!new_pattern) {
+    if (local_pattern >= 250) local_pattern = numbest-1;
+    if (local_pattern >= numbest) local_pattern = 0;
 
-  pattern = bestpatterns[local_pattern];
-  Serial.print("Mapping best pattern idx ");
-  Serial.print(local_pattern);
-  Serial.print(" to ");
-  Serial.println(pattern);
+    pattern = bestpatterns[local_pattern];
+    Serial.print("Mapping best pattern idx ");
+    Serial.print(local_pattern);
+    Serial.print(" to ");
+    Serial.println(pattern);
+  } else {
+    // In bestof mode, a specific pattern called by number is not sticky
+    // next time around, the next bestof pattern will play
+    pattern = new_pattern;
+  }
 #else
   if (local_pattern >= 250) local_pattern = lastpatindex-1;
   if (local_pattern >= lastpatindex) local_pattern = 0;
