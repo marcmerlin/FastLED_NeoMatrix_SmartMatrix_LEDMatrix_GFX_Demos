@@ -53,8 +53,8 @@ int directn = 1, quash = 5;
 #define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-4, 10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 73, 77, 80, 105, 110,
-1, 22, 57, 60, 72, 104, };		     // ok
+10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 73, 77, 80, 105, 110,
+1, 4, 22, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
@@ -81,13 +81,6 @@ void setup()
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / (MATRIX_WIDTH - 1)); //mstep is the step size to distribute 256 over an array the width of the matrix
 
-  // audio stuff
-  pinMode(12, OUTPUT);
-  digitalWrite(12, LOW);    // sets the audio module to off
-  // pinMode(50, OUTPUT);
-  // digitalWrite(50, LOW);    // sets the sleeper guard module to off
-  //Serial1.begin(57600);
-  // ETin.begin(details(music), &Serial1);
   Serial.begin(115200);
   Serial.println("Reset");
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
@@ -99,8 +92,7 @@ void setup()
   hue = random8();//get a starting point for the color progressions
   adio = false; // turn off audio
   if (!adio) mscale = 2.2;
-  fakenoise();// probably not used anymore, was he for faking audio patterns without an audio processor
-  digitalWrite(12, HIGH);
+  fakenoise();
   cangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation gives a float value between -1 and 1
   sangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation in the y direction gives a float value between -1 and 1
   for (byte i = 0; i < mpatterns; i++)  //set up initial delay for animation timing
@@ -186,7 +178,6 @@ void loop()
     Serial.println(waiter[pattern]);
     newpattern();
   }
-  // digitalWrite(50, LOW);    // sets the reset modoule back to off, the other half of the tickle.
 }
 
 void newpattern()//generates all the randomness for each new pattern
@@ -294,7 +285,6 @@ void newpattern()//generates all the randomness for each new pattern
   // new drift factors for x and y drift
   cangle = (sin8(random(25, 220)) - 128.0) / 128.0;
   sangle = (sin8(random(25, 220)) - 128.0) / 128.0;
-  // digitalWrite(12, LOW);
   whatami();//write to screen the lebels (if present) and set some parameters specific to the given pattern
   // runpattern();//generate the first frame of the new pattern
 
@@ -860,20 +850,30 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       corner();
       driftx = MIDLX;
       drifty = MIDLY;
+#if 0
       if (blackringme)bkringer();
       else
         bkboxer();
       if (ringme)ringer();
       else
         boxer();
-      adjuster();
+#endif
+      bkringer();
+      ringer();
+      //bkboxer();
+      //boxer();
+ //     adjuster();
       break;
     case 11:
       whitewarp();
 
+#if 0
       if (ringme)ringer();
       else
         starer();
+#endif
+      ringer(); // exploding circles
+//      starer(); // exploding triangle
       break;
     case 12:
       fuzzy();
@@ -972,54 +972,44 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     // start of audio sectionnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 
     case 29:
-      digitalWrite(12, HIGH);
       Raudio();
       break;
 
     case 30:
-      digitalWrite(12, HIGH);
       audio2();
       break;
 
     case 31:
-      digitalWrite(12, HIGH);
       audio3();
       break;
 
     case 32:
-      digitalWrite(12, HIGH);
       audio();
       break;
 
     case 33:
-      digitalWrite(12, HIGH);
       Raudio2();
       break;
 
     case 34:
-      digitalWrite(12, HIGH);
       Raudio3();
       break;
 
 
     case 35:
-      digitalWrite(12, HIGH);
       Raudio4();
       break;
 
     case 36:
-      digitalWrite(12, HIGH);
       Raudio5();
       break;
 
     case 37:
-      digitalWrite(12, HIGH);
       Raudio();
       adjuster();
       break;
 
     case 38:
-      digitalWrite(12, HIGH);
 
       whitewarp();
       Raudio6();
@@ -1027,35 +1017,29 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 39:
-      digitalWrite(12, HIGH);
       Raudio3();
       Raudio2a();
       break;
 
     case 40:
-      digitalWrite(12, HIGH);
       Raudio6();
       adjuster();
       break;
 
     case 41:
-      digitalWrite(12, HIGH);
       Raudio4();
       break;
 
     case 42:
-      digitalWrite(12, HIGH);
       Raudio5();
       break;
 
     case 43:
-      digitalWrite(12, HIGH);
       Raudio2();
       adjuster();
       break;
 
     case 44:
-      digitalWrite(12, HIGH);
       Raudio4();
       Raudio2();
       break;
@@ -3828,9 +3812,7 @@ void audioprocess()
     {
       delay(5);
       if (longhammer - millis() > 50)
-      { digitalWrite(12, LOW);
         delay(10);
-        digitalWrite(12, HIGH);
         longhammer = millis();
         //  Serial.print("h ");
         //  Serial.println(counter);
@@ -3860,7 +3842,7 @@ void audioprocess()
 void fakenoise()
 {
   faudio[0] = random(1, MIDLY);
-  for (byte i = 0; i < MATRIX_WIDTH; i++) {
+  for (byte i = 1; i < MATRIX_WIDTH; i++) {
     faudio[i] = faudio[i - 1] + random(10) - 7;
     faudio[i] = constrain(faudio[i ], 1, MATRIX_HEIGHT - 2);
   }
