@@ -53,8 +53,8 @@ int directn = 1, quash = 5;
 #define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 72, 80, 104, 105, // best
-1, 4, 22, 57, 60, 73, 77, 110, };		     // ok
+4, 10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 73, 77, 80, 105, 110
+1, 22, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
