@@ -27,7 +27,6 @@
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           113// max number of patterns
 
-
 cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> zeds;
 
 // yes, I use a lot of global variables, likey some of these are redundant or not even used...
@@ -48,6 +47,27 @@ byte raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
 byte shifty = 6, pattern = 0, poffset;
 byte sinewidth, mstep, faudio[64], inner, bfade = 6;
 int directn = 1, quash = 5;
+
+// This allows a selection of only my favourite patterns.
+// Comment this out to get all the patterns -- merlin
+#define BESTPATTERNS
+#ifdef BESTPATTERNS
+uint8_t bestpatterns[] = { 
+10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 72, 80, 104, 105, // best
+1, 4, 22, 57, 60, 73, 77, 110, };		     // ok
+#define numbest           sizeof(bestpatterns)
+#define lastpatindex numbest
+#else
+#define lastpatindex mpatterns
+// mixit = true;
+#endif
+
+
+void matrix_clear() {
+    //FastLED[1].clearLedData();
+    // clear does not work properly with multiple matrices connected via parallel inputs
+    memset(zeds[0], 0, NUM_LEDS*3);
+}
 
 void setup()
 {
@@ -172,6 +192,12 @@ void loop()
 void newpattern()//generates all the randomness for each new pattern
 {
   int16_t new_pattern = 0;
+  // Allows keeping a pattern index for selecting bestof patterns
+  static uint8_t local_pattern = 0;
+
+#ifndef BESTPATTERNS
+  local_pattern = pattern;
+#endif
 
   targetfps = random(20, 30);
   bfade = random(1, 8);
@@ -196,20 +222,36 @@ void newpattern()//generates all the randomness for each new pattern
   }
 
 
-  if (readchar == 'n') { pattern++; Serial.println("Serial => next"); }
-  else if (readchar == 'p') { pattern--; Serial.println("Serial => previous"); }
+  if (readchar == 'n') { local_pattern++; Serial.println("Serial => next"); }
+  else if (readchar == 'p') { local_pattern--; Serial.println("Serial => previous"); }
   else if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
     pattern = random(mpatterns);
     if (!adio)//this skips the audio based patterns unless audio is enabled
       while (pattern >= 29 && pattern <= 44)
         pattern = random(mpatterns);
   }
-  else if (!new_pattern)
-    pattern ++;
+  else if (!new_pattern) {
+    local_pattern ++;
+  }
 
+#ifdef BESTPATTERNS
   // wrap around from 0 to last pattern.
-  if (pattern >= 250) pattern = mpatterns-1;
-  if (pattern >= mpatterns) pattern = 0;
+  if (local_pattern >= 250) local_pattern = numbest-1;
+  if (local_pattern >= numbest) local_pattern = 0;
+
+  pattern = bestpatterns[local_pattern];
+  Serial.print("Mapping best pattern idx ");
+  Serial.print(local_pattern);
+  Serial.print(" to ");
+  Serial.println(pattern);
+#else
+  if (local_pattern >= 250) local_pattern = lastpatindex-1;
+  if (local_pattern >= lastpatindex) local_pattern = 0;
+
+  pattern = local_pattern;
+#endif
+
+  matrix_clear();
 
   dwell = 1000 * (random(20, 40));//set how long the pattern will play
 
@@ -685,8 +727,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(10, 20);
       //bfade = 10;//lots
       break;
-    default:
 
+    default:
       adjunct = 0;
       ringme = false;
       blackringme = false;
@@ -1429,7 +1471,6 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case mpatterns-1:
       seasick5();
-      mixit = true;//after  you get here the first time, it all gets random.
       break;
 
     default:
@@ -3818,8 +3859,9 @@ void fakenoise()
     faudio[i] = faudio[i - 1] + random(10) - 7;
     faudio[i] = constrain(faudio[i ], 1, MATRIX_HEIGHT - 2);
   }
-  if (counter % 600 == 0)
+  if (counter % 600 == 0) {
     faudio[random(MATRIX_WIDTH)] = constrain( (MATRIX_HEIGHT / - random(MIDLY >> 2, MIDLY)), 2, MATRIX_HEIGHT - 1);
+  }
 
 }
 
