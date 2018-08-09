@@ -5,29 +5,13 @@
 
 #include <FastLED.h>        //https://github.com/FastLED/FastLED
 #include <LEDMatrix.h>    //https://github.com/Jorgen-VikingGod/LEDMatrix
+#include "config.h"
+#define zeds ledmatrix
 
-#define MATRIX_TILE_WIDTH   8 // width of EACH NEOPIXEL MATRIX (not total display)
-#define MATRIX_TILE_HEIGHT  32 // height of each matrix
-#define MATRIX_TILE_H       3  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       1  // number of matrices arranged vertically
-#define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
-#define MATRIX_PANEL        (MATRIX_WIDTH*MATRIX_HEIGHT)
-
-#define MATRIX_WIDTH        (MATRIX_TILE_WIDTH*MATRIX_TILE_H)
-#define MATRIX_HEIGHT       (MATRIX_TILE_HEIGHT*MATRIX_TILE_V)
-
-#define NUM_LEDS            (MATRIX_WIDTH*MATRIX_HEIGHT)
-
-#define MAXPOW              150  // useful when not using octo for output
-#define DATA_PIN            11   //used when running single pin
-#define COLOR_ORDER         GRB
-#define CHIPSET             WS2812
-#define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
 #define MIDLX               (MATRIX_WIDTH/2)
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           113// max number of patterns
 
-cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> zeds;
 
 // yes, I use a lot of global variables, likey some of these are redundant or not even used...
 
@@ -54,7 +38,7 @@ int directn = 1, quash = 5;
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
 10, 11, 25, 29, 34, 36, 37, 52, 61, 67, 70, 73, 77, 80, 105, 110,
-1, 4, 22, 57, 60, 72, 104, };		     // ok
+4, 22, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
@@ -71,9 +55,7 @@ void matrix_clear() {
 
 void setup()
 {
-  //FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(zeds[0], zeds.Size()).setCorrection(TypicalSMD5050);
-  FastLED.addLeds<WS2811_PORTA,3>(zeds[0], 256).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(32);
+  matrix_setup();
 
 
   //  FastLED.setMaxPowerInMilliWatts(MAXPOW);//24000 works
@@ -123,8 +105,9 @@ void loop()
     sangle = abs(sangle);
   }
 
-  driftx = constrain(driftx, MIDLX / 3, MATRIX_WIDTH - MIDLX / 3);//constrain the center, probably never gets evoked any more but was useful at one time to keep the graphics on the screen....
-  drifty = constrain(drifty, MIDLY / 3, MATRIX_HEIGHT - MIDLY / 3);
+  driftx = constrain(driftx, MIDLX - MIDLX / 3, MIDLX + MIDLX / 3);//constrain the center, probably never gets evoked any more but was useful at one time to keep the graphics on the screen....
+  drifty = constrain(drifty, MIDLY - MIDLY / 3, MIDLY - MIDLY / 3);
+  // test for frame rate,  every 15 frames
   // test for frame rate,  every 15 frames
   if (counter % 15 == 0) {
     fps = 15000.00 / (millis() - lasttest);
@@ -190,11 +173,6 @@ void newpattern()//generates all the randomness for each new pattern
   local_pattern = pattern;
 #endif
 
-  targetfps = random(20, 30);
-  bfade = random(1, 8);
-  dot = random(2, 6);// controls the size of a circle in many animations
-  adjunct = (random(3, 11));//controls which screen wide effect is used if any
-
   if (readchar) {
     while ((readchar >= '0') && (readchar <= '9')) {
       new_pattern = 10 * new_pattern + (readchar - '0');
@@ -249,6 +227,10 @@ void newpattern()//generates all the randomness for each new pattern
 
   matrix_clear();
 
+  targetfps = random(20, 30);
+  bfade = random(1, 8);
+  dot = random(2, 6);// controls the size of a circle in many animations
+  adjunct = (random(3, 11));//controls which screen wide effect is used if any
   dwell = 1000 * (random(20, 40));//set how long the pattern will play
 
   ringdelay = random(30, 90);//sets how often one of the effects will happen
@@ -947,7 +929,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 25:
       spire();
-      if (flip3)
+      //if (flip3)
         adjuster();
       break;
 
@@ -1238,10 +1220,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 70:
-      if (flip2)
-        boxer();
-      else if (flip3)
-        bkringer();
+      if (flip2) boxer();
+      else if (flip3) bkringer();
       spin2();
       if (!flip && flip2 && !flip3) adjuster();
       break;
@@ -1260,10 +1240,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 74:
-      if (flip2)
-        bkstarer();
-      else
-        bkringer();
+      if (flip2) bkstarer(); else bkringer();
       fireball();
       adjuster();
       break;
@@ -1278,10 +1255,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 77:
-      if (flip2)
-        bkstarer();
-      else
-        bkringer();
+      if (flip2) bkstarer(); else bkringer();
       whitewarp();
       break;
 
@@ -1447,8 +1421,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 110:
-      if (flip3)
-        solid2();
+      if (flip3) solid2();
       bubbles();
       break;
 
@@ -3097,7 +3070,6 @@ void hypnoduck4()
     yangle =  (cos8(jj + quash * h + 128) - 128.0) / 128.0;
     zeds.DrawFilledCircle(driftx + xangle * (jj /  17) , drifty + yangle * (jj / 17), 2, CHSV(h - 115, 255, 255));
   }
-
 }
 
 //void drawstar(byte xlocl, byte ylocl, byte biggy, byte little, byte points, byte dangle, byte koler)// random multipoint star
@@ -3135,7 +3107,6 @@ void bkstarer() {
       pointy = random(4, 9);
     }
   }
-
 }
 
 void triangler() {
