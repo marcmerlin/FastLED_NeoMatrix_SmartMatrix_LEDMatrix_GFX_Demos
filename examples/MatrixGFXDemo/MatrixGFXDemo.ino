@@ -578,11 +578,6 @@ void loop() {
     // 8x8 => 1, 16x8 => 2, 17x9 => 6
     static uint8_t pixmap_count = ((mw+7)/8) * ((mh+7)/8);
 
-    Serial.println("Count pixels. This is slow, you may want to comment me out");
-    count_pixels();
-    Serial.println("Count pixels done");
-    delay(1000);
-
     display_four_white();
     delay(3000);
 
@@ -698,6 +693,12 @@ void setup() {
 	matrix_show();
     }
     Serial.println("Done running blue/red speed test");
+
+    // This counts but also shows bleeding between pixels and lines.
+    Serial.println("Count pixels. This is slow, you may want to comment me out");
+    //count_pixels();
+    Serial.println("Count pixels done");
+    delay(1000);
 }
 
 // vim:sts=4:sw=4
