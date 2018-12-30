@@ -54,7 +54,6 @@
 
 #include "FastLED.h"
 
-// Constructor for single matrix:
 //SmartMatrix_GFX::SmartMatrix_GFX(RGB888 *leds, uint8_t w, uint8_t h): 
 SmartMatrix_GFX::SmartMatrix_GFX(CRGB *leds, uint8_t w, uint8_t h): 
   Adafruit_GFX(w, h),

@@ -314,23 +314,17 @@ void fixdrawRGBBitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, i
 // In a case of a tile of neomatrices, this test is helpful to make sure that the
 // pixels are all in sequence (to check your wiring order and the tile options you
 // gave to the constructor).
+// This also counts as another speed test that measures how fast matrix_show, is.
+// 4096 pixels, 55 seconds, 74 frames per second.
 void count_pixels() {
     matrix->clear();
     for (uint16_t i=0; i<mh; i++) {
 	for (uint16_t j=0; j<mw; j++) {
 	    matrix->drawPixel(j, i, i%3==0?(uint16_t)LED_BLUE_HIGH:i%3==1?(uint16_t)LED_RED_HIGH:(uint16_t)LED_GREEN_HIGH);
-	    // depending on the matrix size, it's too slow to display each pixel, so
-	    // make the scan init faster. This will however be too fast on a small matrix.
-	    #ifdef ESP8266
-	    if (!(j%3)) matrix_show();
-	    yield(); // reset watchdog timer
-	    #elif ESP32
-	    delay(1);
 	    matrix_show();
-	    #else 
-	    matrix_show();
-	    #endif
 	}
+	Serial.print("Row done: ");
+	Serial.println(i);
     }
 }
 
@@ -584,21 +578,8 @@ void loop() {
     // 8x8 => 1, 16x8 => 2, 17x9 => 6
     static uint8_t pixmap_count = ((mw+7)/8) * ((mh+7)/8);
 
-// You can't use millis to time frame fresh rate because it uses cli() which breaks millis()
-// So I use my stopwatch to count 200 displays and that's good enough
-#if 0
-    // 200 displays in 13 seconds = 15 frames per second for 4096 pixels
-    for (uint8_t i=0; i<100; i++) { 
-	matrix->fillScreen(LED_BLUE_LOW);
-	matrix_show();
-	matrix->fillScreen(LED_RED_LOW);
-	matrix_show();
-    }
-#endif
-
-    Serial.println("Count pixels");
-    // Too slow, for 4096 pixels in 52 seconds or 78fps
-    //count_pixels();
+    Serial.println("Count pixels. This is slow, you may want to comment me out");
+    count_pixels();
     Serial.println("Count pixels done");
     delay(1000);
 
@@ -706,6 +687,17 @@ void setup() {
     delay(3000);
     matrix->clear();
 #endif
+    Serial.println("Running blue/red speed test");
+// You can't use millis to time frame fresh rate because it uses cli() which breaks millis()
+// So I use my stopwatch to count 1000 displays and that's good enough
+// 500 loops of 2 updates each is 13.3s for 1000 updates or 75 updates per second for 4096 LEDs
+    for (uint16_t i=0; i<500; i++) { 
+	matrix->fillScreen(LED_BLUE_HIGH);
+	matrix_show();
+	matrix->fillScreen(LED_RED_HIGH);
+	matrix_show();
+    }
+    Serial.println("Done running blue/red speed test");
 }
 
 // vim:sts=4:sw=4
