@@ -5,7 +5,6 @@
 #include <Adafruit_GFX.h>
 #include <SmartMatrix_GFX.h>
 #include <SmartMatrix3.h>
-#include <FastLED.h>
 
 // Choose your prefered pixmap
 //#include "heart24.h"
@@ -20,8 +19,8 @@
 
 /// SmartMatrix Defines
 #define COLOR_DEPTH 24                  // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
-const uint8_t kMatrixWidth = 64;        // known working: 32, 64, 96, 128
-const uint8_t kMatrixHeight = 64;       // known working: 16, 32, 48, 64
+#define kMatrixWidth  64       // known working: 32, 64, 96, 128
+#define kMatrixHeight 64       // known working: 16, 32, 48, 64
 const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
 const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
@@ -37,6 +36,7 @@ const int defaultBrightness = (100*255)/100;        // full (100%) brightness
 
 #define mw kMatrixWidth
 #define mh kMatrixHeight
+#define NUMMATRIX (kMatrixWidth*kMatrixHeight)
 
 // If you don't need to use any FastLED functions on the leds array, you can define
 // an array of 3 bytes instead for RGB888. Then you don't have to include FastLED.h
@@ -44,6 +44,22 @@ const int defaultBrightness = (100*255)/100;        // full (100%) brightness
 // uint8_t leds[kMatrixWidth*kMatrixHeight][3];
 CRGB leds[kMatrixWidth*kMatrixHeight];
 SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, mw, mh);
+
+// FIXME: this works but it's not fast, only 80fps.
+// then again I suppose it's good enough, but can it be better?
+void SMshow() {
+    for (uint16_t y=0; y<kMatrixHeight; y++) {
+	for (uint16_t x=0; x<kMatrixWidth; x++) {
+	    CRGB led = leds[x + kMatrixWidth*y];
+	    // rgb24 defined in MatrixComnon.h
+	    backgroundLayer.drawPixel(x, y, { led.r, led.g, led.b } );
+	}
+    }
+    // Is this zero copy (called without "true") like I think it is?
+    backgroundLayer.swapBuffers();
+
+}
+#define matrix_show SMshow
 
 
 // This could also be defined as matrix->color(255,0,0) but those defines
@@ -306,13 +322,13 @@ void count_pixels() {
 	    // depending on the matrix size, it's too slow to display each pixel, so
 	    // make the scan init faster. This will however be too fast on a small matrix.
 	    #ifdef ESP8266
-	    if (!(j%3)) matrix->show();
+	    if (!(j%3)) matrix_show();
 	    yield(); // reset watchdog timer
 	    #elif ESP32
 	    delay(1);
-	    matrix->show();
+	    matrix_show();
 	    #else 
-	    matrix->show();
+	    matrix_show();
 	    #endif
 	}
     }
@@ -325,7 +341,7 @@ void display_four_white() {
     matrix->drawRect(1,1, mw-2,mh-2, LED_WHITE_MEDIUM);
     matrix->drawRect(2,2, mw-4,mh-4, LED_WHITE_LOW);
     matrix->drawRect(3,3, mw-6,mh-6, LED_WHITE_VERYLOW);
-    matrix->show();
+    matrix_show();
 }
 
 void display_bitmap(uint8_t bmp_num, uint16_t color) { 
@@ -340,7 +356,7 @@ void display_bitmap(uint8_t bmp_num, uint16_t color) {
     if (bmx >= mw) bmx = 0;
     if (!bmx) bmy += 8;
     if (bmy >= mh) bmy = 0;
-    matrix->show();
+    matrix_show();
 }
 
 void display_rgbBitmap(uint8_t bmp_num) { 
@@ -351,7 +367,7 @@ void display_rgbBitmap(uint8_t bmp_num) {
     if (bmx >= mw) bmx = 0;
     if (!bmx) bmy += 8;
     if (bmy >= mh) bmy = 0;
-    matrix->show();
+    matrix_show();
 }
 
 void display_lines() {
@@ -372,7 +388,7 @@ void display_lines() {
     // Diagonal blue line.
     matrix->drawLine(0,0, mw-1,mh-1, LED_BLUE_HIGH);
     matrix->drawLine(0,mh-1, mw-1,0, LED_ORANGE_MEDIUM);
-    matrix->show();
+    matrix_show();
 }
 
 void display_boxes() {
@@ -381,7 +397,7 @@ void display_boxes() {
     matrix->drawRect(1,1, mw-2,mh-2, LED_GREEN_MEDIUM);
     matrix->fillRect(2,2, mw-4,mh-4, LED_RED_HIGH);
     matrix->fillRect(3,3, mw-6,mh-6, LED_ORANGE_MEDIUM);
-    matrix->show();
+    matrix_show();
 }
 
 void display_circles() {
@@ -392,7 +408,7 @@ void display_circles() {
     matrix->drawCircle(1,mh-2, 1, LED_GREEN_LOW);
     matrix->drawCircle(mw-2,1, 1, LED_GREEN_HIGH);
     if (min(mw,mh)>12) matrix->drawCircle(mw/2-1, mh/2-1, min(mh/2-1,mw/2-1), LED_CYAN_HIGH);
-    matrix->show();
+    matrix_show();
 }
 
 void display_resolution() {
@@ -420,7 +436,7 @@ void display_resolution() {
 	} else {
 	    // we're not tall enough either, so we wait and display
 	    // the 2nd value on top.
-	    matrix->show();
+	    matrix_show();
 	    delay(2000);
 	    matrix->clear();
 	    matrix->setCursor(mw-11, 0);
@@ -451,7 +467,7 @@ void display_resolution() {
 	}
     }
     
-    matrix->show();
+    matrix_show();
 }
 
 void display_scrollText() {
@@ -471,7 +487,7 @@ void display_scrollText() {
 	    matrix->setTextColor(LED_ORANGE_HIGH);
 	    matrix->print("World");
 	}
-	matrix->show();
+	matrix_show();
        delay(50);
     }
 
@@ -483,14 +499,14 @@ void display_scrollText() {
 	matrix->clear();
 	matrix->setCursor(x,mw/2-size*4);
 	matrix->print("Rotate");
-	matrix->show();
+	matrix_show();
 	// note that on a big array the refresh rate from show() will be slow enough that
 	// the delay become irrelevant. This is already true on a 32x32 array.
         delay(50/size);
     }
     matrix->setRotation(0);
     matrix->setCursor(0,0);
-    matrix->show();
+    matrix_show();
 }
 
 // Scroll within big bitmap so that all if it becomes visible or bounce a small one.
@@ -522,7 +538,7 @@ void display_panOrBounceBitmap (uint8_t bitmapSize) {
 	// pan 24x24 pixmap
 	if (bitmapSize == 24) matrix->drawRGBBitmap(x, y, (const uint16_t *) bitmap24, bitmapSize, bitmapSize);
 	if (bitmapSize == 32) matrix->drawRGBBitmap(x, y, (const uint16_t *) bitmap32, bitmapSize, bitmapSize);
-	matrix->show();
+	matrix_show();
 	 
 	// Only pan if the display size is smaller than the pixmap
 	// but not if the difference is too small or it'll look bad.
@@ -574,14 +590,15 @@ void loop() {
     // 200 displays in 13 seconds = 15 frames per second for 4096 pixels
     for (uint8_t i=0; i<100; i++) { 
 	matrix->fillScreen(LED_BLUE_LOW);
-	matrix->show();
+	matrix_show();
 	matrix->fillScreen(LED_RED_LOW);
-	matrix->show();
+	matrix_show();
     }
 #endif
 
     Serial.println("Count pixels");
-    count_pixels();
+    // Too slow, for 4096 pixels in 52 seconds or 78fps
+    //count_pixels();
     Serial.println("Count pixels done");
     delay(1000);
 
@@ -669,6 +686,9 @@ void setup() {
 
     // Time for serial port to work?
     delay(1000);
+    backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
+    backgroundLayer.swapBuffers();
+
     Serial.begin(115200);
     Serial.print("Matrix Size: ");
     Serial.print(mw);
@@ -682,7 +702,7 @@ void setup() {
 //#define DISABLE_WHITE
 #ifndef DISABLE_WHITE
     matrix->fillScreen(LED_WHITE_HIGH);
-    matrix->show();
+    matrix_show();
     delay(3000);
     matrix->clear();
 #endif

@@ -87,9 +87,10 @@ class SmartMatrix_GFX : public Adafruit_GFX {
   // pre-computed gamma table
   uint8_t gamma[256];
 
-  // Constructor for single matrix:
-//  SmartMatrix_GFX(RGB888 *, uint8_t w, uint8_t h);
-    SmartMatrix_GFX(CRGB *, uint8_t w, uint8_t h);
+  // I'd love to make my FastLED independent uint24_t definition that is compatible
+  // with FastLED's CRGB, but I haven't succeeded, so for now I'm using FastLED.
+  //SmartMatrix_GFX(RGB888 *, uint8_t w, uint8_t h);
+  SmartMatrix_GFX(CRGB *, uint8_t w, uint8_t h);
 
   int XY(int16_t x, int16_t y); // compat with FastLED code, returns 1D offset
   void
@@ -106,7 +107,7 @@ class SmartMatrix_GFX : public Adafruit_GFX {
 
   void clear() { fillScreen(0); };
   void setBrightness(int b) { 
-    Serial.println("please call matrixLayer.setBrightness(defaultBrightness) instead");
+    Serial.println("please call matrixLayer.setBrightness() instead");
   };
 
   void show() { 
