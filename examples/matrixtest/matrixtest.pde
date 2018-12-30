@@ -3,7 +3,7 @@
 
 #include <Adafruit_GFX.h>
 #include <FastLED.h>
-#include <FastLED_NeoMatrix.h>
+#include <SmartMatrix_GFX.h>
 
 #define PIN 6
 
@@ -38,7 +38,7 @@
 
 CRGB matrixleds[NUMMATRIX];
 
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, mw, mh, mw/8, 1, 
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, mw/8, 1, 
   NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
     NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG );
 

@@ -1,6 +1,6 @@
-// FastLED_NeoMatrix + LEDMatrix example
+// SmartMatrix_GFX + LEDMatrix example
 //
-// https://github.com/marcmerlin/FastLED_NeoMatrix
+// https://github.com/marcmerlin/SmartMatrix_GFX
 // https://github.com/Jorgen-VikingGod/LEDMatrix
 //
 // By Marc MERLIN <marc_soft@merlins.org>
@@ -28,7 +28,7 @@ cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
 // for NeoMatrix and other operations that may work directly on the array like FadeAll.
 CRGB *leds = ledmatrix[0];
 
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
 MATRIX_TILE_H, MATRIX_TILE_V,
   NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
     NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG +

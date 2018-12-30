@@ -1,9 +1,10 @@
-// FastLED_NeoMatrix example for single NeoPixel Shield.
+// SmartMatrix_GFX example for single NeoPixel Shield.
 // By Marc MERLIN <marc_soft@merlins.org>
 // Contains code (c) Adafruit, license BSD
 
 #include <Adafruit_GFX.h>
-#include <FastLED_NeoMatrix.h>
+#include <SmartMatrix_GFX.h>
+#include <SmartMatrix3.h>
 #include <FastLED.h>
 
 // Choose your prefered pixmap
@@ -11,112 +12,38 @@
 //#include "yellowsmiley24.h"
 //#include "bluesmiley24.h"
 #include "smileytongue24.h"
-#ifndef PSTR
- #define PSTR // Make Arduino Due happy
-#endif
 
-// Allow temporaly dithering, does not work with ESP32 right now
-#ifndef ESP32
-#define delay FastLED.delay
-#endif
-
-#if defined(ESP32) or defined(ESP8266)
-#define PIN 12 // GPIO5 = D1
-#else
-#define PIN 13
-#endif
-
-
-//#define P32BY8X4
-#define P16BY16X4
-//#define P32BY8X3
-#if defined(P32BY8X4) || defined(P16BY16X4) || defined(P32BY8X3)
-#define BM32
-#endif
-
-#ifdef BM32
 #include "google32.h"
 // Anything with black does not look so good with the naked eye (better on pictures)
 //#include "linux32.h"
-#endif
 
-// Max is 255, 32 is a conservative value to not overload
-// a USB power supply (500mA) for 12x12 pixels.
-#define BRIGHTNESS 16
 
-// https://learn.adafruit.com/adafruit-neopixel-uberguide/neomatrix-library
-// MATRIX DECLARATION:
-// Parameter 1 = width of EACH NEOPIXEL MATRIX (not total display)
-// Parameter 2 = height of each matrix
-// Parameter 3 = number of matrices arranged horizontally
-// Parameter 4 = number of matrices arranged vertically
-// Parameter 5 = pin number (most are valid)
-// Parameter 6 = matrix layout flags, add together as needed:
-//   NEO_MATRIX_TOP, NEO_MATRIX_BOTTOM, NEO_MATRIX_LEFT, NEO_MATRIX_RIGHT:
-//     Position of the FIRST LED in the FIRST MATRIX; pick two, e.g.
-//     NEO_MATRIX_TOP + NEO_MATRIX_LEFT for the top-left corner.
-//   NEO_MATRIX_ROWS, NEO_MATRIX_COLUMNS: LEDs WITHIN EACH MATRIX are
-//     arranged in horizontal rows or in vertical columns, respectively;
-//     pick one or the other.
-//   NEO_MATRIX_PROGRESSIVE, NEO_MATRIX_ZIGZAG: all rows/columns WITHIN
-//     EACH MATRIX proceed in the same order, or alternate lines reverse
-//     direction; pick one.
-//   NEO_TILE_TOP, NEO_TILE_BOTTOM, NEO_TILE_LEFT, NEO_TILE_RIGHT:
-//     Position of the FIRST MATRIX (tile) in the OVERALL DISPLAY; pick
-//     two, e.g. NEO_TILE_TOP + NEO_TILE_LEFT for the top-left corner.
-//   NEO_TILE_ROWS, NEO_TILE_COLUMNS: the matrices in the OVERALL DISPLAY
-//     are arranged in horizontal rows or in vertical columns, respectively;
-//     pick one or the other.
-//   NEO_TILE_PROGRESSIVE, NEO_TILE_ZIGZAG: the ROWS/COLUMS OF MATRICES
-//     (tiles) in the OVERALL DISPLAY proceed in the same order for every
-//     line, or alternate lines reverse direction; pick one.  When using
-//     zig-zag order, the orientation of the matrices in alternate rows
-//     will be rotated 180 degrees (this is normal -- simplifies wiring).
-//   See example below for these values in action.
+/// SmartMatrix Defines
+#define COLOR_DEPTH 24                  // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
+const uint8_t kMatrixWidth = 64;        // known working: 32, 64, 96, 128
+const uint8_t kMatrixHeight = 64;       // known working: 16, 32, 48, 64
+const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
+const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
+const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
+//const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_NONE);      // see http://docs.pixelmatix.com/SmartMatrix for options
+const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
 
-#ifdef P32BY8X4
-// Define full matrix width and height.
-#define mw 32
-#define mh 32
-#define NUMMATRIX (mw*mh)
-CRGB leds[NUMMATRIX];
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, 8, 32, 4, 1, 
-  NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
-    NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG + 
-// progressive vs zigzag makes no difference for a 4 arrays next to one another
-    NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
+SMARTMATRIX_ALLOCATE_BUFFERS(matrixLayer, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
+SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
 
-#elif defined(P16BY16X4)
-#define mw 32
-#define mh 32
-#define NUMMATRIX (mw*mh)
-CRGB leds[NUMMATRIX];
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, 16, 16, 2, 2, 
-  NEO_MATRIX_BOTTOM     + NEO_MATRIX_RIGHT +
-    NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG + 
-    NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
+const int defaultBrightness = (100*255)/100;        // full (100%) brightness
+//const int defaultBrightness = (15*255)/100;       // dim: 15% brightness
 
-#elif defined(P32BY8X3)
-#define mw 24
-#define mh 32
-#define NUMMATRIX (mw*mh)
-CRGB leds[NUMMATRIX];
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, 8, 32, 3, 1, 
-  NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
-    NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG + 
-    NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
+#define mw kMatrixWidth
+#define mh kMatrixHeight
 
-#else
-#define mw 16
-#define mh 16
-#define NUMMATRIX (mw*mh)
-CRGB leds[NUMMATRIX];
-// Define matrix width and height.
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, mw, mh, 
-  NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
-    NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG);
-#endif
-
+// If you don't need to use any FastLED functions on the leds array, you can define
+// an array of 3 bytes instead for RGB888. Then you don't have to include FastLED.h
+// See struct CRGB in FastLED/pixeltypes.h to see why it's compatible with uint8_t[3]
+// uint8_t leds[kMatrixWidth*kMatrixHeight][3];
+CRGB leds[kMatrixWidth*kMatrixHeight];
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, mw, mh);
 
 
 // This could also be defined as matrix->color(255,0,0) but those defines
@@ -334,11 +261,6 @@ static const uint16_t PROGMEM
 	0x000, 0x000, 0x00F, 0x00F, 0x00F, 0x00F, 0x000, 0x000, },
 };
 
-void matrix_clear() {
-    // clear does not work properly with multiple matrices connected via parallel inputs
-    memset(leds, 0, sizeof(leds));
-}
-
 // Convert a BGR 4/4/4 bitmap to RGB 5/6/5 used by Adafruit_GFX
 void fixdrawRGBBitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h) {
     uint16_t RGB_bmp_fixed[w * h];
@@ -377,10 +299,10 @@ void fixdrawRGBBitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, i
 // pixels are all in sequence (to check your wiring order and the tile options you
 // gave to the constructor).
 void count_pixels() {
-    matrix_clear();
+    matrix->clear();
     for (uint16_t i=0; i<mh; i++) {
 	for (uint16_t j=0; j<mw; j++) {
-	    matrix->drawPixel(j, i, i%3==0?LED_BLUE_HIGH:i%3==1?LED_RED_HIGH:LED_GREEN_HIGH);
+	    matrix->drawPixel(j, i, i%3==0?(uint16_t)LED_BLUE_HIGH:i%3==1?(uint16_t)LED_RED_HIGH:(uint16_t)LED_GREEN_HIGH);
 	    // depending on the matrix size, it's too slow to display each pixel, so
 	    // make the scan init faster. This will however be too fast on a small matrix.
 	    #ifdef ESP8266
@@ -398,7 +320,7 @@ void count_pixels() {
 
 // Fill the screen with multiple levels of white to gauge the quality
 void display_four_white() {
-    matrix_clear();
+    matrix->clear();
     matrix->fillRect(0,0, mw,mh, LED_WHITE_HIGH);
     matrix->drawRect(1,1, mw-2,mh-2, LED_WHITE_MEDIUM);
     matrix->drawRect(2,2, mw-4,mh-4, LED_WHITE_LOW);
@@ -433,7 +355,7 @@ void display_rgbBitmap(uint8_t bmp_num) {
 }
 
 void display_lines() {
-    matrix_clear();
+    matrix->clear();
 
     // 4 levels of crossing red lines.
     matrix->drawLine(0,mh/2-2, mw-1,2, LED_RED_VERYLOW);
@@ -454,7 +376,7 @@ void display_lines() {
 }
 
 void display_boxes() {
-    matrix_clear();
+    matrix->clear();
     matrix->drawRect(0,0, mw,mh, LED_BLUE_HIGH);
     matrix->drawRect(1,1, mw-2,mh-2, LED_GREEN_MEDIUM);
     matrix->fillRect(2,2, mw-4,mh-4, LED_RED_HIGH);
@@ -463,7 +385,7 @@ void display_boxes() {
 }
 
 void display_circles() {
-    matrix_clear();
+    matrix->clear();
     matrix->drawCircle(mw/2,mh/2, 2, LED_RED_MEDIUM);
     matrix->drawCircle(mw/2-1-min(mw,mh)/8, mh/2-1-min(mw,mh)/8, min(mw,mh)/4, LED_BLUE_HIGH);
     matrix->drawCircle(mw/2+1+min(mw,mh)/8, mh/2+1+min(mw,mh)/8, min(mw,mh)/4-1, LED_ORANGE_MEDIUM);
@@ -477,7 +399,7 @@ void display_resolution() {
     matrix->setTextSize(1);
     // not wide enough;
     if (mw<16) return;
-    matrix_clear();
+    matrix->clear();
     // Font is 5x7, if display is too small
     // 8 can only display 1 char
     // 16 can almost display 3 chars
@@ -500,7 +422,7 @@ void display_resolution() {
 	    // the 2nd value on top.
 	    matrix->show();
 	    delay(2000);
-	    matrix_clear();
+	    matrix->clear();
 	    matrix->setCursor(mw-11, 0);
 	}   
     }
@@ -534,13 +456,13 @@ void display_resolution() {
 
 void display_scrollText() {
     uint8_t size = max(int(mw/8), 1);
-    matrix_clear();
+    matrix->clear();
     matrix->setTextWrap(false);  // we don't wrap text so it scrolls nicely
     matrix->setTextSize(1);
     matrix->setRotation(0);
     for (int8_t x=7; x>=-42; x--) {
 	yield();
-	matrix_clear();
+	matrix->clear();
 	matrix->setCursor(x,0);
 	matrix->setTextColor(LED_GREEN_HIGH);
 	matrix->print("Hello");
@@ -558,7 +480,7 @@ void display_scrollText() {
     matrix->setTextColor(LED_BLUE_HIGH);
     for (int16_t x=8*size; x>=-6*8*size; x--) {
 	yield();
-	matrix_clear();
+	matrix->clear();
 	matrix->setCursor(x,mw/2-size*4);
 	matrix->print("Rotate");
 	matrix->show();
@@ -594,14 +516,12 @@ void display_panOrBounceBitmap (uint8_t bitmapSize) {
 	int16_t x = xf >> 4;
 	int16_t y = yf >> 4;
 
-	matrix_clear();
+	matrix->clear();
 	// bounce 8x8 tri color smiley face around the screen
 	if (bitmapSize == 8) fixdrawRGBBitmap(x, y, RGB_bmp[10], 8, 8);
 	// pan 24x24 pixmap
 	if (bitmapSize == 24) matrix->drawRGBBitmap(x, y, (const uint16_t *) bitmap24, bitmapSize, bitmapSize);
-#ifdef BM32
 	if (bitmapSize == 32) matrix->drawRGBBitmap(x, y, (const uint16_t *) bitmap32, bitmapSize, bitmapSize);
-#endif
 	matrix->show();
 	 
 	// Only pan if the display size is smaller than the pixmap
@@ -714,7 +634,7 @@ void loop() {
 
     display_circles();
     delay(3000);
-    matrix_clear();
+    matrix->clear();
 
     Serial.println("Display RGB bitmaps");
     for (uint8_t i=0; i<=(sizeof(RGB_bmp)/sizeof(RGB_bmp[0])-1); i++)
@@ -728,10 +648,8 @@ void loop() {
     Serial.println("Scrolltext");
     display_scrollText();
 
-#ifdef BM32
     Serial.println("bounce 32 bitmap");
     display_panOrBounceBitmap(32);
-#endif
     // pan a big pixmap
     Serial.println("pan/bounce 24 bitmap");
     display_panOrBounceBitmap(24);
@@ -743,26 +661,21 @@ void loop() {
 }
 
 void setup() {
-#ifdef defined(P32BY8X3)
-    // Parallel output
-    FastLED.addLeds<WS2811_PORTA,3>(leds, NUMMATRIX/3).setCorrection(TypicalLEDStrip);
-#else
-    FastLED.addLeds<NEOPIXEL,PIN>(  leds, NUMMATRIX  ).setCorrection(TypicalLEDStrip);
-#endif
+    matrixLayer.addLayer(&backgroundLayer); 
+    matrixLayer.begin();
+    matrixLayer.setBrightness(defaultBrightness);
+    matrixLayer.setRefreshRate(240);
+    backgroundLayer.enableColorCorrection(true);
+
     // Time for serial port to work?
     delay(1000);
     Serial.begin(115200);
-    Serial.print("Init on pin: ");
-    Serial.println(PIN);
     Serial.print("Matrix Size: ");
     Serial.print(mw);
     Serial.print(" ");
-    Serial.print(mh);
-    Serial.print(" ");
-    Serial.println(NUMMATRIX);
+    Serial.println(mh);
     matrix->begin();
     matrix->setTextWrap(false);
-    matrix->setBrightness(BRIGHTNESS);
     Serial.println("If the code crashes here, decrease the brightness or turn off the all white display below");
     // Test full bright of all LEDs. If brightness is too high
     // for your current limit (i.e. USB), decrease it.
@@ -771,7 +684,7 @@ void setup() {
     matrix->fillScreen(LED_WHITE_HIGH);
     matrix->show();
     delay(3000);
-    matrix_clear();
+    matrix->clear();
 #endif
 }
 

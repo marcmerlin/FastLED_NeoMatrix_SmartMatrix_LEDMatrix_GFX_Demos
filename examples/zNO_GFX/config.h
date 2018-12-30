@@ -25,7 +25,7 @@
 #endif
 
 #include <Adafruit_GFX.h>
-#include <FastLED_NeoMatrix.h>
+#include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 
 // End Config
@@ -98,7 +98,7 @@ void FastLEDshowTask(void *pvParameters)
 
 CRGB matrixleds[NUMMATRIX];
 
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V, 
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V, 
   NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
     NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG + 
     NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
@@ -130,7 +130,7 @@ uint8_t matrix_brightness = 64;
 
 CRGB matrixleds[NUMMATRIX];
 
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,  
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,  
     NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
 

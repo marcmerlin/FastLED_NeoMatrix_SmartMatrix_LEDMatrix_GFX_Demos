@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-  Arduino library based on Adafruit_Neomatrix but modified to work with FastLED
+  Arduino library based on Adafruit_Neomatrix but modified to work with SmartMatrix
   by Marc MERLIN <marc_soft@merlins.org>
 
   Original notice and license from Adafruit_Neomatrix:
@@ -18,8 +18,8 @@
   <http://www.gnu.org/licenses/>.
   --------------------------------------------------------------------*/
 
-#ifndef _FASTLED_NEOMATRIX_H_
-#define _FASTLED_NEOMATRIX_H_
+#ifndef _SMARTMATRIX_GFX_H_
+#define _SMARTMATRIX_GFX_H_
 
 #if ARDUINO >= 100
  #include <Arduino.h>
@@ -28,16 +28,23 @@
  #include <pins_arduino.h>
 #endif
 #include <Adafruit_GFX.h>
-#if defined(ESP8266)
-// If you get matrix flickering, modify platforms/esp/8266/clockless_esp8266.h 
-// and platforms/esp/8266/clockless_block_esp8266.h to change WAIT_TIME to 20
-//#pragma message "If you get matrix corruption, turn off FASTLED_ALLOW_INTERRUPTS"
-//#pragma message "in this library, or modify WAIT_TIME in platforms/esp/8266/clockless_esp8266.h"
-//#pragma message "(raise it from 5 to 20 or up to 50 if needed)"
-// Or if you don't need interrupts, you can disable them here
-//#define FASTLED_ALLOW_INTERRUPTS 0
-#endif
-#include <FastLED.h>
+
+// Be compatible with struct CRGB in FastLED/pixeltypes.h which is uint8_t[3]
+struct RGB888 {
+  uint8_t raw[3];
+
+  /// Array access operator to index into the crgb object
+  inline uint8_t& operator[] (uint8_t x) __attribute__((always_inline))
+  {
+      return raw[x];
+  }
+
+  /// Array access operator to index into the crgb object
+  inline const uint8_t& operator[] (uint8_t x) const __attribute__((always_inline))
+  {
+      return raw[x];
+  }
+};
 
 // Matrix layout information is passed in the 'matrixType' parameter for
 // each constructor (the parameter immediately following is the LED type
@@ -73,33 +80,21 @@
 #define NEO_TILE_ZIGZAG        0x80 // Tile order reverses between lines
 #define NEO_TILE_SEQUENCE      0x80 // Bitmask for tile line order
 
-/* 
- * Ideally FastLED_NeoMatrix would multiple inherit from CFastLED too
- * I tried this, but on that path laid madness, apparent compiler bugs
- * and pain due to the unfortunate use of templates in FastLED, preventing
- * passing initalization arguments in the object since they need to be
- * hardcoded at compile time as template values :( -- merlin
- */
-class FastLED_NeoMatrix : public Adafruit_GFX {
+#include "FastLED.h"
+class SmartMatrix_GFX : public Adafruit_GFX {
 
  public:
   // pre-computed gamma table
   uint8_t gamma[256];
 
   // Constructor for single matrix:
-  FastLED_NeoMatrix(CRGB *, uint8_t w, uint8_t h, 
-    uint8_t matrixType = NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS);
-
-  // Constructor for tiled matrices:
-  FastLED_NeoMatrix(CRGB *, uint8_t matrixW, uint8_t matrixH, 
-    uint8_t tX, uint8_t tY,
-    uint8_t matrixType = NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS +
-                         NEO_TILE_TOP + NEO_TILE_LEFT + NEO_TILE_ROWS);
-
+//  SmartMatrix_GFX(RGB888 *, uint8_t w, uint8_t h);
+    SmartMatrix_GFX(CRGB *, uint8_t w, uint8_t h);
 
   int XY(int16_t x, int16_t y); // compat with FastLED code, returns 1D offset
   void
     drawPixel(int16_t x, int16_t y, uint16_t color),
+    drawPixel(int16_t x, int16_t y, uint32_t color),
     fillScreen(uint16_t color),
     setPassThruColor(uint32_t c),
     setPassThruColor(void),
@@ -109,26 +104,20 @@ class FastLED_NeoMatrix : public Adafruit_GFX {
   static uint16_t
     Color(uint8_t r, uint8_t g, uint8_t b);
 
-  void clear() { FastLED.clear(); };
-  void setBrightness(int b) { FastLED.setBrightness(b); };
-
-  void show() {
-#ifdef ESP8266
-// Disable watchdog interrupt so that it does not trigger in the middle of
-// updates. and break timing of pixels, causing random corruption on interval
-// https://github.com/esp8266/Arduino/issues/34
-    ESP.wdtDisable();
-#endif
-    FastLED.show();
-#ifdef ESP8266
-    ESP.wdtEnable(1000);
-#endif
+  void clear() { fillScreen(0); };
+  void setBrightness(int b) { 
+    Serial.println("please call matrixLayer.setBrightness(defaultBrightness) instead");
   };
 
-  void begin();
+  void show() { 
+    Serial.println("please call SMshow(leds) instead");
+  };
+
+  void begin(); // no-op in this lib, left for compat
 
  private:
 
+  //RGB888 *_leds;
   CRGB *_leds;
   const uint8_t
     type;
@@ -138,9 +127,10 @@ class FastLED_NeoMatrix : public Adafruit_GFX {
     numpix,
     (*remapFn)(uint16_t x, uint16_t y);
 
+  uint32_t _malloc_size;
   uint32_t passThruColor;
   boolean  passThruFlag = false;
 };
 
-#endif // _FASTLED_NEOMATRIX_H_
+#endif // _SMARTMATRIX_GFX_H_
 // vim:sts=2:sw=2

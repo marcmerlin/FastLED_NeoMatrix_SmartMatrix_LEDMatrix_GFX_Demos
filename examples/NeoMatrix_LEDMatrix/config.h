@@ -1,7 +1,7 @@
 #ifndef config_h
 #define config_h
 #include <Adafruit_GFX.h>
-#include <FastLED_NeoMatrix.h>
+#include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 
 #include <LEDMatrix.h>
