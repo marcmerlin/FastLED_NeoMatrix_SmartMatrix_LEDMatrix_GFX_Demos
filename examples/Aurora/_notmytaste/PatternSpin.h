@@ -52,7 +52,6 @@ public:
         effects.DimAll(190);
 
         CRGB color = effects.ColorFromCurrentPalette(speed * 8);
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
 
         // start position
         int x;

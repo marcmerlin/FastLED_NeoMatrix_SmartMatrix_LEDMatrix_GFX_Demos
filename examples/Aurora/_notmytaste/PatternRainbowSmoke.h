@@ -347,7 +347,6 @@ class PatternRainbowSmoke : public Drawable {
 
       //backgroundLayer.drawPixel(point.x, point.y, color);
       //effects.Pixel(point.x, point.y, color);
-      matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
       matrix->drawPixel(point.x, point.y, color);
 
       markAvailableNeighbors(point);

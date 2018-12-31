@@ -193,7 +193,6 @@ private:
 
                 Point newImagePoint = imagePoint.Move(direction);
 		// backgroundLayer.drawPixel(newImagePoint.x, newImagePoint.y, color);
-		matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
                 matrix->drawPixel(newImagePoint.x, newImagePoint.y, color);
 
                 cellCount++;
@@ -208,7 +207,6 @@ private:
             Point finishedPoint = cells[index];
             imagePoint = createPoint(finishedPoint.x * 2, finishedPoint.y * 2);
 	    // backgroundLayer.drawPixel(imagePoint.x, imagePoint.y, color)
-	    matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
             matrix->drawPixel(imagePoint.x, imagePoint.y, color);
 
             removeCell(index);

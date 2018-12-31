@@ -157,6 +157,7 @@ class PatternInvadersLarge : public Drawable {
             matrix->fillRect(1 + (4 - x) * 6, 1 + y * 6, 4, 4, color);
         }
       }
+      matrix->setPassThruColor();
 
       return 2000;
     }

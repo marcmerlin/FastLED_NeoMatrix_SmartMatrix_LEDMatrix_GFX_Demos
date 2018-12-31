@@ -59,6 +59,7 @@ class PatternPulse : public Drawable {
         CRGB color = effects.ColorFromCurrentPalette(hue);
         matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
         matrix->drawCircle(centerX, centerY, step, effects.ColorFromCurrentPalette(hue));
+        matrix->setPassThruColor();
         step++;
       }
       else {
