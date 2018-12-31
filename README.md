@@ -26,7 +26,12 @@ Neopixels and other pixels like APA102 have their own chip for each pixel that t
 color value and then refreshing the LED to get that color value for you with no work from you.  
 RGB Panels have no such smarts and require you to constantly refresh every LED and even create colors by flashing each R G B
 pixel between on and off at the right speed to create intensities and color mixes.  
-https://www.sparkfun.com/sparkx/blog/2650 is an awesome page that explains how it's done.
+RGB Panels are cheaper, not as bright, and have much better density (due to lack of per pixel controlling chips).
+
+Tutorials:
+- https://learn.sparkfun.com/tutorials/rgb-panel-hookup-guide/all
+- https://learn.adafruit.com/32x16-32x32-rgb-led-matrix?view=all
+- https://www.sparkfun.com/sparkx/blog/2650 is an awesome page that explains how complex some of them, can be to drive.
 
 Adafruit::GFX vs SmartMatrix vs FastLED APIs
 --------------------------------------------
@@ -71,7 +76,9 @@ Adafruit_RGB_matrix_Panel vs SmartMatrix vs ESP32-RGB64x32MatrixPanel-I2S-DMA vs
 The first 3 libraries all support HUB75 RGB Panels, although not in the same way. 
 
 - https://github.com/adafruit/RGB-matrix-Panel is the original library from Adafruit. It uses bit banging, offers 4bits per pixel and is hardcoded in assembly for some older arduino chips (arduino 328p, ATmega). It is limited to single RGB Panels (16x32 and 32x32) and mostly older and slower arduino chips. This lib does not work with newer faster chips (teensy, ESP8266, ESP32), 64x64 panels with E address line, or chained panels.  
-This Adafruit library of course supports the Adafruit::GFX backend, allowing you to reuse your GFX code on all backends that support it. See above.
+This Adafruit library of course supports the Adafruit::GFX backend, allowing you to reuse your GFX code on all backends that support it. See above.  
+https://github.com/sparkfunX/RGBmatrixPanelHalfScan is an alternate library for an odd sized 32x32 1/8th scan panel.
+
 
 - https://github.com/mrfaptastic/ESP32-RGB64x32MatrixPanel-I2S-DMA offers a totally different approach to offering
 Adafruit::GFX on RGB panels. It uses DMA on ESP32 to do mostly CPU free updates. It is a proof of concept that only offers
