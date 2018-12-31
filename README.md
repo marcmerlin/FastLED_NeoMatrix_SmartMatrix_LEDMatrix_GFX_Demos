@@ -80,3 +80,19 @@ code in a library, SmartMatrix::GFX creates its own FastLED style virtual frameb
 you were using FastLED::NeoMatrix and then each frame is then handed over to SmartMatrix pixel by pixel. It's not that
 efficient since it doubles the RAM needed to store graphics, but it still works fine and doesn't matter too much on chips 
 like ESP32 that have more RAM anyway.
+
+Microcontroller support and level shifters
+------------------------------------------
+If you use the newer and faster microcontrollers, they are 3.3V and it is greatly recommended that you use level shifters 
+(74HCT245 or equivalent).
+
+- If you are using older 16 bits microcontroller, you can only use the Adafruit RGB-matrix-Panel driver. The chips are 5V,
+so you don't need level shifters.
+
+- If you are using teensy (3.x), you should use SmartMatrix, and can use SmartMatrix::GFX on top. You can use this excellent
+shield that includes level shifters: https://docs.pixelmatix.com/SmartMatrix/shieldref.html
+
+- If you are using ESP32, you can use SmartMatrx/SmartMatrix::GFX or ESP32-RGB64x32MatrixPanel-I2S-DMA . You should then use 
+this shield to get level shifters: https://www.evilgeniuslabs.org/hexadecimal-nodemcu-32s-wi-fi-and-ble-led-controller . t
+does not plug directly into the RGBpanel, but at least you can wire directly to the level shifters and not worry about the
+ever changing pin order of the ESP32 chips.
