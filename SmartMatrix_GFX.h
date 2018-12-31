@@ -90,7 +90,7 @@ class SmartMatrix_GFX : public Adafruit_GFX {
   // I'd love to make my FastLED independent uint24_t definition that is compatible
   // with FastLED's CRGB, but I haven't succeeded, so for now I'm using FastLED.
   //SmartMatrix_GFX(RGB888 *, uint8_t w, uint8_t h);
-  SmartMatrix_GFX(CRGB *, uint8_t w, uint8_t h);
+  SmartMatrix_GFX(CRGB *, uint8_t w, uint8_t h, void (* showptr)());
 
   int XY(int16_t x, int16_t y); // compat with FastLED code, returns 1D offset
   void
@@ -106,17 +106,22 @@ class SmartMatrix_GFX : public Adafruit_GFX {
     Color(uint8_t r, uint8_t g, uint8_t b);
 
   void clear() { fillScreen(0); };
+  void show() { _show(); };
+
   void setBrightness(int b) { 
     Serial.println("please call matrixLayer.setBrightness() instead");
   };
 
-  void show() { 
-    Serial.println("please call SMshow(leds) instead");
-  };
 
   void begin(); // no-op in this lib, left for compat
 
+
  private:
+
+  // Because SmartMatrix uses templates so heavily, its object cannot be passed to us
+  // However the main function can create a show function that copies our data from _leds
+  // into the SmartMatrix object, and pass that function to us by pointer.
+  void (* _show)();
 
   //RGB888 *_leds;
   CRGB *_leds;

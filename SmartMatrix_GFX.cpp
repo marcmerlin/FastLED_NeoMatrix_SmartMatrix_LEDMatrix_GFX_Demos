@@ -55,10 +55,11 @@
 #include "FastLED.h"
 
 //SmartMatrix_GFX::SmartMatrix_GFX(RGB888 *leds, uint8_t w, uint8_t h): 
-SmartMatrix_GFX::SmartMatrix_GFX(CRGB *leds, uint8_t w, uint8_t h): 
+SmartMatrix_GFX::SmartMatrix_GFX(CRGB *leds, uint8_t w, uint8_t h, void (* showptr)()): 
   Adafruit_GFX(w, h),
   matrixWidth(w), matrixHeight(h), type(0), tilesX(0), tilesY(0), remapFn(NULL){ 
     _leds = leds;
+    _show = showptr;
     // WARNING: Serial.print seems to crash in the constructor, 
     // but works in begin()
     numpix = matrixWidth * matrixHeight;

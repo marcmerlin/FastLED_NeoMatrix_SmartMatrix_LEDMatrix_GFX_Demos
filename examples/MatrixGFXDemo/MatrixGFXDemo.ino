@@ -41,13 +41,11 @@ const int defaultBrightness = (100*255)/100;        // full (100%) brightness
 // If you don't need to use any FastLED functions on the leds array, you can define
 // an array of 3 bytes instead for RGB888. Then you don't have to include FastLED.h
 // See struct CRGB in FastLED/pixeltypes.h to see why it's compatible with uint8_t[3]
+// Well, that's what I was hoping to offer, but it doesn't work right now.
 // uint8_t leds[kMatrixWidth*kMatrixHeight][3];
 CRGB leds[kMatrixWidth*kMatrixHeight];
-SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, mw, mh);
 
-// FIXME: this works but it's not fast, only 80fps.
-// then again I suppose it's good enough, but can it be better?
-void SMshow() {
+void show() {
     for (uint16_t y=0; y<kMatrixHeight; y++) {
 	for (uint16_t x=0; x<kMatrixWidth; x++) {
 	    CRGB led = leds[x + kMatrixWidth*y];
@@ -55,11 +53,12 @@ void SMshow() {
 	    backgroundLayer.drawPixel(x, y, { led.r, led.g, led.b } );
 	}
     }
-    // Is this zero copy (called without "true") like I think it is?
-    backgroundLayer.swapBuffers();
+    // This should be zero copy
+    backgroundLayer.swapBuffers(false);
 
 }
-#define matrix_show SMshow
+
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, mw, mh, show);
 
 
 // This could also be defined as matrix->color(255,0,0) but those defines
@@ -314,14 +313,15 @@ void fixdrawRGBBitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, i
 // In a case of a tile of neomatrices, this test is helpful to make sure that the
 // pixels are all in sequence (to check your wiring order and the tile options you
 // gave to the constructor).
-// This also counts as another speed test that measures how fast matrix_show, is.
+// This also counts as another speed test that measures how fast matrix->show, is.
 // 4096 pixels, 55 seconds, 74 frames per second.
+// without the pixel copies, it takes 54 seconds, almost as fast.
 void count_pixels() {
     matrix->clear();
     for (uint16_t i=0; i<mh; i++) {
 	for (uint16_t j=0; j<mw; j++) {
 	    matrix->drawPixel(j, i, i%3==0?(uint16_t)LED_BLUE_HIGH:i%3==1?(uint16_t)LED_RED_HIGH:(uint16_t)LED_GREEN_HIGH);
-	    matrix_show();
+	    matrix->show();
 	}
 	Serial.print("Row done: ");
 	Serial.println(i);
@@ -335,7 +335,7 @@ void display_four_white() {
     matrix->drawRect(1,1, mw-2,mh-2, LED_WHITE_MEDIUM);
     matrix->drawRect(2,2, mw-4,mh-4, LED_WHITE_LOW);
     matrix->drawRect(3,3, mw-6,mh-6, LED_WHITE_VERYLOW);
-    matrix_show();
+    matrix->show();
 }
 
 void display_bitmap(uint8_t bmp_num, uint16_t color) { 
@@ -350,7 +350,7 @@ void display_bitmap(uint8_t bmp_num, uint16_t color) {
     if (bmx >= mw) bmx = 0;
     if (!bmx) bmy += 8;
     if (bmy >= mh) bmy = 0;
-    matrix_show();
+    matrix->show();
 }
 
 void display_rgbBitmap(uint8_t bmp_num) { 
@@ -361,7 +361,7 @@ void display_rgbBitmap(uint8_t bmp_num) {
     if (bmx >= mw) bmx = 0;
     if (!bmx) bmy += 8;
     if (bmy >= mh) bmy = 0;
-    matrix_show();
+    matrix->show();
 }
 
 void display_lines() {
@@ -382,7 +382,7 @@ void display_lines() {
     // Diagonal blue line.
     matrix->drawLine(0,0, mw-1,mh-1, LED_BLUE_HIGH);
     matrix->drawLine(0,mh-1, mw-1,0, LED_ORANGE_MEDIUM);
-    matrix_show();
+    matrix->show();
 }
 
 void display_boxes() {
@@ -391,7 +391,7 @@ void display_boxes() {
     matrix->drawRect(1,1, mw-2,mh-2, LED_GREEN_MEDIUM);
     matrix->fillRect(2,2, mw-4,mh-4, LED_RED_HIGH);
     matrix->fillRect(3,3, mw-6,mh-6, LED_ORANGE_MEDIUM);
-    matrix_show();
+    matrix->show();
 }
 
 void display_circles() {
@@ -402,7 +402,7 @@ void display_circles() {
     matrix->drawCircle(1,mh-2, 1, LED_GREEN_LOW);
     matrix->drawCircle(mw-2,1, 1, LED_GREEN_HIGH);
     if (min(mw,mh)>12) matrix->drawCircle(mw/2-1, mh/2-1, min(mh/2-1,mw/2-1), LED_CYAN_HIGH);
-    matrix_show();
+    matrix->show();
 }
 
 void display_resolution() {
@@ -430,7 +430,7 @@ void display_resolution() {
 	} else {
 	    // we're not tall enough either, so we wait and display
 	    // the 2nd value on top.
-	    matrix_show();
+	    matrix->show();
 	    delay(2000);
 	    matrix->clear();
 	    matrix->setCursor(mw-11, 0);
@@ -461,7 +461,7 @@ void display_resolution() {
 	}
     }
     
-    matrix_show();
+    matrix->show();
 }
 
 void display_scrollText() {
@@ -481,7 +481,7 @@ void display_scrollText() {
 	    matrix->setTextColor(LED_ORANGE_HIGH);
 	    matrix->print("World");
 	}
-	matrix_show();
+	matrix->show();
        delay(50);
     }
 
@@ -493,14 +493,14 @@ void display_scrollText() {
 	matrix->clear();
 	matrix->setCursor(x,mw/2-size*4);
 	matrix->print("Rotate");
-	matrix_show();
+	matrix->show();
 	// note that on a big array the refresh rate from show() will be slow enough that
 	// the delay become irrelevant. This is already true on a 32x32 array.
         delay(50/size);
     }
     matrix->setRotation(0);
     matrix->setCursor(0,0);
-    matrix_show();
+    matrix->show();
 }
 
 // Scroll within big bitmap so that all if it becomes visible or bounce a small one.
@@ -532,7 +532,7 @@ void display_panOrBounceBitmap (uint8_t bitmapSize) {
 	// pan 24x24 pixmap
 	if (bitmapSize == 24) matrix->drawRGBBitmap(x, y, (const uint16_t *) bitmap24, bitmapSize, bitmapSize);
 	if (bitmapSize == 32) matrix->drawRGBBitmap(x, y, (const uint16_t *) bitmap32, bitmapSize, bitmapSize);
-	matrix_show();
+	matrix->show();
 	 
 	// Only pan if the display size is smaller than the pixmap
 	// but not if the difference is too small or it'll look bad.
@@ -678,7 +678,7 @@ void setup() {
 //#define DISABLE_WHITE
 #ifndef DISABLE_WHITE
     matrix->fillScreen(LED_WHITE_HIGH);
-    matrix_show();
+    matrix->show();
     delay(3000);
     matrix->clear();
 #endif
@@ -688,9 +688,9 @@ void setup() {
 // 500 loops of 2 updates each is 13.3s for 1000 updates or 75 updates per second for 4096 LEDs
     for (uint16_t i=0; i<500; i++) { 
 	matrix->fillScreen(LED_BLUE_HIGH);
-	matrix_show();
+	matrix->show();
 	matrix->fillScreen(LED_RED_HIGH);
-	matrix_show();
+	matrix->show();
     }
     Serial.println("Done running blue/red speed test");
 
