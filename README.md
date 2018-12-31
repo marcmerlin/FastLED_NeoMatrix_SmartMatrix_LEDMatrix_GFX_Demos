@@ -26,8 +26,12 @@ Neopixels and other pixels like APA102 have their own chip for each pixel that t
 color value and then refreshing the LED to get that color value for you with no work from you.  
 RGB Panels have no such smarts and require you to constantly refresh every LED and even create colors by flashing each R G B
 pixel between on and off at the right speed to create intensities and color mixes.  
-RGB Panels are cheaper, not as bright, and have much better density (due to lack of per pixel controlling chips)  
-https://www.sparkfun.com/sparkx/blog/2650 is an awesome page that explains how complex some of them, can be to drive.
+RGB Panels are cheaper, not as bright, and have much better density (due to lack of per pixel controlling chips).
+
+Tutorials:
+- https://learn.sparkfun.com/tutorials/rgb-panel-hookup-guide/all
+- https://learn.adafruit.com/32x16-32x32-rgb-led-matrix?view=all
+- https://www.sparkfun.com/sparkx/blog/2650 is an awesome page that explains how complex some of them, can be to drive.
 
 Adafruit::GFX vs SmartMatrix vs FastLED APIs
 --------------------------------------------
