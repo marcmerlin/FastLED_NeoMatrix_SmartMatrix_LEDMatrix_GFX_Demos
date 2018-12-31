@@ -2,7 +2,12 @@ SmartMatrix GFX, Control Scan Based Matrices with SmartMatrix and Adafruit GFX A
 ==================================================================================
 
 Adafruit::GFX compatible library for scan based matrices.
-This library requires SmartMatrix and Adafruit_GFX libraries.
+This library requires SmartMatrix, Adafruit_GFX, and FastLED libraries.
+- https://github.com/pixelmatix/SmartMatrix
+- https://github.com/adafruit/Adafruit-GFX-Library
+- https://github.com/FastLED/FastLED  
+(technically it can work without FastLED, but it's convenient to use the FastLED CRGB representation
+and in turn, it gives extra primitives that can be used against pixels, defined here: https://github.com/FastLED/FastLED/blob/master/pixeltypes.h#L90 )
 
 Example code: https://github.com/marcmerlin/SmartMatrix_GFX/blob/master/examples/MatrixGFXDemo/MatrixGFXDemo.ino
 
@@ -15,6 +20,13 @@ That being said, I do recommend that you use Neopixel matrices whenever you can 
 
 It also offers FastLED compatibility if you'd like to use those primitives against your virtual display (like nblend, fade, etc...).
 
+RGB Panels vs NeoPixels and other addressable LEDs
+--------------------------------------------------
+Neopixels and other pixels like APA102 have their own chip for each pixel that take care of accepting a 24bit (or better) 
+color value and then refreshing the LED to get that color value for you with no work from you.  
+RGB Panels have no such smarts and require you to constantly refresh every LED and even create colors by flashing each R G B
+pixel between on and off at the right speed to create intensities and color mixes.  
+https://www.sparkfun.com/sparkx/blog/2650 is an awesome page that explains how it's done.
 
 Adafruit::GFX vs SmartMatrix vs FastLED APIs
 --------------------------------------------
