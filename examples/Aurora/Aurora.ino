@@ -52,20 +52,6 @@ Drawable *pattern;
 int8_t item = -1;
 uint8_t numitems = sizeof(items) / sizeof(items[0]);
 
-
-void matrix_show() {
-    // On my own code, this gets diverted to
-    //FastLED[1].showLeds(matrix_brightness);
-    matrix->show();
-}
-
-// Parallel output on ESP8266 does not clear seconary panels
-void matrix_clear() {
-    //FastLED[1].clearLedData();
-    // clear does not work properly with multiple matrices connected via parallel inputs
-    memset(matrixleds, 0, NUMMATRIX*3);
-}
-
 void loop() {
     int8_t new_pattern = 0;
     char readchar;
@@ -106,7 +92,7 @@ void loop() {
 	Serial.println(pattern->name);
     }
     pattern->drawFrame();
-    matrix_show();
+    matrix->show();
 }
 
 
