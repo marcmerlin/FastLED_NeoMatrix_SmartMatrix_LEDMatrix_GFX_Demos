@@ -53,8 +53,6 @@ class PatternIncrementalDrift2 : public Drawable {
           y = beatcos8((32 - i) * 2, MATRIX_HEIGHT - i, i + 1);
           color = effects.ColorFromCurrentPalette((31 - i) * 14);
         }
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
-
         //backgroundLayer.drawPixel(x, y, color);
         matrix->drawPixel(x, y, color);
       }

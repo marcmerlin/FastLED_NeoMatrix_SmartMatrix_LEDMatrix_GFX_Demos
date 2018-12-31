@@ -63,7 +63,6 @@ public:
             //effects.leds[XY(boid.location.x, boid.location.y)] = effects.ColorFromCurrentPalette(boid.colorIndex);
 	    // drawPixel takes care of it
 	    CRGB color = effects.ColorFromCurrentPalette(boid.colorIndex);
-            matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
             matrix->drawPixel(boid.location.x, boid.location.y, color);
 
             if (boid.location.y >= MATRIX_HEIGHT - 1) {

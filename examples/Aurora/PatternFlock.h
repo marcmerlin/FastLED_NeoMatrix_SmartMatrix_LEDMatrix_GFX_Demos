@@ -94,7 +94,6 @@ class PatternFlock : public Drawable {
         // backgroundLayer.drawLine(location.x, location.y, location.x - velocity.x, location.y - velocity.y, color);
         // effects.leds[XY(location.x, location.y)] += color;
         //backgroundLayer.drawPixel(location.x, location.y, color);
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
         matrix->drawPixel(location.x, location.y, color);
 
         if (applyWind) {
@@ -112,7 +111,6 @@ class PatternFlock : public Drawable {
         // backgroundLayer.drawLine(location.x, location.y, location.x - velocity.x, location.y - velocity.y, color);
         // effects.leds[XY(location.x, location.y)] += color;        
         //backgroundLayer.drawPixel(location.x, location.y, color);
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
         matrix->drawPixel(location.x, location.y, color);
       }
 

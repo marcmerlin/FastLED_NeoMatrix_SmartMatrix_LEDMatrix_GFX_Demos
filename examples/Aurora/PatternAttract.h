@@ -67,9 +67,14 @@ public:
 	    // this writes an out of bounds pixel that looks bad
             //effects.leds[XY(boid.location.x, boid.location.y)] = effects.ColorFromCurrentPalette(boid.colorIndex);
 	    // drawPixel takes care of it
+	    
+	    // drawPixel now accepts native CRGB
 	    CRGB color = effects.ColorFromCurrentPalette(boid.colorIndex);
-            matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
             matrix->drawPixel(boid.location.x, boid.location.y, color);
+
+	    // drawPixel also takes 32bit 0x00RRGGBB (in addition to 16bit RGB565)
+	    //uint32_t color32 = color.r*65536+color.g*256+color.b;
+            //matrix->drawPixel(boid.location.x, boid.location.y, color32);
 
             boids[i] = boid;
         }

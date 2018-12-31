@@ -71,7 +71,6 @@ class PatternFlowField : public Drawable {
         //backgroundLayer.drawPixel(boid->location.x, boid->location.y, effects.ColorFromCurrentPalette(angle + hue)); // color
         //effects.Pixel(boid->location.x, boid->location.y, color); // color
         CRGB color = effects.ColorFromCurrentPalette(effects.ColorFromCurrentPalette(angle + hue));
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
         matrix->drawPixel(boid->location.x, boid->location.y, color);
 
         if (boid->location.x < 0 || boid->location.x >= MATRIX_WIDTH ||

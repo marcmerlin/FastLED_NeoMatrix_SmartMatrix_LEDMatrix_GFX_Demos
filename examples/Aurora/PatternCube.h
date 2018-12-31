@@ -210,6 +210,7 @@ class PatternCube : public Drawable {
           matrix->drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, color);
         }
       }
+      matrix->setPassThruColor();
 
       step++;
       if (step == 8) {

@@ -96,6 +96,7 @@ class SmartMatrix_GFX : public Adafruit_GFX {
   void
     drawPixel(int16_t x, int16_t y, uint16_t color),
     drawPixel(int16_t x, int16_t y, uint32_t color),
+    drawPixel(int16_t x, int16_t y, CRGB color),
     fillScreen(uint16_t color),
     setPassThruColor(uint32_t c),
     setPassThruColor(void),

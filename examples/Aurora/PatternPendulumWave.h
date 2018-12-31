@@ -51,9 +51,7 @@ class PatternPendulumWave : public Drawable {
 
         //backgroundLayer.drawPixel(x, y, effects.ColorFromCurrentPalette(x * 7));
 	CRGB color = effects.ColorFromCurrentPalette(x * 7);
-	matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
         matrix->drawPixel(x, y, color);
-        matrix->setPassThruColor();
 
       }
 

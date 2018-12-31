@@ -2,11 +2,65 @@
 #define config_h
 #include <Adafruit_GFX.h>
 #include <SmartMatrix_GFX.h>
+#include <SmartMatrix3.h>
 #include <FastLED.h>
 
+#define SMARTMATRIX
 
 
-#ifdef M32B8X3
+#if defined(SMARTMATRIX)
+const uint8_t matrix_brightness = 100;
+// Used by LEDMatrix
+#define MATRIX_TILE_WIDTH   64 // width of EACH NEOPIXEL MATRIX (not total display)
+#define MATRIX_TILE_HEIGHT  64 // height of each matrix
+#define MATRIX_TILE_H       1  // number of matrices arranged horizontally
+#define MATRIX_TILE_V       1  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+#define mw (MATRIX_TILE_WIDTH *  MATRIX_TILE_H)
+#define mh (MATRIX_TILE_HEIGHT * MATRIX_TILE_V)
+#define NUMMATRIX (mw*mh)
+
+// Compat for some other demos
+#define NUM_LEDS NUMMATRIX 
+#define MATRIX_HEIGHT mh
+#define MATRIX_WIDTH mw
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
+/// SmartMatrix Defines
+#define COLOR_DEPTH 24                  // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
+#define kMatrixWidth  mw       // known working: 32, 64, 96, 128
+#define kMatrixHeight mh       // known working: 16, 32, 48, 64
+const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
+const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
+const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
+//const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_NONE);      // see http://docs.pixelmatix.com/SmartMatrix for options
+const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
+
+SMARTMATRIX_ALLOCATE_BUFFERS(matrixLayer, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
+SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
+
+CRGB matrixleds[NUMMATRIX];
+
+// Sadly this callback function must be copied around with this init code
+void show_callback() {
+    for (uint16_t y=0; y<kMatrixHeight; y++) {
+	for (uint16_t x=0; x<kMatrixWidth; x++) {
+	    CRGB led = matrixleds[x + kMatrixWidth*y];
+	    // rgb24 defined in MatrixComnon.h
+	    backgroundLayer.drawPixel(x, y, { led.r, led.g, led.b } );
+	}
+    }
+    // This should be zero copy
+    // that said, copy or no copy is about the same speed in the end.
+    backgroundLayer.swapBuffers(false);
+}
+
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, show_callback);
+
+#elif defined(M32B8X3)
+const uint8_t matrix_brightness = 32;
 // Used by LEDMatrix
 #define MATRIX_TILE_WIDTH   8 // width of EACH NEOPIXEL MATRIX (not total display)
 #define MATRIX_TILE_HEIGHT  32 // height of each matrix
@@ -33,6 +87,7 @@ SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, MATRIX_TILE_WIDTH, MAT
 
 #else
 //---------------------------------------------------------------------------- 
+const uint8_t matrix_brightness = 32;
 //
 // Used by LEDMatrix
 #define MATRIX_TILE_WIDTH   64 // width of EACH NEOPIXEL MATRIX (not total display)
@@ -60,8 +115,6 @@ SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, MATRIX_TILE_WIDTH, MAT
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
 #endif
 
-
-uint8_t matrix_brightness = 32;
 
 int XY2( int x, int y, bool wrap=false) { 
     return matrix->XY(x,MATRIX_HEIGHT-1-y);
@@ -108,7 +161,20 @@ void aurora_setup();
 
 
 void matrix_setup() {
-#ifdef M32B8X3
+#if defined(SMARTMATRIX)
+    matrixLayer.addLayer(&backgroundLayer); 
+    matrixLayer.begin();
+    matrixLayer.setBrightness(matrix_brightness);
+    matrixLayer.setRefreshRate(240);
+    backgroundLayer.enableColorCorrection(true);
+    delay(1000);
+    // Quick hello world test
+    backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
+    backgroundLayer.swapBuffers();
+    delay(1000);
+    Serial.print("SmartMatrix GFX output, total LEDs: ");
+    Serial.println(NUMMATRIX);
+#elif defined(M32B8X3)
     // Init Matrix
     // Serialized, 768 pixels takes 26 seconds for 1000 updates or 26ms per refresh
     // FastLED.addLeds<NEOPIXEL,MATRIXPIN>(matrixleds, NUMMATRIX).setCorrection(TypicalLEDStrip);

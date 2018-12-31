@@ -57,7 +57,7 @@
 //SmartMatrix_GFX::SmartMatrix_GFX(RGB888 *leds, uint8_t w, uint8_t h): 
 SmartMatrix_GFX::SmartMatrix_GFX(CRGB *leds, uint8_t w, uint8_t h, void (* showptr)()): 
   Adafruit_GFX(w, h),
-  matrixWidth(w), matrixHeight(h), type(0), tilesX(0), tilesY(0), remapFn(NULL){ 
+  type(0), matrixWidth(w), matrixHeight(h), tilesX(0), tilesY(0), remapFn(NULL){ 
     _leds = leds;
     _show = showptr;
     // WARNING: Serial.print seems to crash in the constructor, 
@@ -224,6 +224,14 @@ void SmartMatrix_GFX::drawPixel(int16_t x, int16_t y, uint32_t color) {
 
   _leds[XY(x,y)] = color;
 }
+
+void SmartMatrix_GFX::drawPixel(int16_t x, int16_t y, CRGB color) {
+
+  if((x < 0) || (y < 0) || (x >= _width) || (y >= _height)) return;
+
+  _leds[XY(x,y)] = color.r*65536+color.g*256+color.b;
+}
+
 
 void SmartMatrix_GFX::fillScreen(uint16_t color) {
   uint32_t c;

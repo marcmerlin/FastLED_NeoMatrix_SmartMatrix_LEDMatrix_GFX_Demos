@@ -16,6 +16,7 @@
 // Anything with black does not look so good with the naked eye (better on pictures)
 //#include "linux32.h"
 
+// ========================== CONFIG START ===================================================
 
 /// SmartMatrix Defines
 #define COLOR_DEPTH 24                  // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
@@ -38,14 +39,10 @@ const int defaultBrightness = (100*255)/100;        // full (100%) brightness
 #define mh kMatrixHeight
 #define NUMMATRIX (kMatrixWidth*kMatrixHeight)
 
-// If you don't need to use any FastLED functions on the leds array, you can define
-// an array of 3 bytes instead for RGB888. Then you don't have to include FastLED.h
-// See struct CRGB in FastLED/pixeltypes.h to see why it's compatible with uint8_t[3]
-// Well, that's what I was hoping to offer, but it doesn't work right now.
-// uint8_t leds[kMatrixWidth*kMatrixHeight][3];
 CRGB leds[kMatrixWidth*kMatrixHeight];
 
-void show() {
+// Sadly this callback function must be copied around with this init code
+void show_callback() {
     for (uint16_t y=0; y<kMatrixHeight; y++) {
 	for (uint16_t x=0; x<kMatrixWidth; x++) {
 	    CRGB led = leds[x + kMatrixWidth*y];
@@ -54,11 +51,13 @@ void show() {
 	}
     }
     // This should be zero copy
+    // that said, copy or no copy is about the same speed in the end.
     backgroundLayer.swapBuffers(false);
-
 }
 
-SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, mw, mh, show);
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, mw, mh, show_callback);
+
+// ========================== CONFIG END ======================================================
 
 
 // This could also be defined as matrix->color(255,0,0) but those defines

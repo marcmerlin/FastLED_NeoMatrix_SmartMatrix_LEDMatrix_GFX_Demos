@@ -65,11 +65,10 @@ public:
                     n = quadwave8(x * 2 + theta) / scale;
                     //backgroundLayer.drawPixel(x, n, effects.ColorFromCurrentPalette(x + hue));
                     CRGB color = effects.ColorFromCurrentPalette(x + hue);
-		    matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
-                    matrix->drawPixel(x, n, 0);
+                    matrix->drawPixel(x, n, color);
                     if (waveCount == 2)
                         //backgroundLayer.drawPixel(x, maxY - n, effects.ColorFromCurrentPalette(x + hue));
-                        matrix->drawPixel(x, maxY - n, 0);
+                        matrix->drawPixel(x, maxY - n, color);
                 }
                 break;
 
@@ -78,11 +77,10 @@ public:
                     n = quadwave8(y * 2 + theta) / scale;
                     // backgroundLayer.drawPixel(n, y, effects.ColorFromCurrentPalette(y + hue));
                     CRGB color = effects.ColorFromCurrentPalette(y + hue);
-		    matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
-                    matrix->drawPixel(n, y, 0);
+                    matrix->drawPixel(n, y, color);
                     if (waveCount == 2)
                         //backgroundLayer.drawPixel(maxX - n, y, effects.ColorFromCurrentPalette(y + hue));
-                        matrix->drawPixel(maxX - n, y, 0);
+                        matrix->drawPixel(maxX - n, y, color);
                 }
                 break;
 
@@ -91,11 +89,10 @@ public:
                     n = quadwave8(x * 2 - theta) / scale;
                     // backgroundLayer.drawPixel(x, n, effects.ColorFromCurrentPalette(x + hue));
                     CRGB color = effects.ColorFromCurrentPalette(x + hue);
-		    matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
-                    matrix->drawPixel(x, n, 0);
+                    matrix->drawPixel(x, n, color);
                     if (waveCount == 2)
                         //backgroundLayer.drawPixel(x, maxY - n, effects.ColorFromCurrentPalette(x + hue));
-                        matrix->drawPixel(x, maxY - n, 0);
+                        matrix->drawPixel(x, maxY - n, color);
                 }
                 break;
 
@@ -104,11 +101,10 @@ public:
                     n = quadwave8(y * 2 - theta) / scale;
                     // backgroundLayer.drawPixel(n, y, effects.ColorFromCurrentPalette(y + hue));
                     CRGB color = effects.ColorFromCurrentPalette(y + hue);
-		    matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
-                    matrix->drawPixel(n, y, 0);
+                    matrix->drawPixel(n, y, color);
                     if (waveCount == 2)
                         //backgroundLayer.drawPixel(maxX - n, y, effects.ColorFromCurrentPalette(y + hue));
-                        matrix->drawPixel(maxX - n, y, 0);
+                        matrix->drawPixel(maxX - n, y, color);
                 }
                 break;
         }

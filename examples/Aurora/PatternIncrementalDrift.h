@@ -38,7 +38,6 @@ class PatternIncrementalDrift : public Drawable {
       for (int i = 2; i <= MATRIX_WIDTH / 2; i++)
       {
         CRGB color = effects.ColorFromCurrentPalette((i - 2) * (240 / (MATRIX_WIDTH / 2)));
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
 
         uint8_t x = beatcos8((17 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
         uint8_t y = beatsin8((17 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);

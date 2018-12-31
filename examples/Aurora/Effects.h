@@ -57,7 +57,7 @@ void drawForegroundHLine(int16_t x0, int16_t x1, int16_t y) {
   int i;
 
   for (i = x0; i <= x1; i++) {
-    matrix->drawPixel(i, y, 1);
+    matrix->drawPixel(i, y, (uint32_t)1);
   }
 }
 

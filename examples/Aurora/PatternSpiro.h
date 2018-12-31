@@ -66,10 +66,8 @@ class PatternSpiro : public Drawable {
         //effects.leds[XY(x2, y2)] += color;
 	// Use GFX hack to pass 24bit color instead of 16bit color
 	// Some coordinates are off screen, using drawpixel avoids the artifact of overwriting pixel0
-        matrix->setPassThruColor(color.r*65536+color.g*256+color.b);
         matrix->drawPixel(x2, y2, color);
-        //matrix->drawPixel(x2, y2, Color24toColor16(color));
-        
+
         if((x2 == MATRIX_CENTER_X && y2 == MATRIX_CENTER_Y) ||
            (x2 == MATRIX_CENTRE_X && y2 == MATRIX_CENTRE_Y)) change = true;
       }
