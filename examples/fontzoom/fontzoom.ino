@@ -6,43 +6,9 @@
 #include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 #include "fonts.h"
-
-#define MATRIXPIN D6
-
-#define MATRIX_TILE_WIDTH   8 // width of EACH NEOPIXEL MATRIX (not total display)
-#define MATRIX_TILE_HEIGHT  32 // height of each matrix
-#define MATRIX_TILE_H       3  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       1  // number of matrices arranged vertically
-
-// Used by NeoMatrix
-#define mw (MATRIX_TILE_WIDTH *  MATRIX_TILE_H)
-#define mh (MATRIX_TILE_HEIGHT * MATRIX_TILE_V)
-#define NUMMATRIX (mw*mh)
-
-uint8_t matrix_brightness = 32;
-
-CRGB matrixleds[NUMMATRIX];
-
-SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V, 
-  NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
-    NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG + 
-    NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
+#include "config.h"
 
 
-void matrix_show() {
-    // On my own code, this gets diverted to
-    //FastLED[1].showLeds(matrix_brightness);
-    matrix->show();
-}
-
-// Parallel output on ESP8266 does not clear seconary panels
-void matrix_clear() {
-    //FastLED[1].clearLedData();
-    // clear does not work properly with multiple matrices connected via parallel inputs
-    memset(matrixleds, 0, NUMMATRIX*3);
-}
-
-bool matrix_reset_demo = 1;
 int8_t matrix_loop = -1;
 
 // ---------------------------------------------------------------------------
@@ -109,12 +75,10 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 	if (matrix_loop == -1) { dont_exit = 1; delayframe = 2; faster = 0; };
     }
 
-    matrix->setTextSize(1);
-
     if (--delayframe) {
 	// reset how long a frame is shown before we switch to the next one
 	// Serial.println("delayed frame");
-	matrix_show(); // make sure we still run at the same speed.
+	matrix->show(); // make sure we still run at the same speed.
 	return repeat;
     }
     delayframe = max((speed / 10) - faster , 1);
@@ -129,9 +93,9 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 	uint16_t txtcolor = Color24toColor16(Wheel(map(letters[l], '0', 'Z', 0, 255)));
 	matrix->setTextColor(txtcolor); 
 
-	matrix_clear();
+	matrix->clear();
 	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
-	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
+	matrix->setCursor(10-size*0.55+offset, mh*2/3+size*0.75);
 	matrix->print(letters[l]);
 	if (size<18) size++; 
 	else if (zoom_type == 0) { done = 1; delayframe = max((speed - faster*10) * 1, 3); } 
@@ -145,14 +109,14 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 	if (letters[l] == 'l') offset = +5 * size/15;
 
 	matrix->setTextColor(txtcolor); 
-	matrix_clear();
+	matrix->clear();
 	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
-	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
+	matrix->setCursor(10-size*0.55+offset, mh*2/3+size*0.75);
 	matrix->print(letters[l]);
 	if (size>3) size--; else { done = 1; direction = 1; delayframe = max((speed-faster*10)/2, 3); };
     }
 
-    matrix_show();
+    matrix->show();
     //Serial.println("done?");
     if (! done) return repeat;
     direction = 1;
@@ -205,21 +169,10 @@ void setup() {
     delay(1000);
     Serial.begin(115200);
 
-    // Init Matrix
-    // Serialized, 768 pixels takes 26 seconds for 1000 updates or 26ms per refresh
-    // FastLED.addLeds<NEOPIXEL,MATRIXPIN>(matrixleds, NUMMATRIX).setCorrection(TypicalLEDStrip);
-    // https://github.com/FastLED/FastLED/wiki/Parallel-Output
-    // WS2811_PORTA - pins 12, 13, 14 and 15 or pins 6,7,5 and 8 on the NodeMCU
-    // This is much faster 1000 updates in 10sec
-    //FastLED.addLeds<NEOPIXEL,PIN>(leds, NUMMATRIX); 
-    FastLED.addLeds<WS2811_PORTA,3>(matrixleds, NUMMATRIX/3).setCorrection(TypicalLEDStrip);
-    Serial.print("Matrix Size: ");
-    Serial.print(mw);
-    Serial.print(" ");
-    Serial.println(mh);
+    matrix_setup();
     matrix->begin();
-    matrix->setBrightness(matrix_brightness);
     matrix->setTextWrap(false);
+    if (mw >= 48 && mh >=64) matrix->setTextSize(2);
 }
 
 // vim:sts=4:sw=4

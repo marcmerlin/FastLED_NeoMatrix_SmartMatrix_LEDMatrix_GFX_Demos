@@ -106,7 +106,6 @@ void setup() {
     Serial.print(" ");
     Serial.println(mh);
     matrix->begin();
-    matrix->setBrightness(matrix_brightness);
     matrix->setTextWrap(false);
 
     effects.leds = matrixleds;
