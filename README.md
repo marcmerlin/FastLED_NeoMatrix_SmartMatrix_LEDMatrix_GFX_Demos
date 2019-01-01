@@ -9,7 +9,6 @@ This library requires SmartMatrix, Adafruit_GFX, and FastLED libraries.
 (technically it can work without FastLED, but it's convenient to use the FastLED CRGB representation
 and in turn, it gives extra primitives that can be used against pixels, defined here: https://github.com/FastLED/FastLED/blob/master/pixeltypes.h#L90 )
 
-Example code: https://github.com/marcmerlin/SmartMatrix_GFX/blob/master/examples/MatrixGFXDemo/MatrixGFXDemo.ino
 
 This code was taken from FastLED_NeoMatrix and adapted to work with the SmartMatrix library. SmartMatrix is used to drive row scan panels. They are not as good as NeoPixel based panels which you can run with FastLED::NeoMatrix instead, but you should consider SmartMatrix driven panels if one of those reasons apply to you:
 * They are cheaper given that the pixels do not have logic (they also don't stay on unless you keep refreshing them)
@@ -19,6 +18,22 @@ This code was taken from FastLED_NeoMatrix and adapted to work with the SmartMat
 That being said, I do recommend that you use Neopixel matrices whenever you can as for their much better display quality, brightness, and being easier to drive, but if you decide to use scan based matrices for the reasons above and you'd like Adafruit::GFX compatibility, then this library is for you.
 
 It also offers FastLED compatibility if you'd like to use those primitives against your virtual display (like nblend, fade, etc...).
+
+Basic GFX Demo and Matrix config (SmartMatrix or FastLED NeoMatrix)
+-------------------------------------------------------------------
+Sample code: https://github.com/marcmerlin/SmartMatrix_GFX/blob/master/examples/MatrixGFXDemo/MatrixGFXDemo.ino  
+MatrixGFXDemo.ino hardcodes the SmartMatrix config and it's the simplest implementation.
+
+All other demos however use this common config.h which can be adjusted to use:
+- SmartMatrix
+- FastLED NeoMatrix ESP8266 parallel output
+- FastLED NeoMatrix ESP32 8 channel RMT parallel output (Sam driver)
+- FastLED NeoMatrix ESP32 16-24 channel big banging parallel output (Yves driver)
+- FastLED NeoMAtrix serial output is not present but trivial to add.
+
+See: https://github.com/marcmerlin/SmartMatrix_GFX/blob/master/examples/config.h  
+Sample usage: https://github.com/marcmerlin/SmartMatrix_GFX/blob/master/examples/fontzoom/fontzoom.ino
+
 
 RGB Panels vs NeoPixels and other addressable LEDs
 --------------------------------------------------
