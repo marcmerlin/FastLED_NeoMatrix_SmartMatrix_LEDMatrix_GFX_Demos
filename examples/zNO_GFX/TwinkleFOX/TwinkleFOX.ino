@@ -60,16 +60,9 @@
 //
 //  -Mark Kriegsman, December 2015
 
-#include "FastLED.h"
-#define LED_TYPE NEOPIXEL  // *Update to your strip type.  NEOPIXEL, APA102, LPD8806, etc..
-#define DATA_PIN D1         // *Set this to your data pin.
-#define NUM_LEDS 768        // *Update to the number of pixels in your strip.
-#define COLOR_ORDER GRB
-//#define COLOR_ORDER BGR
-#define BRIGHTNESS          64
-
-
-CRGBArray<NUM_LEDS> leds;
+#include "config.h"
+#include <FastLED_NeoMatrix.h>
+#include <FastLED.h>
 
 // Overall twinkle speed.
 // 0 (VERY slow) to 8 (VERY fast).  
@@ -112,9 +105,9 @@ CRGBPalette16 gTargetPalette;
 void setup() {
   delay( 1000 ); //safety startup delay
   Serial.begin(115200);
-  //FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811_PORTA,3>(leds, 256).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
+  matrix_setup();
+  matrix->begin();
+  Serial.println("Setup done");
 
   chooseNextColorPalette(gTargetPalette);
 }
@@ -129,9 +122,9 @@ void loop()
     nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
   }
 
-  drawTwinkles( leds);
+  drawTwinkles();
   
-  FastLED.show();
+  matrix->show();
 }
 
 
@@ -140,7 +133,7 @@ void loop()
 //  "CalculateOneTwinkle" on each pixel.  It then displays
 //  either the twinkle color of the background color, 
 //  whichever is brighter.
-void drawTwinkles( CRGBSet& L)
+void drawTwinkles( )
 {
   // "PRNG16" is the pseudorandom number generator
   // It MUST be reset to the same starting value each time
@@ -172,7 +165,7 @@ void drawTwinkles( CRGBSet& L)
 
   uint8_t backgroundBrightness = bg.getAverageLight();
   
-  for( CRGB& pixel: L) {
+  for ( uint16_t idx=0; idx < NUMMATRIX; idx++) {
     PRNG16 = (uint16_t)(PRNG16 * 2053) + 1384; // next 'random' number
     uint16_t myclockoffset16= PRNG16; // use that number as clock offset
     PRNG16 = (uint16_t)(PRNG16 * 2053) + 1384; // next 'random' number
@@ -191,15 +184,15 @@ void drawTwinkles( CRGBSet& L)
     if( deltabright >= 32 || (!bg)) {
       // If the new pixel is significantly brighter than the background color, 
       // use the new color.
-      pixel = c;
+      matrixleds[idx] = c;
     } else if( deltabright > 0 ) {
       // If the new pixel is just slightly brighter than the background color,
       // mix a blend of the new color and the background color
-      pixel = blend( bg, c, deltabright * 8);
+      matrixleds[idx] = blend( bg, c, deltabright * 8);
     } else { 
       // if the new pixel is not at all brighter than the background color,
       // just use the background color.
-      pixel = bg;
+      matrixleds[idx] = bg;
     }
   }
 }
@@ -245,12 +238,13 @@ CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
 // This function is like 'triwave8', which produces a 
 // symmetrical up-and-down triangle sawtooth waveform, except that this
 // function produces a triangle wave with a faster attack and a slower decay:
-//
-//     / \ 
-//    /     \ 
-//   /         \ 
-//  /             \ 
-//
+/*
+     / \ 
+    /     \ 
+   /         \ 
+  /             \ 
+*/
+
 
 uint8_t attackDecayWave8( uint8_t i)
 {

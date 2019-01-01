@@ -185,7 +185,11 @@ Dot gSparks[MAX_SHELLS][MAX_SPARKS];			//Creates an array object named gSparks o
 
 void fireworks() 
 {
+#ifdef NEOMATRIX
+	CRGB sky1(0,0,32);				// Background sky color (will only work if brightness is set high 128 or up !!)
+#else
 	CRGB sky1(0,0,17);				// Background sky color (will only work if brightness is set high 128 or up !!)
+#endif
 	CRGB sky2(32,32,64);				// Alternate sky color to create a star twinkle effect 
 
 	for( uint8_t h = 0; h < MATRIX_WIDTH; h++) {	// All leds will be set to 'sky1' (very dark blue) 

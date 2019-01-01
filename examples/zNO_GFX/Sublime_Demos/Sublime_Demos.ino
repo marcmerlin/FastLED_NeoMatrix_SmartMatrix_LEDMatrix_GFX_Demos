@@ -19,8 +19,7 @@
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-uint8_t intensity = 42;
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+uint8_t intensity = 255;
 
 CRGB solidColor = CRGB::Blue;
 CRGB solidRainColor = CRGB(60,80,90);
@@ -139,7 +138,7 @@ void theMatrix()
 void coloredRain()
 {
 	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
-	rain(60, 180, map8(intensity,2,60), 10, solidRainColor, true, true, false);
+	rain(60, 200, map8(intensity,2,60), 10, solidRainColor, true, true, false);
 }
 
 void stormyRain()
@@ -159,7 +158,11 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 
 	CRGB lightningColor = CRGB(72,72,80);
 	CRGBPalette16 rain_p( CRGB::Black, rainColor );
+#ifdef SMARTMATRIX
+	CRGBPalette16 rainClouds_p( CRGB::Black, CRGB(35,44,44), CRGB(29,35,35), CRGB::Black );
+#else
 	CRGBPalette16 rainClouds_p( CRGB::Black, CRGB(15,24,24), CRGB(9,15,15), CRGB::Black );
+#endif
 
 	fadeToBlackBy( leds, NUM_LEDS, 255-tailLength);
 
@@ -206,11 +209,13 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 		}
 
 		// Step 5. Add lightning if called for
-		#ifndef ESP32
 		if (storm) {
 			int lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
 
 			if (random16() < 72) {		// Odds of a lightning bolt
+			#ifdef ESP32
+			Serial.println("The lightening code hangs on ESP32, no idea why");
+			#else
 				lightning[scale8(random8(), MATRIX_WIDTH-1)][MATRIX_HEIGHT-1] = 255;	// Random starting location
 				for(int ly = MATRIX_HEIGHT-1; ly > 0; ly--) {
 					for (int lx = 0; lx < MATRIX_WIDTH; lx++) {
@@ -243,9 +248,9 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 						}
 					}
 				}
+			#endif
 			}
 		}
-		#endif
 
 		// Step 6. Add clouds if called for
 		if (clouds) {
@@ -553,7 +558,7 @@ void loop()
 	// Call the current pattern function once, updating the 'leds' array
 	gPatterns[gCurrentPatternNumber]();
 
-	matrix_show();
-	// feed watchdog
+	matrix->show();
+	// feed watchdog for ESP8266
 	yield();
 }
