@@ -157,14 +157,18 @@ class PatternCube : public Drawable {
     }
 
     unsigned int drawFrame() {
-//      uint8_t blurAmount = beatsin8(2, 10, 255);
+      uint8_t blurAmount = beatsin8(2, 10, 255);
 
 #if FASTLED_VERSION >= 3001000
-//      blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, blurAmount);
+      if (MATRIX_WIDTH > 32)  {
+        blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, 255);
+      } else {
+        fadeToBlackBy( matrixleds, NUMMATRIX, 128);
+      }
 #else
-//      effects.DimAll(blurAmount);
+      effects.DimAll(blurAmount);
 #endif
-      fadeToBlackBy( matrixleds, NUMMATRIX, 128);
+      //fadeToBlackBy( matrixleds, NUMMATRIX, 128);
 
       zCamera = beatsin8(2, 100, 140);
       AngxSpeed = beatsin8(3, 1, 10) / 100.0f;
