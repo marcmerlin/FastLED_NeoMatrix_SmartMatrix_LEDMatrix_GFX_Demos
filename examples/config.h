@@ -32,8 +32,9 @@
 
 // The above optional defines must be before FastLED is included.
 #include <Adafruit_GFX.h>
-#include <SmartMatrix_GFX.h>
+#include <SmartLEDShieldV4.h>  // comment out this line for if you're not using SmartLED Shield V4 hardware (this line needs to be before #include <SmartMatrix3.h>)
 #include <SmartMatrix3.h>
+#include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 
 

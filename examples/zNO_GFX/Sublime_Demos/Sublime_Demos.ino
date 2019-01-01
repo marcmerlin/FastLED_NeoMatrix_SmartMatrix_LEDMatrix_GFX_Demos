@@ -79,7 +79,6 @@ void fire()
 #else
 	#define FIRE_BASE	MATRIX_HEIGHT/6+1
 #endif
-	static uint8_t currentPaletteIndex = 0;
 	static uint8_t currentFirePaletteIndex = 0;
 	// COOLING: How much does the air cool as it rises?
 	// Less cooling = taller flames.  More cooling = shorter flames.
@@ -111,7 +110,7 @@ void fire()
 		}
 
 		// Step 2.  Heat from each cell drifts 'up' and diffuses a little
-		for (int k = MATRIX_HEIGHT; k > 0; k--) {
+		for (int k = MATRIX_HEIGHT; k > 1; k--) {
 			tempMatrix[x][k] = (tempMatrix[x][k - 1] + tempMatrix[x][k - 2] + tempMatrix[x][k - 2]) / 3;
 		}
 
@@ -215,6 +214,8 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 			if (random16() < 72) {		// Odds of a lightning bolt
 			#ifdef ESP32
 			Serial.println("The lightening code hangs on ESP32, no idea why");
+			// I verified that it works on ESP8266, teensy 3.x, but it hangs on ESP32 and I can't
+			// find why...
 			#else
 				lightning[scale8(random8(), MATRIX_WIDTH-1)][MATRIX_HEIGHT-1] = 255;	// Random starting location
 				for(int ly = MATRIX_HEIGHT-1; ly > 0; ly--) {
@@ -513,6 +514,7 @@ SimplePatternList gPatterns = {
 
 void nextPattern()
 {
+  matrix->clear();
   // add one to the current pattern number, and wrap around at the end
   gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
   Serial.print("Switched to pattern #"); Serial.println(gCurrentPatternNumber);
@@ -553,7 +555,7 @@ void loop()
 		gHue++;  // slowly cycle the "base color" through the rainbow
 	}
 
-	EVERY_N_SECONDS( 10 ) { nextPattern(); } // change patterns periodically
+	EVERY_N_SECONDS( 20 ) { nextPattern(); } // change patterns periodically
 
 	// Call the current pattern function once, updating the 'leds' array
 	gPatterns[gCurrentPatternNumber]();

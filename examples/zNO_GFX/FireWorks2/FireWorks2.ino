@@ -199,7 +199,8 @@ void fireworks()
 	}
 
 	if( random8() < 48 ) {
-		matrixleds[XY2(random16(MATRIX_WIDTH),random16(MATRIX_HEIGHT))] = sky2;	// Around once each 8 frames, a random pixel is set to 'sky2' 
+		// Around once each 8 frames, a random pixel is set to 'sky2' 
+		matrixleds[XY2(random16(MATRIX_WIDTH),random16(MATRIX_HEIGHT))] = sky2;	
 	}
 
 	static uint8_t launchcountdown = 0;
