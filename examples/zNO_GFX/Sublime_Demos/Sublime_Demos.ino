@@ -20,6 +20,7 @@
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 uint8_t intensity = 255;
+uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
 
 CRGB solidColor = CRGB::Blue;
 CRGB solidRainColor = CRGB(60,80,90);
@@ -209,8 +210,6 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 
 		// Step 5. Add lightning if called for
 		if (storm) {
-			int lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
-
 			if (random16() < 72) {		// Odds of a lightning bolt
 				lightning[scale8(random8(), MATRIX_WIDTH-1)][MATRIX_HEIGHT-1] = 255;	// Random starting location
 				for(int ly = MATRIX_HEIGHT-1; ly > 1; ly--) {
