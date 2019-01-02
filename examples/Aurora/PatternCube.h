@@ -157,7 +157,6 @@ class PatternCube : public Drawable {
     }
 
     unsigned int drawFrame() {
-      uint8_t blurAmount = beatsin8(2, 10, 255);
 
 #if FASTLED_VERSION >= 3001000
       if (MATRIX_WIDTH > 32)  {
@@ -166,6 +165,7 @@ class PatternCube : public Drawable {
         fadeToBlackBy( matrixleds, NUMMATRIX, 128);
       }
 #else
+      uint8_t blurAmount = beatsin8(2, 10, 255);
       effects.DimAll(blurAmount);
 #endif
       //fadeToBlackBy( matrixleds, NUMMATRIX, 128);

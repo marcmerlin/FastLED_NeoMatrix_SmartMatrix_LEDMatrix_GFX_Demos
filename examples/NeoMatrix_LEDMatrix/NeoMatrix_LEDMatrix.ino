@@ -6,40 +6,8 @@
 // By Marc MERLIN <marc_soft@merlins.org>
 // License: BSD-2
 
+#define LEDMATRIX
 #include "config.h"
-
-
-#if defined(ESP32) or defined(ESP8266)
-#define PIN 5
-#else
-#define PIN 13
-#endif
-
-// cLEDMatrix defines 
-cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
-    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
-
-
-// Normally we would define this:
-//CRGB leds[NUMMATRIX];
-
-// cLEDMatrix creates a FastLED array inside its object and we need to retrieve
-// a pointer to its first element to act as a regular FastLED array, necessary
-// for NeoMatrix and other operations that may work directly on the array like FadeAll.
-CRGB *leds = ledmatrix[0];
-
-SmartMatrix_GFX *matrix = new SmartMatrix_GFX(leds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
-MATRIX_TILE_H, MATRIX_TILE_V,
-  NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
-    NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG +
-    NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
-
-void matrix_clear() {
-    // FastLED.clear does not work properly with multiple matrices connected via parallel inputs
-    // on ESP8266 (not sure about other chips).
-    memset(leds, 0, NUMMATRIX*3);
-}
-
 
 // This could also be defined as matrix->color(255,0,0) but those defines
 // are meant to work for adafruit_gfx backends that are lacking color()
@@ -80,31 +48,8 @@ void matrix_clear() {
 #define LED_WHITE_MEDIUM	(LED_RED_MEDIUM  + LED_GREEN_MEDIUM  + LED_BLUE_MEDIUM)
 #define LED_WHITE_HIGH		(LED_RED_HIGH    + LED_GREEN_HIGH    + LED_BLUE_HIGH)
 
-// In a case of a tile of neomatrices, this test is helpful to make sure that the
-// pixels are all in sequence (to check your wiring order and the tile options you
-// gave to the constructor).
-void count_pixels() {
-    matrix_clear();
-    for (uint16_t i=0; i<mh; i++) {
-	for (uint16_t j=0; j<mw; j++) {
-	    matrix->drawPixel(j, i, i%3==0?LED_BLUE_HIGH:i%3==1?LED_RED_HIGH:LED_GREEN_HIGH);
-	    // depending on the matrix size, it's too slow to display each pixel, so
-	    // make the scan init faster. This will however be too fast on a small matrix.
-	    #ifdef ESP8266
-	    if (!(j%3)) matrix->show();
-	    yield(); // reset watchdog timer
-	    #elif ESP32
-	    delay(1);
-	    matrix->show();
-	    #else
-	    matrix->show();
-	    #endif
-	}
-    }
-}
-
 void display_lines() {
-    matrix_clear();
+    matrix->clear();
 
     // 4 levels of crossing red lines.
     matrix->drawLine(0,mh/2-2, mw-1,2, LED_RED_VERYLOW);
@@ -125,7 +70,7 @@ void display_lines() {
 }
 
 void display_boxes() {
-    matrix_clear();
+    matrix->clear();
     matrix->drawRect(0,0, mw,mh, LED_BLUE_HIGH);
     matrix->drawRect(1,1, mw-2,mh-2, LED_GREEN_MEDIUM);
     matrix->fillRect(2,2, mw-4,mh-4, LED_RED_HIGH);
@@ -134,7 +79,7 @@ void display_boxes() {
 }
 
 void display_circles() {
-    matrix_clear();
+    matrix->clear();
     matrix->drawCircle(mw/2,mh/2, 2, LED_RED_MEDIUM);
     matrix->drawCircle(mw/2-1-min(mw,mh)/8, mh/2-1-min(mw,mh)/8, min(mw,mh)/4, LED_BLUE_HIGH);
     matrix->drawCircle(mw/2+1+min(mw,mh)/8, mh/2+1+min(mw,mh)/8, min(mw,mh)/4-1, LED_ORANGE_MEDIUM);
@@ -146,17 +91,10 @@ void display_circles() {
 
 
 void loop() {
-#if 0
-    Serial.println("Count pixels");
-    count_pixels();
-    Serial.println("Count pixels done");
-    delay(1000);
-#endif
-
     Serial.println("Use LEDMatrix to display a flag");
     flag();
     delay(3000);
-    matrix_clear();
+    matrix->clear();
 
     Serial.println("Back to NeoMatrix/GFX to Display lines, boxes and circles");
     display_lines();
@@ -167,29 +105,19 @@ void loop() {
 
     display_circles();
     delay(3000);
-    matrix_clear();
+    matrix->clear();
 
 
     Serial.println("Demo loop done, starting over");
 }
 
 void setup() {
-    // Normal output
-    FastLED.addLeds<NEOPIXEL,PIN>(leds, NUMMATRIX).setCorrection(TypicalLEDStrip);
-    // Parallel output on 3 lines (ESP8266)
-    //FastLED.addLeds<WS2811_PORTA,3>(leds, NUMMATRIX/3).setCorrection(TypicalLEDStrip);
-    // Time for serial port to work?
     delay(1000);
     Serial.begin(115200);
-    Serial.print("Matrix Size: ");
-    Serial.print(mw);
-    Serial.print(" ");
-    Serial.println(mh);
-    matrix->begin();
-    matrix->setTextWrap(false);
-    matrix->setBrightness(BRIGHTNESS);
+
+    matrix_setup();
     // Mix in an init of LEDMatrix
-    sprite_setup();
+    ledmatrix_setup();
     delay(2000);
     Serial.println("If the code crashes here, decrease the brightness or turn off the all white display below");
     // Test full bright of all LEDs. If brightness is too high
@@ -199,8 +127,8 @@ void setup() {
     matrix->show();
     Serial.println("First matrix->show did not crash/hang, trying clear");
     delay(3000);
-    matrix_clear();
-    Serial.println("First matrix_clear done");
+    matrix->clear();
+    Serial.println("First matrix->clear done");
 #endif
 }
 

@@ -2,6 +2,8 @@
 #define config_h
 
 #define SMARTMATRIX
+
+// The ESP32 FastLED defines below must be defined before FastLED.h is loaded
 #ifndef SMARTMATRIX
 #ifdef ESP32
 // 64x64 matrix with optional 16 pin parallel driver
@@ -37,6 +39,10 @@
 #include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 
+#ifdef LEDMATRIX
+#include <LEDMatrix.h>
+#endif
+
 
 // Separate Neopixel Strip, if used. Not the NeoMatrix
 uint8_t led_brightness = 64;
@@ -65,15 +71,31 @@ const uint8_t matrix_brightness = 255;
 #define kMatrixHeight mh       // known working: 16, 32, 48, 64
 const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
 const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
+#ifndef __MK66FX1M0__
+#warning "Compiling for non teensy with 64x32 16 scan panel"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
-//const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+#else // my teensy 3.6 is connected to a 64x64 panel
+#warning "Compiling for Teensy with 64x64 32 scan panel"
+const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+#endif
 const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_NONE);      // see http://docs.pixelmatix.com/SmartMatrix for options
 const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
 
 SMARTMATRIX_ALLOCATE_BUFFERS(matrixLayer, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
 SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
 
+#ifdef LEDMATRIX
+// cLEDMatrix defines 
+cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+
+// cLEDMatrix creates a FastLED array inside its object and we need to retrieve
+// a pointer to its first element to act as a regular FastLED array, necessary
+// for NeoMatrix and other operations that may work directly on the array like FadeAll.
+CRGB *matrixleds = ledmatrix[0];
+#else
 CRGB matrixleds[NUMMATRIX];
+#endif
 
 // Sadly this callback function must be copied around with this init code
 void show_callback() {
@@ -110,7 +132,20 @@ const uint8_t matrix_brightness = 64;
 #define MATRIX_WIDTH mw
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+#ifdef LEDMATRIX
 CRGB matrixleds[NUMMATRIX];
+// cLEDMatrix defines 
+cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+
+// cLEDMatrix creates a FastLED array inside its object and we need to retrieve
+// a pointer to its first element to act as a regular FastLED array, necessary
+// for NeoMatrix and other operations that may work directly on the array like FadeAll.
+CRGB *matrixleds = ledmatrix[0];
+#else
+CRGB matrixleds[NUMMATRIX];
+#endif
+
 
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V, 
   NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
@@ -140,7 +175,19 @@ const uint8_t matrix_brightness = 32;
 #define MATRIX_WIDTH mw
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+#ifdef LEDMATRIX
 CRGB matrixleds[NUMMATRIX];
+// cLEDMatrix defines 
+cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+
+// cLEDMatrix creates a FastLED array inside its object and we need to retrieve
+// a pointer to its first element to act as a regular FastLED array, necessary
+// for NeoMatrix and other operations that may work directly on the array like FadeAll.
+CRGB *matrixleds = ledmatrix[0];
+#else
+CRGB matrixleds[NUMMATRIX];
+#endif
 
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,  
     NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
