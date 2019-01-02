@@ -1,10 +1,7 @@
 // code by Mark Estes
 // this version has audio input turned off unless you are specific matrix size
 
-#include <SPI.h>
-
-#include <FastLED.h>        //https://github.com/FastLED/FastLED
-#include <LEDMatrix.h>    //https://github.com/Jorgen-VikingGod/LEDMatrix
+#define LEDMATRIX
 #include "config.h"
 #define zeds ledmatrix
 
@@ -57,8 +54,6 @@ void setup()
 {
   matrix_setup();
 
-
-  //  FastLED.setMaxPowerInMilliWatts(MAXPOW);//24000 works
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / (MATRIX_WIDTH - 1)); //mstep is the step size to distribute 256 over an array the width of the matrix
@@ -81,7 +76,7 @@ void setup()
     waiter[i] = 10;
   whatami();//this prints out the current status of stuff
   smile2();// make one frame of the smile 2 pattern
-  FastLED.show();
+  matrix->show();
   delay(1000);
   //zoro();//helpful with matrix mapping and wiring
   //delay(60000);//helpful with pixel mapping
@@ -148,7 +143,7 @@ void loop()
 
   runpattern();//got generate a updted screen
   counter++;//increment the counter which is used for many things
-  FastLED.show();
+  matrix->show();
   delay(waiter[pattern]);//frame rate control
   if (Serial.available()) readchar = Serial.read(); else readchar = 0;
   if (readchar > 31 || millis() > lastmillis + dwell)//when to change patterns
