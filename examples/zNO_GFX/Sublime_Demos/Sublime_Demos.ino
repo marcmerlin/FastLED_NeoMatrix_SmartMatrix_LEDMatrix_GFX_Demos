@@ -212,23 +212,15 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 			int lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
 
 			if (random16() < 72) {		// Odds of a lightning bolt
-			#ifdef ESP32a
-			Serial.println("The lightening code hangs on ESP32, no idea why");
-			// I verified that it works on ESP8266, teensy 3.x, but it hangs on ESP32 and I can't
-			// find why...
-			#else
 				lightning[scale8(random8(), MATRIX_WIDTH-1)][MATRIX_HEIGHT-1] = 255;	// Random starting location
 				for(int ly = MATRIX_HEIGHT-1; ly > 1; ly--) {
 					for (int lx = 1; lx < MATRIX_WIDTH-1; lx++) {
 						if (lightning[lx][ly] == 255) {
 							lightning[lx][ly] = 0;
-							// storm crashes here on ESP32. no idea why.
 							uint8_t dir = random8(4);
 							switch (dir) {
 								case 0:
-									// storm also crashes here, again no idea why
 									leds[XY2(lx+1,ly-1,true)] = lightningColor;
-									// but not here
 									lightning[wrapX(lx+1)][ly-1] = 255;	// move down and right
 								break;
 								case 1:
@@ -249,7 +241,6 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 						}
 					}
 				}
-			#endif
 			}
 		}
 
