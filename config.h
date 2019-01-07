@@ -186,10 +186,6 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
     NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG + 
     NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
 
-// If the matrix is not 32x32, adjust how the image is displayed
-#define OFFSETX -4
-#define OFFSETY 0
-
 //---------------------------------------------------------------------------- 
 #elif defined(M16BY16T4)
 const uint8_t matrix_brightness = 64;
@@ -321,14 +317,6 @@ void FastLEDshowTask(void *pvParameters)
 #endif // end Matrix resolution and display defines
 
 //============================================================================ 
-
-
-#ifndef OFFSETX
-#define OFFSETX 0
-#endif
-#ifndef OFFSETY
-#define OFFSETY 0
-#endif
 
 #ifdef ESP8266 // For my shirt demo
 // This is for a neopixel strip, not the array.
