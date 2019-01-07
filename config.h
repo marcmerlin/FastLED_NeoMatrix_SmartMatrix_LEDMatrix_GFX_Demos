@@ -1,81 +1,86 @@
-#ifndef config_h
-#define config_h
+#ifndef neomatrix_config_h
+#define neomatrix_config_h
 
+#ifndef NEOPIXEL_MATRIX
 #define SMARTMATRIX
+#endif
+
+#include <Adafruit_GFX.h>
+
+//============================================================================ 
+// Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
+//============================================================================ 
 
 // The ESP32 FastLED defines below must be defined before FastLED.h is loaded
 #ifndef SMARTMATRIX
-#ifdef ESP32
-// 64x64 matrix with optional 16 pin parallel driver
-// 55fps without 16PINS, 110fps with 16PINS
-#define ESP32_16PINS
-#elif ESP8266
-// ESP8266 shirt with neopixel strips
-#define M32B8X3
-#else
-#error Please write a matrix config
-#endif
+    #ifdef ESP32
+        #ifdef ESP32_16PINS
+            // This uses https://github.com/hpwit/fastled-esp32-16PINS.git
+            // instead of https://github.com/samguyer/FastLED.git
+            #define FASTLED_ALLOW_INTERRUPTS 0
+            #define FASTLED_SHOW_CORE 0
+        #else
+            // Allow infrared
+            #define FASTLED_ALLOW_INTERRUPTS 1
+            #pragma message "Please use https://github.com/samguyer/FastLED.git if stock FastLED is unstable with ESP32"
+        #endif // ESP32_16PINS
+    #endif
 
-#ifdef ESP32
-    #ifdef ESP32_16PINS
-    // This uses https://github.com/hpwit/fastled-esp32-16PINS.git
-    // instead of https://github.com/samguyer/FastLED.git
-    #define FASTLED_ALLOW_INTERRUPTS 0
-    #define FASTLED_SHOW_CORE 0
-    #else
-    // Allow infrared
-    #define FASTLED_ALLOW_INTERRUPTS 1
-    #endif // ESP32_16PINS
-#endif
-#if defined(ESP32) && ! defined(ESP32_16PINS)
-#pragma message "Please use https://github.com/samguyer/FastLED.git as stock FastLED is unstable with ESP32"
-#endif
+    #if !defined(M16BY16T4)
+        #ifdef ESP32
+            // 64x64 matrix with optional 16 pin parallel driver
+            #define M64BY64
+            // 55fps without 16PINS, 110fps with 16PINS
+            //#define ESP32_16PINS
+        #elif ESP8266
+            // ESP8266 shirt with neopixel strips
+            #define M32B8X3
+        #endif
+    #endif
+    
+    #include <FastLED_NeoMatrix.h>
+#else
+    #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware
+    #include <SmartMatrix3.h>
+    #include <SmartMatrix_GFX.h>
 #endif // SMARTMATRIX
 
-// The above optional defines must be before FastLED is included.
-#include <Adafruit_GFX.h>
-#include <SmartLEDShieldV4.h>  // comment out this line for if you're not using SmartLED Shield V4 hardware (this line needs to be before #include <SmartMatrix3.h>)
-#include <SmartMatrix3.h>
-#include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 
 #ifdef LEDMATRIX
 #include <LEDMatrix.h>
 #endif
 
-
-// Separate Neopixel Strip, if used. Not the NeoMatrix
-uint8_t led_brightness = 64;
 #if defined(SMARTMATRIX)
 const uint8_t matrix_brightness = 255;
 // Used by LEDMatrix
-#define MATRIX_TILE_WIDTH   64 // width of EACH NEOPIXEL MATRIX (not total display)
-#define MATRIX_TILE_HEIGHT  64 // height of each matrix
-#define MATRIX_TILE_H       1  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       1  // number of matrices arranged vertically
+const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint8_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
 // Used by NeoMatrix
-#define mw (MATRIX_TILE_WIDTH *  MATRIX_TILE_H)
-#define mh (MATRIX_TILE_HEIGHT * MATRIX_TILE_V)
-#define NUMMATRIX (mw*mh)
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint16_t NUMMATRIX = mw*mh;
 
 // Compat for some other demos
-#define NUM_LEDS NUMMATRIX 
-#define MATRIX_HEIGHT mh
-#define MATRIX_WIDTH mw
+const uint16_t NUM_LEDS = NUMMATRIX; 
+const uint8_t MATRIX_HEIGHT = mh;
+const uint8_t MATRIX_WIDTH = mw;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 /// SmartMatrix Defines
-#define COLOR_DEPTH 24                  // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
-#define kMatrixWidth  mw       // known working: 32, 64, 96, 128
-#define kMatrixHeight mh       // known working: 16, 32, 48, 64
+#define COLOR_DEPTH 24         // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
+const uint8_t kMatrixWidth = mw;
+const uint8_t kMatrixHeight = mh;
 const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
 const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
 #ifndef __MK66FX1M0__
-#warning "Compiling for non teensy with 64x32 16 scan panel"
+#pragma message "Compiling for non teensy with 64x32 16 scan panel"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 #else // my teensy 3.6 is connected to a 64x64 panel
-#warning "Compiling for Teensy with 64x64 32 scan panel"
+#pragma message "Compiling for Teensy with 64x64 32 scan panel"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
 #endif
 const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_NONE);      // see http://docs.pixelmatix.com/SmartMatrix for options
@@ -113,23 +118,24 @@ void show_callback() {
 
 SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, show_callback);
 
+//---------------------------------------------------------------------------- 
 #elif defined(M32B8X3)
 const uint8_t matrix_brightness = 64;
 // Used by LEDMatrix
-#define MATRIX_TILE_WIDTH   8 // width of EACH NEOPIXEL MATRIX (not total display)
-#define MATRIX_TILE_HEIGHT  32 // height of each matrix
-#define MATRIX_TILE_H       3  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       1  // number of matrices arranged vertically
+const uint8_t MATRIX_TILE_WIDTH = 8; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint8_t MATRIX_TILE_HEIGHT= 32; // height of each matrix
+const uint8_t MATRIX_TILE_H     = 3;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
 // Used by NeoMatrix
-#define mw (MATRIX_TILE_WIDTH *  MATRIX_TILE_H)
-#define mh (MATRIX_TILE_HEIGHT * MATRIX_TILE_V)
-#define NUMMATRIX (mw*mh)
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint16_t NUMMATRIX = mw*mh;
 
 // Compat for some other demos
-#define NUM_LEDS NUMMATRIX 
-#define MATRIX_HEIGHT mh
-#define MATRIX_WIDTH mw
+const uint16_t NUM_LEDS = NUMMATRIX; 
+const uint8_t MATRIX_HEIGHT = mh;
+const uint8_t MATRIX_WIDTH = mw;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
@@ -147,32 +153,111 @@ CRGB matrixleds[NUMMATRIX];
 #endif
 
 
+// MATRIX DECLARATION:
+// Parameter 1 = width of EACH NEOPIXEL MATRIX (not total display)
+// Parameter 2 = height of each matrix
+// Parameter 3 = number of matrices arranged horizontally
+// Parameter 4 = number of matrices arranged vertically
+// Parameter 5 = pin number (most are valid)
+// Parameter 6 = matrix layout flags, add together as needed:
+//   NEO_MATRIX_TOP, NEO_MATRIX_BOTTOM, NEO_MATRIX_LEFT, NEO_MATRIX_RIGHT:
+//     Position of the FIRST LED in the FIRST MATRIX; pick two, e.g.
+//     NEO_MATRIX_TOP + NEO_MATRIX_LEFT for the top-left corner.
+//   NEO_MATRIX_ROWS, NEO_MATRIX_COLUMNS: LEDs WITHIN EACH MATRIX are
+//     arranged in horizontal rows or in vertical columns, respectively;
+//     pick one or the other.
+//   NEO_MATRIX_PROGRESSIVE, NEO_MATRIX_ZIGZAG: all rows/columns WITHIN
+//     EACH MATRIX proceed in the same order, or alternate lines reverse
+//     direction; pick one.
+//   NEO_TILE_TOP, NEO_TILE_BOTTOM, NEO_TILE_LEFT, NEO_TILE_RIGHT:
+//     Position of the FIRST MATRIX (tile) in the OVERALL DISPLAY; pick
+//     two, e.g. NEO_TILE_TOP + NEO_TILE_LEFT for the top-left corner.
+//   NEO_TILE_ROWS, NEO_TILE_COLUMNS: the matrices in the OVERALL DISPLAY
+//     are arranged in horizontal rows or in vertical columns, respectively;
+//     pick one or the other.
+//   NEO_TILE_PROGRESSIVE, NEO_TILE_ZIGZAG: the ROWS/COLUMS OF MATRICES
+//     (tiles) in the OVERALL DISPLAY proceed in the same order for every
+//     line, or alternate lines reverse direction; pick one.  When using
+//     zig-zag order, the orientation of the matrices in alternate rows
+//     will be rotated 180 degrees (this is normal -- simplifies wiring).
+//   See example below for these values in action.
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V, 
   NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
     NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG + 
     NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
 
-#else
+// If the matrix is not 32x32, adjust how the image is displayed
+#define OFFSETX -4
+#define OFFSETY 0
+
 //---------------------------------------------------------------------------- 
+#elif defined(M16BY16T4)
+const uint8_t matrix_brightness = 64;
+
+const uint8_t MATRIX_TILE_WIDTH = 16; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint8_t MATRIX_TILE_HEIGHT= 16; // height of each matrix
+const uint8_t MATRIX_TILE_H     = 2; // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 2; // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint16_t NUMMATRIX = mw*mh;
+
+// Compat for some other demos
+const uint16_t NUM_LEDS = NUMMATRIX; 
+const uint8_t MATRIX_HEIGHT = mh;
+const uint8_t MATRIX_WIDTH = mw;
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
+#ifdef LEDMATRIX
+CRGB matrixleds[NUMMATRIX];
+// cLEDMatrix defines 
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+
+// cLEDMatrix creates a FastLED array inside its object and we need to retrieve
+// a pointer to its first element to act as a regular FastLED array, necessary
+// for NeoMatrix and other operations that may work directly on the array like FadeAll.
+CRGB *matrixleds = ledmatrix[0];
+#else
+CRGB matrixleds[NUMMATRIX];
+#endif
+
+FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V, 
+  NEO_MATRIX_BOTTOM     + NEO_MATRIX_RIGHT +
+    NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG + 
+    NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
+
+#ifdef ESP8266
+const uint8_t MATRIXPIN = 5
+#else
+const uint8_t MATRIXPIN = 13
+#endif
+
+
+//---------------------------------------------------------------------------- 
+#elif defined(M64BY64) // 64x64 straight connection (no matrices)
+// http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
 const uint8_t matrix_brightness = 32;
 //
 // Used by LEDMatrix
-#define MATRIX_TILE_WIDTH   64 // width of EACH NEOPIXEL MATRIX (not total display)
-#define MATRIX_TILE_HEIGHT  64 // height of each matrix
-#define MATRIX_TILE_H       1  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       1  // number of matrices arranged vertically
+const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint8_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 #define NUM_STRIPS 16
 #define NUM_LEDS_PER_STRIP 256
 
 // Used by NeoMatrix
-#define mw (MATRIX_TILE_WIDTH *  MATRIX_TILE_H)
-#define mh (MATRIX_TILE_HEIGHT * MATRIX_TILE_V)
-#define NUMMATRIX (mw*mh)
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint16_t NUMMATRIX = mw*mh;
 
 // Compat for some other demos
-#define NUM_LEDS NUMMATRIX 
-#define MATRIX_HEIGHT mh
-#define MATRIX_WIDTH mw
+const uint16_t NUM_LEDS = NUMMATRIX; 
+const uint8_t MATRIX_HEIGHT = mh;
+const uint8_t MATRIX_WIDTH = mw;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
@@ -191,7 +276,7 @@ CRGB matrixleds[NUMMATRIX];
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,  
     NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
-`
+
 #ifdef ESP32_16PINS
 FASTLED_USING_NAMESPACE
 // -- Task handles for use in the notifications
@@ -231,21 +316,23 @@ void FastLEDshowTask(void *pvParameters)
     }
 }
 #endif // ESP32_16PINS
+#else
+#error Please write a matrix config
+#endif // end Matrix resolution and display defines
+
+//============================================================================ 
+
+
+#ifndef OFFSETX
+#define OFFSETX 0
+#endif
+#ifndef OFFSETY
+#define OFFSETY 0
 #endif
 
-// Like XY, but for a mirror image from the top (used by misconfigured code)
-int XY2( int x, int y, bool wrap=false) { 
-    return matrix->XY(x,MATRIX_HEIGHT-1-y);
-}
-
-
-uint16_t XY( uint8_t x, uint8_t y) {
-    return matrix->XY(x,y);
-}
-
-#ifdef ESP8266
+#ifdef ESP8266 // For my shirt demo
+// This is for a neopixel strip, not the array.
 #define NEOPIXEL_PIN D1 // GPIO5
-
 
 // D4 is also the system LED, causing it to blink on IR receive, which is great.
 #define RECV_PIN D4     // GPIO2
@@ -260,12 +347,22 @@ extern "C" {
 // min/max are broken by the ESP8266 include
 #define min(a,b) (a<b)?(a):(b)
 #define max(a,b) (a>b)?(a):(b)
-#endif
+#endif // ESP8266
 
-bool matrix_reset_demo = 1;
 
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns
 uint16_t speed = 255;
+
+float matrix_gamma = 1; // higher number is darker, needed for Neomatrix more than SmartMatrix
+
+// Like XY, but for a mirror image from the top (used by misconfigured code)
+int XY2( int x, int y, bool wrap=false) { 
+    return matrix->XY(x,MATRIX_HEIGHT-1-y);
+}
+
+uint16_t XY( uint8_t x, uint8_t y) {
+    return matrix->XY(x,y);
+}
 
 int wrapX(int x) { 
 	if (x < 0 ) return 0;
@@ -273,12 +370,11 @@ int wrapX(int x) {
 	return x;
 }
 
-void matrix_show();
-void aurora_setup();
-
 
 void matrix_setup() {
+    matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
 #if defined(SMARTMATRIX)
+    matrix_gamma = 1; // SmartMatrix should be good by default.
     matrixLayer.addLayer(&backgroundLayer); 
     matrixLayer.begin();
     matrixLayer.setBrightness(matrix_brightness);
@@ -291,6 +387,7 @@ void matrix_setup() {
     delay(1000);
     Serial.print("SmartMatrix GFX output, total LEDs: ");
     Serial.println(NUMMATRIX);
+// Example of parallel output
 #elif defined(M32B8X3)
     // Init Matrix
     // Serialized, 768 pixels takes 26 seconds for 1000 updates or 26ms per refresh
@@ -298,10 +395,21 @@ void matrix_setup() {
     // https://github.com/FastLED/FastLED/wiki/Parallel-Output
     // WS2811_PORTA - pins 12, 13, 14 and 15 or pins 6,7,5 and 8 on the NodeMCU
     // This is much faster 1000 updates in 10sec
-    //FastLED.addLeds<NEOPIXEL,PIN>(matrixleds, NUMMATRIX); 
-    FastLED.addLeds<WS2811_PORTA,3>(matrixleds, NUMMATRIX/3).setCorrection(TypicalLEDStrip);
+// See  https://github.com/FastLED/FastLED/wiki/Parallel-Output for pin definitions
+    #ifdef ESP8266
+    FastLED.addLeds<WS2811_PORTA,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
+    #else
+    FastLED.addLeds<WS2811_PORTD,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
+    #endif
     Serial.print("Neomatrix parallel output, total LEDs: ");
     Serial.println(NUMMATRIX);
+// Serialized (slow-ish) output
+#elif defined(M16BY16T4)
+    FastLED.addLeds<NEOPIXEL,MATRIXPIN>(matrixleds, NUMMATRIX).setCorrection(TypicalLEDStrip);
+    Serial.print("Neomatrix total LEDs: ");
+    Serial.print(NUMMATRIX);
+    Serial.print(" running on pin: ");
+// 64x64 straight wiring
 #else
     // https://github.com/FastLED/FastLED/wiki/Multiple-Controller-Examples
     #ifdef ESP32_16PINS
@@ -338,6 +446,7 @@ void matrix_setup() {
 #if !defined(SMARTMATRIX)
     FastLED.setBrightness(matrix_brightness);
 #endif
+    if (matrix_gamma != 1) matrix->precal_gamma(matrix_gamma);
 }
 
-#endif // config.h
+#endif
