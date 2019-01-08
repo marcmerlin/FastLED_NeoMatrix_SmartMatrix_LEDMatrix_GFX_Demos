@@ -10,6 +10,7 @@
 
 
 int8_t matrix_loop = -1;
+uint8_t matrix_reset_demo = 1;
 
 // ---------------------------------------------------------------------------
 // Shared functions

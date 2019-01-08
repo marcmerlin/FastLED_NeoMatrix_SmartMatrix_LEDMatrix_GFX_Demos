@@ -1,6 +1,8 @@
 #ifndef neomatrix_config_h
 #define neomatrix_config_h
 
+//#define M16BY16T4
+//#define NEOPIXEL_MATRIX
 #ifndef NEOPIXEL_MATRIX
 #define SMARTMATRIX
 #endif
@@ -139,7 +141,6 @@ const uint8_t MATRIX_WIDTH = mw;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
-CRGB matrixleds[NUMMATRIX];
 // cLEDMatrix defines 
 cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
     MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
@@ -188,7 +189,7 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
 
 //---------------------------------------------------------------------------- 
 #elif defined(M16BY16T4)
-const uint8_t matrix_brightness = 64;
+const uint8_t matrix_brightness = 32;
 
 const uint8_t MATRIX_TILE_WIDTH = 16; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_HEIGHT= 16; // height of each matrix
@@ -207,7 +208,6 @@ const uint8_t MATRIX_WIDTH = mw;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
-CRGB matrixleds[NUMMATRIX];
 // cLEDMatrix defines 
 cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
     MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
@@ -226,9 +226,9 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
     NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
 
 #ifdef ESP8266
-const uint8_t MATRIXPIN = 5
+const uint8_t MATRIXPIN = 5;
 #else
-const uint8_t MATRIXPIN = 13
+const uint8_t MATRIXPIN = 13;
 #endif
 
 
@@ -257,7 +257,6 @@ const uint8_t MATRIX_WIDTH = mw;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
-CRGB matrixleds[NUMMATRIX];
 // cLEDMatrix defines 
 cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmatrix;
 
@@ -318,13 +317,7 @@ void FastLEDshowTask(void *pvParameters)
 
 //============================================================================ 
 
-#ifdef ESP8266 // For my shirt demo
-// This is for a neopixel strip, not the array.
-#define NEOPIXEL_PIN D1 // GPIO5
-
-// D4 is also the system LED, causing it to blink on IR receive, which is great.
-#define RECV_PIN D4     // GPIO2
-
+#ifdef ESP8266
 // Turn off Wifi in setup()
 // https://www.hackster.io/rayburne/esp8266-turn-off-wifi-reduce-current-big-time-1df8ae
 //
@@ -397,6 +390,7 @@ void matrix_setup() {
     Serial.print("Neomatrix total LEDs: ");
     Serial.print(NUMMATRIX);
     Serial.print(" running on pin: ");
+    Serial.println(MATRIXPIN);
 // 64x64 straight wiring
 #else
     // https://github.com/FastLED/FastLED/wiki/Multiple-Controller-Examples
