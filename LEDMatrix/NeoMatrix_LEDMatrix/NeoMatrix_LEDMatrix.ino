@@ -118,18 +118,7 @@ void setup() {
     matrix_setup();
     // Mix in an init of LEDMatrix
     ledmatrix_setup();
-    delay(2000);
-    Serial.println("If the code crashes here, decrease the brightness or turn off the all white display below");
-    // Test full bright of all LEDs. If brightness is too high
-    // for your current limit (i.e. USB), decrease it.
-#ifndef DISABLE_WHITE
-    matrix->fillScreen(LED_WHITE_HIGH);
-    matrix->show();
-    Serial.println("First matrix->show did not crash/hang, trying clear");
-    delay(3000);
-    matrix->clear();
-    Serial.println("First matrix->clear done");
-#endif
+    delay(5000);
 }
 
 // vim:sts=4:sw=4

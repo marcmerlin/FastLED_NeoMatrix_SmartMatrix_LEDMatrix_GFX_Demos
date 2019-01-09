@@ -1,8 +1,8 @@
 #ifndef neomatrix_config_h
 #define neomatrix_config_h
 
-//#define M16BY16T4
-//#define NEOPIXEL_MATRIX
+#define M16BY16T4
+#define NEOPIXEL_MATRIX
 #ifndef NEOPIXEL_MATRIX
 #define SMARTMATRIX
 #endif
@@ -189,7 +189,7 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
 
 //---------------------------------------------------------------------------- 
 #elif defined(M16BY16T4)
-const uint8_t matrix_brightness = 32;
+const uint8_t matrix_brightness = 16;
 
 const uint8_t MATRIX_TILE_WIDTH = 16; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_HEIGHT= 16; // height of each matrix
@@ -209,8 +209,8 @@ const uint8_t MATRIX_WIDTH = mw;
 
 #ifdef LEDMATRIX
 // cLEDMatrix defines 
-cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
-    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, VERTICAL_BLOCKS> ledmatrix;
 
 // cLEDMatrix creates a FastLED array inside its object and we need to retrieve
 // a pointer to its first element to act as a regular FastLED array, necessary
