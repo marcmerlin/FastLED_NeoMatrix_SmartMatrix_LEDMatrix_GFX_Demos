@@ -1,47 +1,7 @@
-#include <FastLED.h>
-
-#include <LEDMatrix.h>
+#define LEDMATRIX
+#include "config.h"
 #include <LEDSprites.h>
-
-// Change the next 6 defines to match your matrix type and size
-
-#if 0
-#define LED_PIN        2
-#define COLOR_ORDER    GRB
-#define CHIPSET        WS2812B
-
-#define MATRIX_WIDTH   80
-#define MATRIX_HEIGHT  10
-#define MATRIX_TYPE    HORIZONTAL_MATRIX
-
-cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> leds;
-#endif
-
-#define MATRIX_TILE_WIDTH   8 // width of EACH NEOPIXEL MATRIX (not total display)
-#define MATRIX_TILE_HEIGHT  32 // height of each matrix
-#define MATRIX_TILE_H       3  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       1  // number of matrices arranged vertically
-#define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
-#define MATRIX_PANEL        (MATRIX_WIDTH*MATRIX_HEIGHT)
-
-#define MATRIX_WIDTH        (MATRIX_TILE_WIDTH*MATRIX_TILE_H)
-#define MATRIX_HEIGHT       (MATRIX_TILE_HEIGHT*MATRIX_TILE_V)
-
-#define NUM_LEDS            (MATRIX_WIDTH*MATRIX_HEIGHT)
-
-// create our matrix based on matrix definition
-//cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, VERTICAL_BLOCKS> leds;
-// Need to inverse height for things to look ok
-
-cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> leds;
-
-
-void matrix_clear() {
-    //FastLED[1].clearLedData();
-    // clear does not work properly with multiple matrices connected via parallel inputs
-    memset(leds[0], 0, NUM_LEDS*3);
-}
-
+#define leds ledmatrix
 
 cLEDSprites Sprites(&leds);
 
@@ -372,22 +332,7 @@ cSprite SprEyes(MY_SPRITE_WIDTH, MY_SPRITE_HEIGHT, EyesData, 1, _2BIT, EyesColTa
 
 void setup()
 {
-    delay(1000);
-    Serial.begin(115200);
-    Serial.println("Start setup");
-    //FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds[0], leds.Size());
-    FastLED.addLeds<WS2811_PORTA,3>(leds[0], 256).setCorrection(TypicalLEDStrip);
-    FastLED.setBrightness(32);
-    FastLED.clear(true);
-#if 0
-    matrix_clear();
-    leds.DrawLine (0, 0, leds.Width() - 1, leds.Height() - 1, CRGB(0, 255, 0));
-    leds.DrawPixel(0, 0, CRGB::Red);
-    leds.DrawPixel(leds.Width() - 1, leds.Height() - 1, CRGB::Blue);
-    FastLED.show();
-    delay(1000);
-    matrix_clear();
-#endif
+    matrix_setup();
 
     // Rate is a divider, higher rate is slower.
     SprPacmanRight.SetPositionFrameMotionOptions(0/*X*/, -10/*Y*/, 0/*Frame*/, 4/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_DETECT_COLLISION);
@@ -420,7 +365,7 @@ void loop()
     int8_t ex = SprEyes.m_X;
     int8_t ey = SprEyes.m_Y;
 
-    matrix_clear();
+    matrix->clear();
     leds.DrawLine (leds.Width()/2, MY_SPRITE_HEIGHT, leds.Width()/2, leds.Height() - 1 - MY_SPRITE_HEIGHT, CRGB::Grey);
     Sprites.UpdateSprites();
     Sprites.DetectCollisions();
@@ -600,9 +545,7 @@ void loop()
     }
 
     Sprites.RenderSprites();
-    FastLED.show();
+    matrix->show();
     delay(30);
-
-    
 }
 // vim:sts=4:sw=4

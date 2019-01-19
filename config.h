@@ -2,7 +2,7 @@
 #define neomatrix_config_h
 
 #define M16BY16T4
-#define NEOPIXEL_MATRIX
+//#define NEOPIXEL_MATRIX
 #ifndef NEOPIXEL_MATRIX
 #define SMARTMATRIX
 #endif
@@ -93,7 +93,7 @@ SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeig
 
 #ifdef LEDMATRIX
 // cLEDMatrix defines 
-cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
     MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
 
 // cLEDMatrix creates a FastLED array inside its object and we need to retrieve

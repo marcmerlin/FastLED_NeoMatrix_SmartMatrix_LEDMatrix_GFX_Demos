@@ -58,8 +58,8 @@ void setup()
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / (MATRIX_WIDTH - 1)); //mstep is the step size to distribute 256 over an array the width of the matrix
 
-  Serial.begin(115200);
-  Serial.println("Reset");
+  //Serial.begin(115200);
+  //Serial.println("Reset");
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
   lasttest = millis();
