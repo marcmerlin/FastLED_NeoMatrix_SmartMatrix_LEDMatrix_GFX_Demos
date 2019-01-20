@@ -106,15 +106,7 @@ CRGB matrixleds[NUMMATRIX];
 
 // Sadly this callback function must be copied around with this init code
 void show_callback() {
-    for (uint16_t y=0; y<kMatrixHeight; y++) {
-	for (uint16_t x=0; x<kMatrixWidth; x++) {
-	    CRGB led = matrixleds[x + kMatrixWidth*y];
-	    // rgb24 defined in MatrixComnon.h
-	    backgroundLayer.drawPixel(x, y, { led.r, led.g, led.b } );
-	}
-    }
-    // This should be zero copy
-    // that said, copy or no copy is about the same speed in the end.
+    memcpy(backgroundLayer.backBuffer(), matrixleds, kMatrixHeight*kMatrixWidth*3);
     backgroundLayer.swapBuffers(false);
 }
 
