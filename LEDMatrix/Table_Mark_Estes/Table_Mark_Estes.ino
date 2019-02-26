@@ -26,7 +26,7 @@ unsigned long lasttest, lastmillis, dwell = 5000,  longhammer;
 float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle;
 byte raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
 byte shifty = 6, pattern = 0, poffset;
-byte sinewidth, mstep, faudio[64], inner, bfade = 6;
+byte sinewidth, mstep, faudio[MATRIX_HEIGHT], inner, bfade = 6;
 int directn = 1, quash = 5;
 
 // This allows a selection of only my favourite patterns.
@@ -53,13 +53,12 @@ void matrix_clear() {
 void setup()
 {
   matrix_setup();
+  Serial.println("Reset");
 
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / (MATRIX_WIDTH - 1)); //mstep is the step size to distribute 256 over an array the width of the matrix
 
-  //Serial.begin(115200);
-  //Serial.println("Reset");
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
   lasttest = millis();
