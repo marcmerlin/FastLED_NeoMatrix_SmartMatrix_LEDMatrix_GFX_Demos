@@ -44,12 +44,6 @@ uint8_t bestpatterns[] = {
 #endif
 
 
-void matrix_clear() {
-    //FastLED[1].clearLedData();
-    // clear does not work properly with multiple matrices connected via parallel inputs
-    memset(zeds[0], 0, NUM_LEDS*3);
-}
-
 void setup()
 {
   matrix_setup();
@@ -62,8 +56,8 @@ void setup()
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
   lasttest = millis();
-  randomSeed(analogRead(0) - analogRead(3) + analogRead(5));
-
+  // This breaks ESP32 + SmartMatrix as some of those lines are used for input
+  //randomSeed(analogRead(0) - analogRead(3) + analogRead(5));
 
   hue = random8();//get a starting point for the color progressions
   adio = false; // turn off audio
@@ -76,7 +70,7 @@ void setup()
   whatami();//this prints out the current status of stuff
   smile2();// make one frame of the smile 2 pattern
   matrix->show();
-  delay(1000);
+  delay(3000);
   //zoro();//helpful with matrix mapping and wiring
   //delay(60000);//helpful with pixel mapping
 }
@@ -219,7 +213,7 @@ void newpattern()//generates all the randomness for each new pattern
   pattern = local_pattern;
 #endif
 
-  matrix_clear();
+  matrix->clear();
 
   targetfps = random(20, 30);
   bfade = random(1, 8);
