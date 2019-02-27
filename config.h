@@ -363,9 +363,11 @@ void matrix_setup() {
     Serial.println(NUMMATRIX);
     delay(1000);
     // Quick hello world test
+#ifndef DISABLE_MATRIX_TEST
     backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
     backgroundLayer.swapBuffers();
     delay(1000);
+#endif
 
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
 // Example of parallel output
@@ -435,6 +437,21 @@ void matrix_setup() {
     // Gamma is used by AnimatedGIFs, as such:
     // CRGB color = CRGB(matrix->gamma[red], matrix->gamma[green], matrix->gamma[blue]);
     matrix->precal_gamma(matrix_gamma);
+
+// LEDMatrix alignment is tricky, make sure things are aligned correctly
+#ifndef DISABLE_MATRIX_TEST
+#ifdef LEDMATRIX
+    ledmatrix.DrawLine (0, 0, ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 255, 0));
+    ledmatrix.DrawPixel(0, 0, CRGB(255, 0, 0));
+    ledmatrix.DrawPixel(ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 0, 255));
+
+    ledmatrix.DrawLine (ledmatrix.Width() - 5, 4, 4, ledmatrix.Height() - 5, CRGB(128, 128, 128));
+    ledmatrix.DrawPixel(ledmatrix.Width() - 5, 4,  CRGB(255, 64, 64));
+    ledmatrix.DrawPixel(4, ledmatrix.Height() - 5, CRGB(64, 64, 255));
+    matrix->show();
+    delay(1000);
+#endif
+#endif
 
     // At least on teensy, due to some framework bug it seems, early
     // serial output gets looped back into serial input
