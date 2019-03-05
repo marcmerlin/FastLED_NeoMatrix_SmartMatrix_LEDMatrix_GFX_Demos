@@ -41,7 +41,9 @@
     #endif
     
     #include <FastLED_NeoMatrix.h>
+    #pragma message "Compiling for NEOMATRIX"
 #else
+    #pragma message "Compiling for SMARTMATRIX with NEOMATRIX API"
     #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware
     #include <SmartMatrix3.h>
     #include <SmartMatrix_GFX.h>
@@ -313,6 +315,13 @@ void FastLEDshowTask(void *pvParameters)
 
 //============================================================================ 
 
+// Compat with SmartMatrix code that uses those variables
+// (but don't redefine for SmartMatrix backend)
+#ifdef NEOPIXEL_MATRIX
+const uint8_t kMatrixWidth = mw;
+const uint8_t kMatrixHeight = mh;
+#endif
+
 #ifdef ESP8266
 // Turn off Wifi in setup()
 // https://www.hackster.io/rayburne/esp8266-turn-off-wifi-reduce-current-big-time-1df8ae
@@ -364,6 +373,7 @@ void matrix_setup() {
     delay(1000);
     // Quick hello world test
 #ifndef DISABLE_MATRIX_TEST
+    Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Grey Demo");
     backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
     backgroundLayer.swapBuffers();
     delay(1000);
