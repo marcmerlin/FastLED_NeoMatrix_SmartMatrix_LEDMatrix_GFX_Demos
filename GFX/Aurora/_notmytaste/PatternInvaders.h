@@ -40,7 +40,7 @@ class PatternInvaders : public Drawable {
 
     void start() {
       //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-      matrix_clear();
+      matrix->clear();
     }
 
     unsigned int drawFrame() {
@@ -87,7 +87,7 @@ class PatternInvadersMedium : public Drawable {
 
     void start() {
       //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-      matrix_clear();
+      matrix->clear();
     }
 
     unsigned int drawFrame() {
@@ -131,12 +131,12 @@ class PatternInvadersLarge : public Drawable {
 
     void start() {
       //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-      matrix_clear();
+      matrix->clear();
     }
 
     unsigned int drawFrame() {
       //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-      matrix_clear();
+      matrix->clear();
 
       CRGB color1 = effects.ColorFromCurrentPalette(random(0, 255));
 

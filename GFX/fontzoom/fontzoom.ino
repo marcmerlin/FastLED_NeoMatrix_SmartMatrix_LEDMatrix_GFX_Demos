@@ -6,7 +6,7 @@
 #include <SmartMatrix_GFX.h>
 #include <FastLED.h>
 #include "fonts.h"
-#include "config.h"
+#include "neomatrix_config.h"
 
 
 int8_t matrix_loop = -1;

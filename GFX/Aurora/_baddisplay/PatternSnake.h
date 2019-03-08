@@ -119,7 +119,7 @@ public:
 
     unsigned int drawFrame() {
         //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-	matrix_clear();
+	matrix->clear();
 
         fill_palette(colors, SNAKE_LENGTH, initialHue++, 5, effects.currentPalette, 255, LINEARBLEND);
 

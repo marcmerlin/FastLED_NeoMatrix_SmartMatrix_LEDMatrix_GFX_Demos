@@ -7,7 +7,7 @@
 // License: BSD-2
 
 #define LEDMATRIX
-#include "config.h"
+#include "neomatrix_config.h"
 
 // This could also be defined as matrix->color(255,0,0) but those defines
 // are meant to work for adafruit_gfx backends that are lacking color()

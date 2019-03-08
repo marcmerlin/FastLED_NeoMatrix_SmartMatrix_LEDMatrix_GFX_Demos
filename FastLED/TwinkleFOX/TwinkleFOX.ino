@@ -60,7 +60,7 @@
 //
 //  -Mark Kriegsman, December 2015
 
-#include "config.h"
+#include "neomatrix_config.h"
 #include <FastLED_NeoMatrix.h>
 #include <FastLED.h>
 

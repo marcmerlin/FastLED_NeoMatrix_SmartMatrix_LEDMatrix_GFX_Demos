@@ -1,5 +1,5 @@
 #define LEDMATRIX
-#include "config.h"
+#include "neomatrix_config.h"
 
 
 void ledmatrix_setup()

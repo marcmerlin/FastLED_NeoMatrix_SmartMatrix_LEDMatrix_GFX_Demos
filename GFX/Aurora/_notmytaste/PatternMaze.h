@@ -221,7 +221,7 @@ public:
     unsigned int drawFrame() {
         if (cellCount < 1) {
             //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-	    matrix_clear();
+	    matrix->clear();
 
             // reset the maze grid
             for (int y = 0; y < height; y++) {
@@ -256,7 +256,7 @@ public:
 
     void start() {
         //backgroundLayer.fillScreen({ 0, 0, 0 });
-	matrix_clear();
+	matrix->clear();
         cellCount = 0;
         hue = 0;
     }

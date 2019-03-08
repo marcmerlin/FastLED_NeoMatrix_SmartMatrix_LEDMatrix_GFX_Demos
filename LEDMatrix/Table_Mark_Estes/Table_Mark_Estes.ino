@@ -2,7 +2,7 @@
 // this version has audio input turned off unless you are specific matrix size
 
 #define LEDMATRIX
-#include "config.h"
+#include "neomatrix_config.h"
 #define zeds ledmatrix
 
 #define MIDLX               (MATRIX_WIDTH/2)

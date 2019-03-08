@@ -81,7 +81,7 @@ public:
     unsigned int drawFrame() {
         if (generation == 0) {
             //backgroundLayer.fillScreen(CRGB(CRGB::Black));
-	    matrix_clear();
+	    matrix->clear();
 
             randomFillWorld();
         }

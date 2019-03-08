@@ -317,7 +317,7 @@ class PatternRainbowSmoke : public Drawable {
         //randomSeed(analogRead(5));
 
         //backgroundLayer.fillScreen({ 0, 0, 0 });
-        matrix_clear();
+        matrix->clear();
         createPalette();
         algorithm = random(2);
 
@@ -362,7 +362,7 @@ class PatternRainbowSmoke : public Drawable {
 
     void start() {
       //backgroundLayer.fillScreen({ 0, 0, 0 });
-      matrix_clear();
+      matrix->clear();
       currentColorIndex = 0;
     }
 };

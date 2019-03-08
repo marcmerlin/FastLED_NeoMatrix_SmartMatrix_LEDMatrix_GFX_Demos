@@ -5,7 +5,7 @@
 #ifndef matrix_h
 #define matrix_h
 
-#include "config.h"
+#include "neomatrix_config.h"
 #include "Drawable.h"
 
 const int MATRIX_CENTER_X = MATRIX_WIDTH / 2;

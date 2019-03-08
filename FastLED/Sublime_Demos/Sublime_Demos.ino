@@ -5,7 +5,7 @@
 // standalone examples.
 
 
-#include "config.h"
+#include "neomatrix_config.h"
 #include <FastLED_NeoMatrix.h>
 #include <FastLED.h>
 
