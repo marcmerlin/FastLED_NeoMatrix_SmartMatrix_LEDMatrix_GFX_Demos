@@ -1,17 +1,16 @@
 #define LEDMATRIX
 #include "neomatrix_config.h"
 #include <LEDSprites.h>
-#define leds ledmatrix
 
-cLEDSprites Sprites(&leds);
+cLEDSprites Sprites(&ledmatrix);
 
 #define MY_SPRITE_WIDTH  11
 #define MY_SPRITE_HEIGHT 10
 #define PACMAN_FRAMES  3
 #define PINKY_FRAMES  2
 
-#define maxx (MATRIX_WIDTH - MY_SPRITE_WIDTH - 1)
-#define maxy (MATRIX_HEIGHT - MY_SPRITE_HEIGHT -1)
+#define max_x (MATRIX_WIDTH - MY_SPRITE_WIDTH - 1)
+#define max_y (MATRIX_HEIGHT - MY_SPRITE_HEIGHT -1)
 
 // How long before the pill appears?
 uint8_t pacman_loops = 3;
@@ -340,9 +339,9 @@ void setup()
     SprPinky.SetPositionFrameMotionOptions(     0 /*X*/, -62/*Y*/, 0/*Frame*/, 2/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_Y_KEEPIN | SPRITE_DETECT_EDGE);
     Sprites.AddSprite(&SprPinky);
     Serial.print("Top X for sprite: ");
-    Serial.print(maxx);
+    Serial.print(max_x);
     Serial.print(". Top Y for sprite: ");
-    Serial.println(maxy);
+    Serial.println(max_y);
 }
 
 void loop()
@@ -366,7 +365,6 @@ void loop()
     int8_t ey = SprEyes.m_Y;
 
     matrix->clear();
-    leds.DrawLine (leds.Width()/2, MY_SPRITE_HEIGHT, leds.Width()/2, leds.Height() - 1 - MY_SPRITE_HEIGHT, CRGB::Grey);
     Sprites.UpdateSprites();
     Sprites.DetectCollisions();
     Serial.print("rx: ");
@@ -422,12 +420,12 @@ void loop()
 	SprGhost.SetMotion(1, 2, 0, 0);
 	ginmaze = 7;
     }
-    else if (gx > maxx && ginmaze == 7) {
+    else if (gx > max_x && ginmaze == 7) {
 	Serial.println("Ghost hit bottom/right wall2");
 	SprGhost.SetMotion(0, 0, 1, 2);
 	ginmaze = 8;
     }
-    else if (gy > maxy && ginmaze == 8) {
+    else if (gy > max_y && ginmaze == 8) {
 	SprGhost.SetMotion(-1, 2, 0, 0);
 	Serial.println("Ghost hit top/right wall2");
 	ginmaze = 9;
@@ -439,13 +437,13 @@ void loop()
     }
 
 
-    if (pcmry >= maxy && !inmaze) inmaze = 1;
-    if (pcmry >= maxy && inmaze == 1) {
+    if (pcmry >= max_y && !inmaze) inmaze = 1;
+    if (pcmry >= max_y && inmaze == 1) {
 	SprPacmanRight.SetMotion(1, 1, 0, 0);
 	Serial.println("Pacman hit top/left wall");
 	inmaze = 2;
     }
-    else if (pcmrx >= maxx && inmaze == 2) {
+    else if (pcmrx >= max_x && inmaze == 2) {
 	Serial.println("Pacman hit top/right wall");
 	SprPacmanRight.SetMotion(0, 0, -1, 1);
 	inmaze = 3;
@@ -483,12 +481,12 @@ void loop()
 	SprPacmanLeft.SetMotion(1, 1, 0, 0);
 	inmaze = 7;
     }
-    else if (pcmlx >= maxx && inmaze == 7) {
+    else if (pcmlx >= max_x && inmaze == 7) {
 	Serial.println("Pacman hit bottom/right wall2");
 	SprPacmanLeft.SetMotion(0, 0, 1, 1);
 	inmaze = 8;
     }
-    else if (pcmly >= maxy && inmaze == 8) {
+    else if (pcmly >= max_y && inmaze == 8) {
 	SprPacmanLeft.SetMotion(-1, 1, 0, 0);
 	Serial.println("Pacman hit top/right wall2");
 	inmaze = 9;
@@ -500,13 +498,13 @@ void loop()
     }
 
 
-    if (py >= maxy && !pinmaze) pinmaze = 1;
-    if (py >= maxy && pinmaze == 1) {
+    if (py >= max_y && !pinmaze) pinmaze = 1;
+    if (py >= max_y && pinmaze == 1) {
 	SprPinky.SetMotion(1, 1, 0, 0);
 	Serial.println("Pinky hit top/left wall");
 	pinmaze = 2;
     }
-    else if (px >= maxx && pinmaze == 2) {
+    else if (px >= max_x && pinmaze == 2) {
 	Serial.println("Pinky hit top/right wall");
 	SprPinky.SetMotion(0, 0, -1, 1);
 	pinmaze = 3;
@@ -545,6 +543,7 @@ void loop()
     }
 
     Sprites.RenderSprites();
+    ledmatrix.DrawLine (ledmatrix.Width()/2, MY_SPRITE_HEIGHT, ledmatrix.Width()/2, ledmatrix.Height() - 1 - MY_SPRITE_HEIGHT, CRGB::Grey);
     matrix->show();
     delay(30);
 }
