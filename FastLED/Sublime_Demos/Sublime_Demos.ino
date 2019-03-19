@@ -64,7 +64,8 @@ void fire()
 #else
 	#define FIRE_BASE	MATRIX_HEIGHT/6+1
 #endif
-	static uint8_t currentFirePaletteIndex = 0;
+	//static uint8_t currentFirePaletteIndex = 0;
+	static uint8_t currentFirePaletteIndex = firePaletteCount-1; // Force rotating fire palette
 	// COOLING: How much does the air cool as it rises?
 	// Less cooling = taller flames.  More cooling = shorter flames.
 	uint8_t cooling = 80;
@@ -504,9 +505,25 @@ void setup() {
   matrix->begin();
   Serial.println("Setup done");
 }
+#endif // SUBLIME_INCLUDE
 
-void loop()
-{
+#ifndef SUBLIME_INCLUDE
+void loop() {
+#else
+void sublime_loop() {
+#endif
+	static int8_t rotatingFirePaletteIndex = 0;
+
+	EVERY_N_SECONDS(3) {
+		RotatingFire_p = firePalettes[ rotatingFirePaletteIndex ];
+		rotatingFirePaletteIndex = addmod8( rotatingFirePaletteIndex, 1, firePaletteCount-1);
+		Serial.print("changed fire palette to ");
+		Serial.println(rotatingFirePaletteIndex);
+	}
+
+
+
+#ifndef SUBLIME_INCLUDE
 	EVERY_N_MILLISECONDS(40) {
 		gHue++;  // slowly cycle the "base color" through the rainbow
 	}
@@ -519,12 +536,5 @@ void loop()
 	matrix->show();
 	// feed watchdog for ESP8266
 	yield();
-}
-#else
-void sublime_loop() {
-	EVERY_N_SECONDS(5) {
-		RotatingFire_p = firePalettes[ rotatingFirePaletteIndex ];
-		rotatingFirePaletteIndex = addmod8( rotatingFirePaletteIndex, 1, firePaletteCount-1);
-	}
-}
 #endif // SUBLIME_INCLUDE
+}
