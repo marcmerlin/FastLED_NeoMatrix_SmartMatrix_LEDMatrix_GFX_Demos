@@ -185,8 +185,13 @@ Dot gSparks[MAX_SHELLS][MAX_SPARKS];			//Creates an array object named gSparks o
 
 void fireworks() 
 {
+// Background sky color (brightness needs to be low, but not too low, backend dependent)
 #ifdef NEOMATRIX
-	CRGB sky1(0,0,32);				// Background sky color (will only work if brightness is set high 128 or up !!)
+	#ifdef M32B8X3
+	CRGB sky1(0,0,17);
+	#else
+	CRGB sky1(0,0,32);				
+	#endif
 #else
 	CRGB sky1(0,0,17);				// Background sky color (will only work if brightness is set high 128 or up !!)
 #endif
@@ -261,6 +266,7 @@ void fireworks()
 	}
 }
 
+#ifndef FIREWORKS_INCLUDE
 void setup() {
   delay( 1000 ); //safety startup delay
   Serial.begin(115200);
@@ -274,4 +280,4 @@ void loop()
   
   matrix->show();
 }
-
+#endif

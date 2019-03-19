@@ -4,29 +4,13 @@
 // Further adapted by Marc MERLIN for integration in FastLED::NeoMatrix
 // standalone examples.
 
-
 #include "neomatrix_config.h"
-#include <FastLED_NeoMatrix.h>
-#include <FastLED.h>
 
-
-// compat with my code definitions
-#define MATRIX_TOTAL NUMMATRIX 
-#define NUM_LEDS NUMMATRIX 
-#define MATRIX_HEIGHT mh
-#define MATRIX_WIDTH mw
-#define leds matrixleds
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-
-uint8_t intensity = 255;
+static uint8_t intensity = 42;  // was 255
 uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
 
 CRGB solidColor = CRGB::Blue;
 CRGB solidRainColor = CRGB(60,80,90);
-
-
-uint8_t gCurrentPaletteNumber = 0;
 
 CRGBPalette16 gCurrentPalette( CRGB::Black);
 
@@ -124,27 +108,9 @@ void fire()
 		// Step 4.  Map from heat cells to LED colors
 		for (int y = 0; y < MATRIX_HEIGHT; y++) {
 			// Blend new data with previous frame. Average data between neighbouring pixels
-			nblend(leds[XY2(x,y)], ColorFromPalette(fire_p, ((tempMatrix[x][y]*0.7) + (tempMatrix[wrapX(x+1)][y]*0.3))), fireSmoothing);
+			nblend(matrixleds[XY2(x,y)], ColorFromPalette(fire_p, ((tempMatrix[x][y]*0.7) + (tempMatrix[wrapX(x+1)][y]*0.3))), fireSmoothing);
 		}
 	}
-}
-
-void theMatrix()
-{
-	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
-	rain(60, 200, map8(intensity,5,100), 195, CRGB::Green, false, false, false);
-}
-
-void coloredRain()
-{
-	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
-	rain(60, 200, map8(intensity,2,60), 10, solidRainColor, true, true, false);
-}
-
-void stormyRain()
-{
-	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
-	rain(0, 90, map8(intensity,0,150)+60, 10, solidRainColor, true, true, true);
 }
 
 void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLength, CRGB rainColor, bool splashes, bool clouds, bool storm)
@@ -164,7 +130,7 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 	CRGBPalette16 rainClouds_p( CRGB::Black, CRGB(15,24,24), CRGB(9,15,15), CRGB::Black );
 #endif
 
-	fadeToBlackBy( leds, NUM_LEDS, 255-tailLength);
+	fadeToBlackBy( matrixleds, NUM_LEDS, 255-tailLength);
 
 	// Loop for each column individually
 	for (int x = 0; x < MATRIX_WIDTH; x++) {
@@ -184,7 +150,7 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 		// Step 3. Map from tempMatrix cells to LED colors
 		for (int y = 0; y < MATRIX_HEIGHT; y++) {
 			if (tempMatrix[x][y] >= backgroundDepth) {	// Don't write out empty cells
-				leds[XY2(x,y)] = ColorFromPalette(rain_p, tempMatrix[x][y]);
+				matrixleds[XY2(x,y)] = ColorFromPalette(rain_p, tempMatrix[x][y]);
 			}
 		}
 
@@ -196,14 +162,14 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 			byte v = tempMatrix[x][0];
 
 			if (j >= backgroundDepth) {
-				leds[XY2(x-2,0,true)] = ColorFromPalette(rain_p, j/3);
-				leds[XY2(x+2,0,true)] = ColorFromPalette(rain_p, j/3);
+				matrixleds[XY2(x-2,0,true)] = ColorFromPalette(rain_p, j/3);
+				matrixleds[XY2(x+2,0,true)] = ColorFromPalette(rain_p, j/3);
 				splashArray[x] = 0; 	// Reset splash
 			}
 
 			if (v >= backgroundDepth) {
-				leds[XY2(x-1,1,true)] = ColorFromPalette(rain_p, v/2);
-				leds[XY2(x+1,1,true)] = ColorFromPalette(rain_p, v/2);
+				matrixleds[XY2(x-1,1,true)] = ColorFromPalette(rain_p, v/2);
+				matrixleds[XY2(x+1,1,true)] = ColorFromPalette(rain_p, v/2);
 				splashArray[x] = v;	// Prep splash for next frame
 			}
 		}
@@ -219,21 +185,21 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 							uint8_t dir = random8(4);
 							switch (dir) {
 								case 0:
-									leds[XY2(lx+1,ly-1,true)] = lightningColor;
+									matrixleds[XY2(lx+1,ly-1,true)] = lightningColor;
 									lightning[wrapX(lx+1)][ly-1] = 255;	// move down and right
 								break;
 								case 1:
-									leds[XY2(lx,ly-1,true)] = CRGB(128,128,128);
+									matrixleds[XY2(lx,ly-1,true)] = CRGB(128,128,128);
 									lightning[lx][ly-1] = 255;		// move down
 								break;
 								case 2:
-									leds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
+									matrixleds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
 									lightning[wrapX(lx-1)][ly-1] = 255;	// move down and left
 								break;
 								case 3:
-									leds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
+									matrixleds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
 									lightning[wrapX(lx-1)][ly-1] = 255;	// fork down and left
-									leds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
+									matrixleds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
 									lightning[wrapX(lx+1)][ly-1] = 255;	// fork down and right
 								break;
 							}
@@ -257,17 +223,38 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 				uint8_t noiseData = qsub8(inoise8(noiseX + xoffset,noiseY + yoffset,noiseZ),16);
 				noiseData = qadd8(noiseData,scale8(noiseData,39));
 				noise[x][z] = scale8( noise[x][z], dataSmoothing) + scale8( noiseData, 256 - dataSmoothing);
-				nblend(leds[XY2(x,MATRIX_HEIGHT-z-1)], ColorFromPalette(rainClouds_p, noise[x][z]), (cloudHeight-z)*(250/cloudHeight));
+				nblend(matrixleds[XY2(x,MATRIX_HEIGHT-z-1)], ColorFromPalette(rainClouds_p, noise[x][z]), (cloudHeight-z)*(250/cloudHeight));
 			}
 			noiseZ ++;
 		}
 	}
 }
 
+void theMatrix()
+{
+	yield();
+	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
+	rain(60, 200, map8(intensity,5,100), 195, CRGB::Green, false, false, false);
+}
+
+void coloredRain()
+{
+	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
+	//rain(60, 200, map8(intensity,2,60), 10, solidRainColor, true, true, false);
+	rain(60, 180, map8(intensity,2,60), 30, solidRainColor, true, true, false);
+}
+
+void stormyRain()
+{
+	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
+	//rain(0, 90, map8(intensity,0,150)+60, 10, solidRainColor, true, true, true);
+	rain(0, 90, map8(intensity,0,100)+30, 30, solidRainColor, true, true, true);
+}
+
 void addGlitter( uint8_t chanceOfGlitter)
 {
 	if ( random8() < chanceOfGlitter) {
-		leds[ random16(NUM_LEDS) ] += CRGB::White;
+		matrixleds[ random16(NUM_LEDS) ] += CRGB::White;
 	}
 }
 
@@ -279,9 +266,9 @@ void bpm()
 	for ( int r = 0; r < MATRIX_HEIGHT; r++) {
 		for (uint8_t i = 0; i < MATRIX_WIDTH; i++) {
 			#ifdef REVERSE_ORDER
-			leds[XY2(i,MATRIX_HEIGHT-1-r)] = ColorFromPalette(palette, gHue + (r * 2), beat - gHue + (r * 10));
+			matrixleds[XY2(i,MATRIX_HEIGHT-1-r)] = ColorFromPalette(palette, gHue + (r * 2), beat - gHue + (r * 10));
 			#else
-			leds[XY2(i,r)] = ColorFromPalette(palette, gHue + (r * 2), beat - gHue + (r * 10));
+			matrixleds[XY2(i,r)] = ColorFromPalette(palette, gHue + (r * 2), beat - gHue + (r * 10));
 			#endif
 		}
 	}
@@ -315,19 +302,14 @@ void juggle()
 
 	// Several colored dots, weaving in and out of sync with each other
 	curhue = thishue; // Reset the hue values.
-	fadeToBlackBy(leds, NUM_LEDS, faderate);
+	fadeToBlackBy(matrixleds, NUM_LEDS, faderate);
 	for ( int i = 0; i < numdots; i++) {
 		uint16_t pos_n = beatsin16(basebeat + i + numdots, 0, MATRIX_HEIGHT-1);
 		for (uint8_t c = 0; c < MATRIX_WIDTH; c++) {
-			leds[XY2(c,pos_n)] += CHSV(gHue + curhue, thissat, thisbright);
+			matrixleds[XY2(c,pos_n)] += CHSV(gHue + curhue, thissat, thisbright);
 		}
 		curhue += hueinc;
 	}
-}
-
-void colorWaves()
-{
-	colorwaves( leds, MATRIX_HEIGHT, gCurrentPalette);
 }
 
 // ColorWavesWithPalettes by Mark Kriegsman: https://gist.github.com/kriegsman/8281905786e8b2632aeb
@@ -390,6 +372,11 @@ void colorwaves( CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette)
 	}
 }
 
+void colorWaves()
+{
+	colorwaves( matrixleds, MATRIX_HEIGHT, gCurrentPalette);
+}
+
 // Pride2015 by Mark Kriegsman: https://gist.github.com/kriegsman/964de772d64c502760e5
 // This function draws rainbows with an ever-changing, widely-varying set of parameters.
 void pride()
@@ -415,7 +402,7 @@ void pride()
 	sHue16 += deltams * beatsin88( 400, 5, 9);
 	uint16_t brightnesstheta16 = sPseudotime;
 
-	for ( uint16_t i = 0 ; i < MATRIX_TOTAL; i++) {
+	for ( uint16_t i = 0 ; i < NUMMATRIX; i++) {
 		hue16 += hueinc16;
 		uint8_t hue8 = hue16 / 256;
 
@@ -429,12 +416,12 @@ void pride()
 		CRGB newcolor = CHSV( hue8, sat8, bri8);
 
 		#ifdef REVERSE_ORDER
-		uint16_t pixelnumber = (MATRIX_TOTAL - 1) - i;
+		uint16_t pixelnumber = (NUMMATRIX - 1) - i;
 		#else
 		uint16_t pixelnumber = i;
 		#endif
 
-		nblend( leds[XY2(pixelnumber/MATRIX_HEIGHT,pixelnumber%MATRIX_HEIGHT)], newcolor, 64);
+		nblend( matrixleds[XY2(pixelnumber/MATRIX_HEIGHT,pixelnumber%MATRIX_HEIGHT)], newcolor, 64);
 	}
 }
 
@@ -445,9 +432,9 @@ void rainbow()
 	for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
 		for (int y = 0; y < MATRIX_HEIGHT; y++) {
 			#ifdef REVERSE_ORDER
-			leds[XY2(x,y)] = tempHeightStrip[y];
+			matrixleds[XY2(x,y)] = tempHeightStrip[y];
 			#else
-			leds[XY2(x,y)] = tempHeightStrip[MATRIX_HEIGHT-1-y];
+			matrixleds[XY2(x,y)] = tempHeightStrip[MATRIX_HEIGHT-1-y];
 			#endif
 		}
 	}
@@ -476,28 +463,28 @@ void sinelon()
 
 	for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
 		for (int y = 0; y < MATRIX_HEIGHT; y++) {
-			leds[XY2(x,y)] = tempHeightStrip[y];
+			matrixleds[XY2(x,y)] = tempHeightStrip[y];
 		}
 	}
 	prevpos = pos;
 }
 
-
+#ifndef SUBLIME_INCLUDE
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 typedef void (*SimplePatternList[])();
-#if 0
 SimplePatternList gPatterns = { fire, theMatrix, coloredRain,  // 0-2
 				stormyRain, bpm, juggle,       // 3-5
 				pride, rainbow, rainbowWithGlitter, // 6-8
 				sinelon, //9 
 				//colorWaves,  // broken until pallette support is added (but I don't like it so much)
 };
-#endif
+#if 0
 // Only use patterns that work ok and look good
 SimplePatternList gPatterns = { 
 				stormyRain, theMatrix, coloredRain,
 				pride, fire, 
 };
+#endif
 
 // fire, theMatrix, stormyRrain, pride
 // debug colorWaves
@@ -520,37 +507,24 @@ void setup() {
 
 void loop()
 {
-#if 0
-	// change to a new cpt-city gradient palette
-	EVERY_N_SECONDS( secondsPerPalette ) {
-		gCurrentPaletteNumber = addmod8( gCurrentPaletteNumber, 1, gGradientPaletteCount);
-		gTargetPalette = gGradientPalettes[ gCurrentPaletteNumber ];
-	}
-
-	EVERY_N_MILLISECONDS(40) {
-		// slowly blend the current palette to the next
-		nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 8);
-		nblendPaletteTowardPalette(RotatingFire_p, TargetFire_p, 30);
-		gHue++;  // slowly cycle the "base color" through the rainbow
-	}
-
-	EVERY_N_SECONDS(25) {
-		RotatingFire_p = firePalettes[ rotatingFirePaletteIndex ];
-		rotatingFirePaletteIndex = addmod8( rotatingFirePaletteIndex, 1, firePaletteCount-1);
-		TargetFire_p = firePalettes[ rotatingFirePaletteIndex ];
-	}
-#endif
-
 	EVERY_N_MILLISECONDS(40) {
 		gHue++;  // slowly cycle the "base color" through the rainbow
 	}
 
 	EVERY_N_SECONDS( 20 ) { nextPattern(); } // change patterns periodically
 
-	// Call the current pattern function once, updating the 'leds' array
+	// Call the current pattern function once, updating the 'matrixleds' array
 	gPatterns[gCurrentPatternNumber]();
 
 	matrix->show();
 	// feed watchdog for ESP8266
 	yield();
 }
+#else
+void sublime_loop() {
+	EVERY_N_SECONDS(5) {
+		RotatingFire_p = firePalettes[ rotatingFirePaletteIndex ];
+		rotatingFirePaletteIndex = addmod8( rotatingFirePaletteIndex, 1, firePaletteCount-1);
+	}
+}
+#endif // SUBLIME_INCLUDE
