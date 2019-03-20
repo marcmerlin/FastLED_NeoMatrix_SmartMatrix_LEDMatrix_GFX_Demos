@@ -149,9 +149,10 @@ class Dot {
 
 	void GroundLaunch() {
 		gGravity = map8(speed, 0, 6)+3;
-
-		if (MATRIX_HEIGHT <= 32) yv = ((20*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*5);	// Vertical velocity = Minimum velocity + Random maximum difference
-		if (MATRIX_HEIGHT > 32)  yv = ((14*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*3);	// Vertical velocity = Minimum velocity + Random maximum difference
+		// Vertical velocity = Minimum velocity + Random maximum difference
+		if (MATRIX_HEIGHT <= 32) yv = ((20*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*5);	
+		else if (MATRIX_HEIGHT < 64)  yv = ((14*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*3);
+		else yv = ((10*(MATRIX_HEIGHT+(1.5*(gGravity*0.8))))-(MATRIX_HEIGHT*2)) + random16(MATRIX_HEIGHT*2);
 		xv = random16(350) - 175;			// Generates a signed int value between +/- 175  (Nice width but always inside of frame)      
 		y = 0;						// Ground launch
 //		x = random16(); 				// Horizontal
@@ -193,7 +194,7 @@ void fireworks()
 	CRGB sky1(0,0,32);				
 	#endif
 #else
-	CRGB sky1(0,0,17);				// Background sky color (will only work if brightness is set high 128 or up !!)
+	CRGB sky1(0,0,32);				// Background sky color (will only work if brightness is set high 128 or up !!)
 #endif
 	CRGB sky2(32,32,64);				// Alternate sky color to create a star twinkle effect 
 
