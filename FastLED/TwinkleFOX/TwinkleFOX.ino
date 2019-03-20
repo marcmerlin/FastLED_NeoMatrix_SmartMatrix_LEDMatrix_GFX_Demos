@@ -99,10 +99,12 @@ CRGB gBackgroundColor = CRGB::Black;
 #define COOL_LIKE_INCANDESCENT 1
 
 
-CRGBPalette16 gCurrentPalette;
 CRGBPalette16 gTargetPalette;
 
-void setup() {
+#ifndef TWINKLEFOX_INCLUDE
+CRGBPalette16 gCurrentPalette;
+
+void setup() 
   delay( 1000 ); //safety startup delay
   Serial.begin(115200);
   matrix_setup();
@@ -111,22 +113,7 @@ void setup() {
 
   chooseNextColorPalette(gTargetPalette);
 }
-
-void loop()
-{
-  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) { 
-    chooseNextColorPalette( gTargetPalette ); 
-  }
-  
-  EVERY_N_MILLISECONDS( 10 ) {
-    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
-  }
-
-  drawTwinkles();
-  
-  matrix->show();
-}
-
+#endif
 
 //  This function loops over each pixel, calculates the 
 //  adjusted 'clock' that this pixel should use, and calls 
@@ -370,6 +357,26 @@ void chooseNextColorPalette( CRGBPalette16& pal)
   whichPalette = addmod8( whichPalette, 1, numberOfPalettes);
 
   pal = *(ActivePaletteList[whichPalette]);
+}
+
+
+#ifndef TWINKLEFOX_INCLUDE
+void loop()
+#else
+void twinkle_loop()
+#endif
+{
+  EVERY_N_SECONDS( SECONDS_PER_PALETTE ) { 
+    chooseNextColorPalette( gTargetPalette ); 
+  }
+  
+  EVERY_N_MILLISECONDS( 10 ) {
+    nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
+  }
+
+  drawTwinkles();
+  
+  matrix->show();
 }
 
 
