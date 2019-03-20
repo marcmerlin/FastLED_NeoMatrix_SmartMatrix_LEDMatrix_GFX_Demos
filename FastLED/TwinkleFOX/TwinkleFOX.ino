@@ -115,6 +115,77 @@ void setup()
 }
 #endif
 
+// This function is like 'triwave8', which produces a 
+// symmetrical up-and-down triangle sawtooth waveform, except that this
+// function produces a triangle wave with a faster attack and a slower decay:
+/*
+     / \ 
+    /     \ 
+   /         \ 
+  /             \ 
+*/
+
+
+uint8_t attackDecayWave8( uint8_t i)
+{
+  if( i < 86) {
+    return i * 3;
+  } else {
+    i -= 86;
+    return 255 - (i + (i/2));
+  }
+}
+
+// This function takes a pixel, and if its in the 'fading down'
+// part of the cycle, it adjusts the color a little bit like the 
+// way that incandescent bulbs fade toward 'red' as they dim.
+void coolLikeIncandescent( CRGB& c, uint8_t phase)
+{
+  if( phase < 128) return;
+
+  uint8_t cooling = (phase - 128) >> 4;
+  c.g = qsub8( c.g, cooling);
+  c.b = qsub8( c.b, cooling * 2);
+}
+
+//  This function takes a time in pseudo-milliseconds,
+//  figures out brightness = f( time ), and also hue = f( time )
+//  The 'low digits' of the millisecond time are used as 
+//  input to the brightness wave function.  
+//  The 'high digits' are used to select a color, so that the color
+//  does not change over the course of the fade-in, fade-out
+//  of one cycle of the brightness wave function.
+//  The 'high digits' are also used to determine whether this pixel
+//  should light at all during this cycle, based on the TWINKLE_DENSITY.
+CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
+{
+  uint16_t ticks = ms >> (8-TWINKLE_SPEED);
+  uint8_t fastcycle8 = ticks;
+  uint16_t slowcycle16 = (ticks >> 8) + salt;
+  slowcycle16 += sin8( slowcycle16);
+  slowcycle16 =  (slowcycle16 * 2053) + 1384;
+  uint8_t slowcycle8 = (slowcycle16 & 0xFF) + (slowcycle16 >> 8);
+  
+  uint8_t bright = 0;
+  if( ((slowcycle8 & 0x0E)/2) < TWINKLE_DENSITY) {
+    bright = attackDecayWave8( fastcycle8);
+  }
+
+  uint8_t hue = slowcycle8 - salt;
+  CRGB c;
+  if( bright > 0) {
+    c = ColorFromPalette( gCurrentPalette, hue, bright, NOBLEND);
+    if( COOL_LIKE_INCANDESCENT == 1 ) {
+      coolLikeIncandescent( c, fastcycle8);
+    }
+  } else {
+    c = CRGB::Black;
+  }
+  return c;
+}
+
+
+
 //  This function loops over each pixel, calculates the 
 //  adjusted 'clock' that this pixel should use, and calls 
 //  "CalculateOneTwinkle" on each pixel.  It then displays
@@ -182,77 +253,6 @@ void drawTwinkles( )
       matrixleds[idx] = bg;
     }
   }
-}
-
-
-//  This function takes a time in pseudo-milliseconds,
-//  figures out brightness = f( time ), and also hue = f( time )
-//  The 'low digits' of the millisecond time are used as 
-//  input to the brightness wave function.  
-//  The 'high digits' are used to select a color, so that the color
-//  does not change over the course of the fade-in, fade-out
-//  of one cycle of the brightness wave function.
-//  The 'high digits' are also used to determine whether this pixel
-//  should light at all during this cycle, based on the TWINKLE_DENSITY.
-CRGB computeOneTwinkle( uint32_t ms, uint8_t salt)
-{
-  uint16_t ticks = ms >> (8-TWINKLE_SPEED);
-  uint8_t fastcycle8 = ticks;
-  uint16_t slowcycle16 = (ticks >> 8) + salt;
-  slowcycle16 += sin8( slowcycle16);
-  slowcycle16 =  (slowcycle16 * 2053) + 1384;
-  uint8_t slowcycle8 = (slowcycle16 & 0xFF) + (slowcycle16 >> 8);
-  
-  uint8_t bright = 0;
-  if( ((slowcycle8 & 0x0E)/2) < TWINKLE_DENSITY) {
-    bright = attackDecayWave8( fastcycle8);
-  }
-
-  uint8_t hue = slowcycle8 - salt;
-  CRGB c;
-  if( bright > 0) {
-    c = ColorFromPalette( gCurrentPalette, hue, bright, NOBLEND);
-    if( COOL_LIKE_INCANDESCENT == 1 ) {
-      coolLikeIncandescent( c, fastcycle8);
-    }
-  } else {
-    c = CRGB::Black;
-  }
-  return c;
-}
-
-
-// This function is like 'triwave8', which produces a 
-// symmetrical up-and-down triangle sawtooth waveform, except that this
-// function produces a triangle wave with a faster attack and a slower decay:
-/*
-     / \ 
-    /     \ 
-   /         \ 
-  /             \ 
-*/
-
-
-uint8_t attackDecayWave8( uint8_t i)
-{
-  if( i < 86) {
-    return i * 3;
-  } else {
-    i -= 86;
-    return 255 - (i + (i/2));
-  }
-}
-
-// This function takes a pixel, and if its in the 'fading down'
-// part of the cycle, it adjusts the color a little bit like the 
-// way that incandescent bulbs fade toward 'red' as they dim.
-void coolLikeIncandescent( CRGB& c, uint8_t phase)
-{
-  if( phase < 128) return;
-
-  uint8_t cooling = (phase - 128) >> 4;
-  c.g = qsub8( c.g, cooling);
-  c.b = qsub8( c.b, cooling * 2);
 }
 
 // A mostly red palette with green accents and white trim.
