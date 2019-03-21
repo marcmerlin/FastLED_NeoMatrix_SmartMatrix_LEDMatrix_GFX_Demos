@@ -74,8 +74,6 @@
 // Default is 5.
 #define TWINKLE_DENSITY 5
 
-// How often to change color palettes.
-#define SECONDS_PER_PALETTE  30
 // Also: toward the bottom of the file is an array 
 // called "ActivePaletteList" which controls which color
 // palettes are used; you can add or remove color palettes
@@ -103,16 +101,6 @@ CRGBPalette16 gTargetPalette;
 
 #ifndef TWINKLEFOX_INCLUDE
 CRGBPalette16 gCurrentPalette;
-
-void setup() 
-  delay( 1000 ); //safety startup delay
-  Serial.begin(115200);
-  matrix_setup();
-  matrix->begin();
-  Serial.println("Setup done");
-
-  chooseNextColorPalette(gTargetPalette);
-}
 #endif
 
 // This function is like 'triwave8', which produces a 
@@ -359,6 +347,26 @@ void chooseNextColorPalette( CRGBPalette16& pal)
   pal = *(ActivePaletteList[whichPalette]);
 }
 
+#ifndef TWINKLEFOX_INCLUDE
+// How often to change color palettes.
+#define SECONDS_PER_PALETTE  30
+
+void setup() {
+  delay( 1000 ); //safety startup delay
+  Serial.begin(115200);
+  matrix_setup();
+  matrix->begin();
+  Serial.println("Setup done");
+
+#else // TWINKLEFOX_INCLUDE
+// How often to change color palettes.
+#define SECONDS_PER_PALETTE 10
+
+void twinklefox_setup() {
+#endif // TWINKLEFOX_INCLUDE
+  chooseNextColorPalette(gTargetPalette);
+}
+
 
 #ifndef TWINKLEFOX_INCLUDE
 void loop()
@@ -370,7 +378,11 @@ void twinkle_loop()
     chooseNextColorPalette( gTargetPalette ); 
   }
   
+#ifndef TWINKLEFOX_INCLUDE
   EVERY_N_MILLISECONDS( 10 ) {
+#else
+  EVERY_N_MILLISECONDS( 3 ) {
+#endif
     nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
   }
 

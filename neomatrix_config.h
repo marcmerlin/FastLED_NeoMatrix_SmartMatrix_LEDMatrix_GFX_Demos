@@ -8,6 +8,7 @@
 #endif
 
 #include <Adafruit_GFX.h>
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 //============================================================================ 
 // Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
@@ -83,7 +84,6 @@ const uint16_t NUMMATRIX = mw*mh;
 const uint16_t NUM_LEDS = NUMMATRIX; 
 const uint8_t MATRIX_HEIGHT = mh;
 const uint8_t MATRIX_WIDTH = mw;
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 /// SmartMatrix Defines
 #define COLOR_DEPTH 24         // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
@@ -136,7 +136,6 @@ const uint16_t NUMMATRIX = mw*mh;
 const uint16_t NUM_LEDS = NUMMATRIX; 
 const uint8_t MATRIX_HEIGHT = mh;
 const uint8_t MATRIX_WIDTH = mw;
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
 // cLEDMatrix defines 
@@ -203,7 +202,6 @@ const uint16_t NUMMATRIX = mw*mh;
 const uint16_t NUM_LEDS = NUMMATRIX; 
 const uint8_t MATRIX_HEIGHT = mh;
 const uint8_t MATRIX_WIDTH = mw;
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
 // cLEDMatrix defines 
@@ -252,7 +250,6 @@ const uint16_t NUMMATRIX = mw*mh;
 const uint16_t NUM_LEDS = NUMMATRIX; 
 const uint8_t MATRIX_HEIGHT = mh;
 const uint8_t MATRIX_WIDTH = mw;
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #ifdef LEDMATRIX
 // cLEDMatrix defines 

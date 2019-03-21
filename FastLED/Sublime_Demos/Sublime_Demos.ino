@@ -517,8 +517,8 @@ void sublime_loop() {
 	EVERY_N_SECONDS(3) {
 		RotatingFire_p = firePalettes[ rotatingFirePaletteIndex ];
 		rotatingFirePaletteIndex = addmod8( rotatingFirePaletteIndex, 1, firePaletteCount-1);
-		Serial.print("changed fire palette to ");
-		Serial.println(rotatingFirePaletteIndex);
+		//Serial.print("changed fire palette to ");
+		//Serial.println(rotatingFirePaletteIndex);
 	}
 
 
