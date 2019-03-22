@@ -51,6 +51,8 @@ public:
 
     void start() {
         rotation = random(0, 4);
+	if (MATRIX_HEIGHT > MATRIX_WIDTH) rotation = 1;
+	if (MATRIX_HEIGHT < MATRIX_WIDTH) rotation = 0;
         waveCount = random(1, 3);
         //thetaUpdateFrequency = random(1, 2);
         //hueUpdateFrequency = random(1, 6);
