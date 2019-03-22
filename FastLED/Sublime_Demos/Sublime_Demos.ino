@@ -7,7 +7,10 @@
 #include "neomatrix_config.h"
 
 static uint8_t intensity = 42;  // was 255
-uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
+
+//uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
+// ESP32 does not like static arrays  https://github.com/espressif/arduino-esp32/issues/2567
+uint8_t *lightning = (uint8_t *) malloc(MATRIX_WIDTH * MATRIX_HEIGHT);
 
 CRGB solidColor = CRGB::Blue;
 CRGB solidRainColor = CRGB(60,80,90);
@@ -178,30 +181,30 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 		// Step 5. Add lightning if called for
 		if (storm) {
 			if (random16() < 72) {		// Odds of a lightning bolt
-				lightning[scale8(random8(), MATRIX_WIDTH-1)][MATRIX_HEIGHT-1] = 255;	// Random starting location
+				lightning[scale8(random8(), MATRIX_WIDTH-1) + (MATRIX_HEIGHT-1) * MATRIX_WIDTH] = 255;	// Random starting location
 				for(int ly = MATRIX_HEIGHT-1; ly > 1; ly--) {
 					for (int lx = 1; lx < MATRIX_WIDTH-1; lx++) {
-						if (lightning[lx][ly] == 255) {
-							lightning[lx][ly] = 0;
+						if (lightning[lx + ly * MATRIX_WIDTH] == 255) {
+							lightning[lx + ly * MATRIX_WIDTH] = 0;
 							uint8_t dir = random8(4);
 							switch (dir) {
 								case 0:
 									matrixleds[XY2(lx+1,ly-1,true)] = lightningColor;
-									lightning[wrapX(lx+1)][ly-1] = 255;	// move down and right
+									lightning[wrapX(lx+1) + (ly-1) * MATRIX_WIDTH] = 255;	// move down and right
 								break;
 								case 1:
 									matrixleds[XY2(lx,ly-1,true)] = CRGB(128,128,128);
-									lightning[lx][ly-1] = 255;		// move down
+									lightning[lx + (ly-1) * MATRIX_WIDTH] = 255;		// move down
 								break;
 								case 2:
 									matrixleds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
-									lightning[wrapX(lx-1)][ly-1] = 255;	// move down and left
+									lightning[wrapX(lx-1) + (ly-1) * MATRIX_WIDTH] = 255;	// move down and left
 								break;
 								case 3:
 									matrixleds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
-									lightning[wrapX(lx-1)][ly-1] = 255;	// fork down and left
+									lightning[wrapX(lx-1) + (ly-1) * MATRIX_WIDTH] = 255;	// fork down and left
 									matrixleds[XY2(lx-1,ly-1,true)] = CRGB(128,128,128);
-									lightning[wrapX(lx+1)][ly-1] = 255;	// fork down and right
+									lightning[wrapX(lx+1) + (ly-1) * MATRIX_WIDTH] = 255;	// fork down and right
 								break;
 							}
 						}
@@ -473,8 +476,8 @@ void sinelon()
 #ifndef SUBLIME_INCLUDE
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { fire, theMatrix, coloredRain,  // 0-2
-				stormyRain, bpm, juggle,       // 3-5
+SimplePatternList gPatterns = { stormyRain, fire, theMatrix, coloredRain,  // 0-2
+				bpm, juggle,       // 3-5
 				pride, rainbow, rainbowWithGlitter, // 6-8
 				sinelon, //9 
 				//colorWaves,  // broken until pallette support is added (but I don't like it so much)
