@@ -11,3 +11,6 @@ Video examples:
 * 64x64 with audio: https://photos.app.goo.gl/qLS14Ad6UzCng3Q23
 * More 64x64 with audio: https://photos.app.goo.gl/syEPi7O97hgsWKb53
 * My 32x24 panel compilation of my favourite patterns: https://photos.app.goo.gl/syEPi7O97hgsWKb53
+
+Below is a demo of that code running on top of SmartMatrix::GFX:
+![image](https://user-images.githubusercontent.com/1369412/54888844-266bc480-4e5e-11e9-904e-75f417a7d9d2.png)
