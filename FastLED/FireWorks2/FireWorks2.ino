@@ -181,8 +181,13 @@ class Dot {
 #define MAX_SPARKS 40
 #define MIN_SPARKS 20
 
-Dot gDot[MAX_SHELLS];					//Creates an object named gDot of type Dot class
-Dot gSparks[MAX_SHELLS][MAX_SPARKS];			//Creates an array object named gSparks of type Dot class
+Dot *gDot;		// Creates an object named gDot of type Dot class
+Dot *gSparks;		// Creates an array object named gSparks of type Dot class
+
+void fireworks_setup() {
+    gDot    = (Dot *) malloc(MAX_SHELLS * sizeof(Dot));
+    gSparks = (Dot *) malloc(MAX_SHELLS * MATRIX_HEIGHT* sizeof(Dot));
+}
 
 void fireworks() 
 {
@@ -239,9 +244,9 @@ void fireworks()
 			re_launchcountdown = random16(100);	// Last SHELL has launched, restart the relaunch timer
 		}
 
-	//	if( gDot[a].theType == EXPLODING) {
-	//		gDot[a].color.setRGB(255,255,255);
-	//	}
+		if( gDot[a].theType == EXPLODING) {
+			gDot[a].color.setRGB(255,255,255);
+		}
 
 		if( gDot[a].theType == BURSTING) {
 			hsv2rgb_rainbow( CHSV( random8(), 255, random8(64,254)), gBurstcolor);
@@ -249,7 +254,7 @@ void fireworks()
 			gBursty = gDot[a].y;
 			int nsparks = random8(MIN_SPARKS, MAX_SPARKS+1);
 			for( int b = 0; b < nsparks; b++) {
-				gSparks[a][b].Skyburst( gBurstx, gBursty, gBurstcolor);
+				gSparks[a*MATRIX_HEIGHT+b].Skyburst( gBurstx, gBursty, gBurstcolor);
 			}
 			gDot[a].theType = SPARK;
 		}
@@ -258,11 +263,11 @@ void fireworks()
 		gDot[a].Draw();					// Scale the position of the shell on the LED matrix 
 
 		for( int b = 0; b < MAX_SPARKS; b++) {		// Always moves and draws the MAX number of sparks not the actual number of sparks (Wasteful!?)
-			gSparks[a][b].Move();
-			gSparks[a][b].color.r = gSparks[a][b].color.r * 255 /256;
-			gSparks[a][b].color.g = gSparks[a][b].color.g * 255 /256;
-			gSparks[a][b].color.b = gSparks[a][b].color.b * 255 /256;
-			gSparks[a][b].Draw();
+			gSparks[a*MATRIX_HEIGHT+b].Move();
+			gSparks[a*MATRIX_HEIGHT+b].color.r = gSparks[a*MATRIX_HEIGHT+b].color.r * 255 /256;
+			gSparks[a*MATRIX_HEIGHT+b].color.g = gSparks[a*MATRIX_HEIGHT+b].color.g * 255 /256;
+			gSparks[a*MATRIX_HEIGHT+b].color.b = gSparks[a*MATRIX_HEIGHT+b].color.b * 255 /256;
+			gSparks[a*MATRIX_HEIGHT+b].Draw();
 		}
 	}
 }
@@ -273,6 +278,7 @@ void setup() {
   Serial.begin(115200);
   matrix_setup();
   matrix->begin();
+  fireworks_setup();
 }
 
 void loop()
