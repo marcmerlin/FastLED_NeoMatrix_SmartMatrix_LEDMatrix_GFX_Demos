@@ -357,7 +357,7 @@ int wrapX(int x) {
 }
 
 
-void matrix_setup() {
+void matrix_setup(int reservemem = 40000) {
     if (init_done) {
 	Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
 	return;
@@ -369,7 +369,9 @@ void matrix_setup() {
 #if defined(SMARTMATRIX)
     matrix_gamma = 1; // SmartMatrix should be good by default.
     matrixLayer.addLayer(&backgroundLayer); 
-    matrixLayer.begin();
+    // SmartMatrix takes all the RAM it can get its hands on. Get it to leave some
+    // free RAM so that other libraries can work too.
+    if (reservemem) matrixLayer.begin(reservemem); else matrixLayer.begin();
     matrixLayer.setBrightness(matrix_brightness);
     matrixLayer.setRefreshRate(240);
     backgroundLayer.enableColorCorrection(true);
