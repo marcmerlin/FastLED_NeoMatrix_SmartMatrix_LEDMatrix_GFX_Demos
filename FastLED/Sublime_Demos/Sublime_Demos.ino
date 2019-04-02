@@ -6,13 +6,26 @@
 
 #include "neomatrix_config.h"
 
+/*
+Before, with arrays
+Heap Memory Available: 179392 bytes total, 86640 bytes largest free block
+8-bit Accessible Memory Available: 92752 bytes total, 36576 bytes largest free block
+
+After malloc cleanup
+Heap Memory Available: 212344 bytes total, 86640 bytes largest free block
+8-bit Accessible Memory Available: 125704 bytes total, 64624 bytes largest free block
+
+39KB of static memory saved
+*/
+
 static uint8_t intensity = 42;  // was 255
 
-//uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
-// ESP32 does not like static arrays  https://github.com/espressif/arduino-esp32/issues/2567
-uint8_t *lightning = (uint8_t *) malloc(MATRIX_WIDTH * MATRIX_HEIGHT);
-
 CRGB solidColor = CRGB::Blue;
+//
+// Array of temp cells (used by fire, theMatrix, coloredRain, stormyRain)
+uint8_t **tempMatrix;
+uint8_t *splashArray;
+
 CRGB solidRainColor = CRGB(60,80,90);
 
 CRGBPalette16 gCurrentPalette( CRGB::Black);
@@ -54,10 +67,6 @@ const uint8_t firePaletteCount = ARRAY_SIZE(firePalettes);
 
 uint8_t currentPaletteIndex = 0;
 
-// Array of temp cells (used by fire, theMatrix, coloredRain, stormyRain)
-uint_fast16_t tempMatrix[MATRIX_WIDTH+1][MATRIX_HEIGHT+1];
-// Temporary CRGB array for storing RGB data for one column to be duplicated.
-CRGB tempHeightStrip[MATRIX_HEIGHT];
 
 // based on FastLED example Fire2012WithPalette: https://github.com/FastLED/FastLED/blob/master/examples/Fire2012WithPalette/Fire2012WithPalette.ino
 void fire()
@@ -160,8 +169,6 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 
 		// Step 4. Add splash if called for
 		if (splashes) {
-			static uint_fast16_t splashArray[MATRIX_WIDTH];
-
 			byte j = splashArray[x];
 			byte v = tempMatrix[x][0];
 
@@ -180,6 +187,10 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 
 		// Step 5. Add lightning if called for
 		if (storm) {
+			//uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
+			// ESP32 does not like static arrays  https://github.com/espressif/arduino-esp32/issues/2567
+			uint8_t *lightning = (uint8_t *) malloc(MATRIX_WIDTH * MATRIX_HEIGHT);
+
 			if (random16() < 72) {		// Odds of a lightning bolt
 				lightning[scale8(random8(), MATRIX_WIDTH-1) + (MATRIX_HEIGHT-1) * MATRIX_WIDTH] = 255;	// Random starting location
 				for(int ly = MATRIX_HEIGHT-1; ly > 1; ly--) {
@@ -211,14 +222,17 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 					}
 				}
 			}
+			free(lightning);
 		}
 
 		// Step 6. Add clouds if called for
 		if (clouds) {
 			uint16_t noiseScale = 250;	// A value of 1 will be so zoomed in, you'll mostly see solid colors. A value of 4011 will be very zoomed out and shimmery
 			const uint8_t cloudHeight = (MATRIX_HEIGHT*0.2)+1;
+
 			// This is the array that we keep our computed noise values in
-			static uint8_t noise[MATRIX_WIDTH][cloudHeight];
+			//static uint8_t noise[MATRIX_WIDTH][cloudHeight];
+			static uint8_t *noise = (uint8_t *) malloc(MATRIX_WIDTH * cloudHeight);
 			int xoffset = noiseScale * x + gHue;
 
 			for(int z = 0; z < cloudHeight; z++) {
@@ -226,8 +240,8 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 				uint8_t dataSmoothing = 192;
 				uint8_t noiseData = qsub8(inoise8(noiseX + xoffset,noiseY + yoffset,noiseZ),16);
 				noiseData = qadd8(noiseData,scale8(noiseData,39));
-				noise[x][z] = scale8( noise[x][z], dataSmoothing) + scale8( noiseData, 256 - dataSmoothing);
-				nblend(matrixleds[XY2(x,MATRIX_HEIGHT-z-1)], ColorFromPalette(rainClouds_p, noise[x][z]), (cloudHeight-z)*(250/cloudHeight));
+				noise[x * cloudHeight + z] = scale8( noise[x * cloudHeight + z], dataSmoothing) + scale8( noiseData, 256 - dataSmoothing);
+				nblend(matrixleds[XY2(x,MATRIX_HEIGHT-z-1)], ColorFromPalette(rainClouds_p, noise[x * cloudHeight + z]), (cloudHeight-z)*(250/cloudHeight));
 			}
 			noiseZ ++;
 		}
@@ -431,6 +445,7 @@ void pride()
 
 void rainbow()
 {
+	CRGB tempHeightStrip[MATRIX_HEIGHT];
 	fill_rainbow(tempHeightStrip, MATRIX_HEIGHT, gHue, 10);
 
 	for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
@@ -453,6 +468,9 @@ void rainbowWithGlitter()
 
 void sinelon()
 {
+	// This is not memory efficient if you use the function, but saves memory by avoiding 
+	// a global if you never call the function
+	static CRGB tempHeightStrip[MATRIX_HEIGHT];
 	// a colored dot sweeping back and forth, with fading trails
 	fadeToBlackBy( tempHeightStrip, MATRIX_HEIGHT, 20);
 	int pos = beatsin16(map8(speed,30,150), 0, MATRIX_HEIGHT - 1);
@@ -473,10 +491,20 @@ void sinelon()
 	prevpos = pos;
 }
 
+void sublime_setup() {
+    // https://www.geeksforgeeks.org/dynamically-allocate-2d-array-c/
+    tempMatrix = (uint8_t **) malloc( (MATRIX_WIDTH+1) * sizeof(int *) );
+    for (uint16_t i=0; i < MATRIX_WIDTH+1; i++) {
+        tempMatrix[i] = (uint8_t *) malloc(MATRIX_HEIGHT+1);
+    }
+    splashArray = (uint8_t *) malloc(MATRIX_WIDTH);
+}
+
+
 #ifndef SUBLIME_INCLUDE
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { stormyRain, fire, theMatrix, coloredRain,  // 0-2
+const SimplePatternList gPatterns = { stormyRain, fire, theMatrix, coloredRain,  // 0-2
 				bpm, juggle,       // 3-5
 				pride, rainbow, rainbowWithGlitter, // 6-8
 				sinelon, //9 
@@ -506,6 +534,7 @@ void setup() {
   Serial.begin(115200);
   matrix_setup();
   matrix->begin();
+  sublime_setup();
   Serial.println("Setup done");
 }
 #endif // SUBLIME_INCLUDE
