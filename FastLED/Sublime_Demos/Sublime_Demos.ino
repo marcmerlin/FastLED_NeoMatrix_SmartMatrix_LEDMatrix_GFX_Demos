@@ -80,15 +80,17 @@ void fire()
 	static uint8_t currentFirePaletteIndex = firePaletteCount-1; // Force rotating fire palette
 	// COOLING: How much does the air cool as it rises?
 	// Less cooling = taller flames.  More cooling = shorter flames.
-	uint8_t cooling = 80;
+	uint8_t cooling = 70;
 	// SPARKING: What chance (out of 255) is there that a new spark will be lit?
 	// Higher chance = more roaring fire.  Lower chance = more flickery fire.
-	uint8_t sparking = 84;
+	uint8_t sparking = 130;
 	// SMOOTHING; How much blending should be done between frames
 	// Lower = more blending and smoother flames. Higher = less blending and flickery flames
-	const uint8_t fireSmoothing = 60;
+	const uint8_t fireSmoothing = 80;
 
+#ifndef SUBLIME_INCLUDE
 	FastLED.delay(1000/map8(speed,30,110));
+#endif
 	// Add entropy to random number generator; we use a lot of it.
 	random16_add_entropy(random(256));
 
@@ -132,13 +134,14 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 	static uint16_t noiseY = random16();
 	static uint16_t noiseZ = random16();
 
+#ifndef SUBLIME_INCLUDE
 	FastLED.delay(1000/map8(speed,16,32));
-	// Add entropy to random number generator; we use a lot of it.
+#endif
 
 	CRGB lightningColor = CRGB(72,72,80);
 	CRGBPalette16 rain_p( CRGB::Black, rainColor );
 #ifdef SMARTMATRIX
-	CRGBPalette16 rainClouds_p( CRGB::Black, CRGB(35,44,44), CRGB(29,35,35), CRGB::Black );
+	CRGBPalette16 rainClouds_p( CRGB::Black, CRGB(75,84,84), CRGB(49,75,75), CRGB::Black );
 #else
 	CRGBPalette16 rainClouds_p( CRGB::Black, CRGB(15,24,24), CRGB(9,15,15), CRGB::Black );
 #endif
@@ -169,6 +172,7 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 
 		// Step 4. Add splash if called for
 		if (splashes) {
+			// FIXME, this is broken
 			byte j = splashArray[x];
 			byte v = tempMatrix[x][0];
 
@@ -266,7 +270,7 @@ void stormyRain()
 {
 	// ( Depth of dots, maximum brightness, frequency of new dots, length of tails, color, splashes, clouds, ligthening )
 	//rain(0, 90, map8(intensity,0,150)+60, 10, solidRainColor, true, true, true);
-	rain(0, 90, map8(intensity,0,100)+30, 30, solidRainColor, true, true, true);
+	rain(60, 160, map8(intensity,0,100)+30, 30, solidRainColor, true, true, true);
 }
 
 void addGlitter( uint8_t chanceOfGlitter)
@@ -500,6 +504,14 @@ void sublime_setup() {
     splashArray = (uint8_t *) malloc(MATRIX_WIDTH);
 }
 
+void sublime_reset() {
+    for (uint16_t i=0; i < MATRIX_WIDTH+1; i++) {
+        memset(tempMatrix[i], 0, MATRIX_HEIGHT+1);
+    }
+    memset(splashArray, 0, MATRIX_WIDTH);
+}
+
+
 
 #ifndef SUBLIME_INCLUDE
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
@@ -521,11 +533,11 @@ SimplePatternList gPatterns = {
 // fire, theMatrix, stormyRrain, pride
 // debug colorWaves
 
-void nextPattern()
+void ChangePattern(int8_t dir)
 {
   matrix->clear();
   // add one to the current pattern number, and wrap around at the end
-  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
+  gCurrentPatternNumber = (gCurrentPatternNumber + dir) % ARRAY_SIZE( gPatterns);
   Serial.print("Switched to pattern #"); Serial.println(gCurrentPatternNumber);
 }
 
@@ -541,6 +553,21 @@ void setup() {
 
 #ifndef SUBLIME_INCLUDE
 void loop() {
+        char readchar;
+	if (Serial.available()) readchar = Serial.read(); else readchar = 0;
+
+	switch(readchar) {
+	case 'n': 
+		Serial.println("Serial => next"); 
+		ChangePattern(1);
+		break;
+
+	case 'p':
+		Serial.println("Serial => previous");
+		ChangePattern(-1);
+		break;
+	}
+	
 #else
 void sublime_loop() {
 #endif
@@ -556,11 +583,8 @@ void sublime_loop() {
 
 
 #ifndef SUBLIME_INCLUDE
-	EVERY_N_MILLISECONDS(40) {
-		gHue++;  // slowly cycle the "base color" through the rainbow
-	}
-
-	EVERY_N_SECONDS( 20 ) { nextPattern(); } // change patterns periodically
+	EVERY_N_MILLISECONDS(40) { gHue++;  } // slowly cycle the "base color" through the rainbow
+	EVERY_N_SECONDS( 20 ) { ChangePattern(1); } // change patterns periodically
 
 	// Call the current pattern function once, updating the 'matrixleds' array
 	gPatterns[gCurrentPatternNumber]();
