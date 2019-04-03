@@ -159,7 +159,11 @@ class Dot {
 		x = random16(0x8000)+0x2000;			// Horizontal middle 7/8 of the matrix
 //		x = random16(0x4000)+0x2000;			// Horizontal middle 2/4 of the matrix
 //		x = 0x4000;					// Horizontal middle of the matrix
+#ifdef NEOMATRIX
 		color.setRGB(24,24,24);				// Shells are white color' as a CRGB
+#else
+		color.setRGB(64,64,64);				// Shells are white color' as a CRGB
+#endif
 		theType = SHELL;
 		show = 1;
 	}							// End of Groundlaunch function
@@ -182,11 +186,14 @@ class Dot {
 #define MIN_SPARKS 20
 
 Dot *gDot;		// Creates an object named gDot of type Dot class
+//Dot gDot[MAX_SHELLS];
 Dot *gSparks;		// Creates an array object named gSparks of type Dot class
 
 void fireworks_setup() {
     gDot    = (Dot *) malloc(MAX_SHELLS * sizeof(Dot));
-    gSparks = (Dot *) malloc(MAX_SHELLS * MATRIX_HEIGHT* sizeof(Dot));
+    gSparks = (Dot *) malloc(MAX_SHELLS * MATRIX_HEIGHT * sizeof(Dot));
+    memset(gDot,    0, MAX_SHELLS * sizeof(Dot));
+    memset(gSparks, 0, MAX_SHELLS * MATRIX_HEIGHT * sizeof(Dot));
 }
 
 void fireworks() 
@@ -198,10 +205,11 @@ void fireworks()
 	#else
 	CRGB sky1(0,0,32);				
 	#endif
+	CRGB sky2(32,32,64);				
 #else
-	CRGB sky1(0,0,32);				// Background sky color (will only work if brightness is set high 128 or up !!)
+	CRGB sky1(0,0,48);				// Background sky color
+	CRGB sky2(64,64,128);				// Alternate sky color to create a star twinkle effect 
 #endif
-	CRGB sky2(32,32,64);				// Alternate sky color to create a star twinkle effect 
 
 	for( uint8_t h = 0; h < MATRIX_WIDTH; h++) {	// All leds will be set to 'sky1' (very dark blue) 
 		for( int v = 0; v < MATRIX_HEIGHT; v++) {
