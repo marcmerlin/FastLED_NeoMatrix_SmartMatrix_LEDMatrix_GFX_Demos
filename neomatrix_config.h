@@ -104,23 +104,33 @@ SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeig
 #ifdef LEDMATRIX
 // cLEDMatrix defines 
 cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
-    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
 
 // cLEDMatrix creates a FastLED array inside its object and we need to retrieve
 // a pointer to its first element to act as a regular FastLED array, necessary
 // for NeoMatrix and other operations that may work directly on the array like FadeAll.
-CRGB *matrixleds = ledmatrix[0];
+//CRGB *matrixleds = ledmatrix[0];
 #else
-CRGB matrixleds[NUMMATRIX];
+//CRGB matrixleds[NUMMATRIX];
 #endif
+CRGB *matrixleds;
+
+void show_callback();
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, show_callback);
 
 // Sadly this callback function must be copied around with this init code
 void show_callback() {
-    memcpy(backgroundLayer.backBuffer(), matrixleds, kMatrixHeight*kMatrixWidth*3);
-    backgroundLayer.swapBuffers(false);
+//    memcpy(backgroundLayer.backBuffer(), matrixleds, kMatrixHeight*kMatrixWidth*3);
+//    backgroundLayer.swapBuffers(false);
+    backgroundLayer.swapBuffers(true);
+    //matrixleds = (CRGB *)backgroundLayer.getRealBackBuffer());
+    matrixleds = (CRGB *)backgroundLayer.backBuffer();
+    matrix->newLedsPtr(matrixleds);
+#ifdef LEDMATRIX
+    ledmatrix.SetLEDArray(matrixleds);
+#endif
 }
 
-SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, show_callback);
 
 //---------------------------------------------------------------------------- 
 #elif defined(M32B8X3)
@@ -372,7 +382,8 @@ void matrix_setup(int reservemem = 40000) {
     // SmartMatrix takes all the RAM it can get its hands on. Get it to leave some
     // free RAM so that other libraries can work too.
     if (reservemem) matrixLayer.begin(reservemem); else matrixLayer.begin();
-    matrixLayer.setBrightness(matrix_brightness);
+    // This sets the neomatrix and LEDMatrix pointers
+    show_callback();
     matrixLayer.setRefreshRate(240);
     backgroundLayer.enableColorCorrection(true);
     Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix GFX output, total LEDs: ");
@@ -382,7 +393,8 @@ void matrix_setup(int reservemem = 40000) {
 #ifndef DISABLE_MATRIX_TEST
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Grey Demo");
     backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
-    backgroundLayer.swapBuffers();
+    // backgroundLayer.swapBuffers();
+    show_callback();
     delay(1000);
 #endif
 
@@ -444,18 +456,21 @@ void matrix_setup(int reservemem = 40000) {
         #endif // ESP32
     #endif // ESP32_16PINS
 #endif
-#if !defined(SMARTMATRIX)
+
+    Serial.print("Setting Brightness: ");
+    Serial.println(matrix_brightness);
+#if defined(SMARTMATRIX)
+    matrixLayer.setBrightness(matrix_brightness);
+#else
     FastLED.setBrightness(matrix_brightness);
 #endif
-    Serial.print("Brightness: ");
-    Serial.println(matrix_brightness);
     Serial.print("Gamma Correction: ");
     Serial.println(matrix_gamma);
-    // Gamma is used by AnimatedGIFs, as such:
+    // Gamma is used by AnimatedGIFs and others, as such:
     // CRGB color = CRGB(matrix->gamma[red], matrix->gamma[green], matrix->gamma[blue]);
     matrix->precal_gamma(matrix_gamma);
 
-// LEDMatrix alignment is tricky, make sure things are aligned correctly
+// LEDMatrix alignment is tricky, this test helps make sure things are aligned correctly
 #ifndef DISABLE_MATRIX_TEST
 #ifdef LEDMATRIX
     ledmatrix.DrawLine (0, 0, ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 255, 0));
