@@ -57,6 +57,8 @@ bool init_done = 0;
 #include <FastLED.h>
 
 #ifdef LEDMATRIX
+// Please use https://github.com/marcmerlin/LEDMatrix/tree/ledmalloc for
+// zero copy/no malloc code to work.
 #include <LEDMatrix.h>
 #endif
 
