@@ -1,0 +1,76 @@
+Pattern 1 Inca , Time (s) 26, Step 7, Adjunct 3 Flip, flip2, flip3: 100 fader 5 pre waiter  10 target FPS   29  Actual FPS: 28.14  delta: 0.9   end waiter: 19
+Pattern 10 Corn , Time (s) 30, Step 6, Adjunct 7 Flip, flip2, flip3: 010 fader 3 pre waiter  10 target FPS   25  Actual FPS: 25.13  delta: -0.1   end waiter: 26
+Pattern 11 Wt warp , Time (s) 38, Step 3, Adjunct 0 Flip, flip2, flip3: 001 fader 1 pre waiter  10 target FPS   14  Actual FPS: 19.16  delta: -5.2   end waiter: 44
+Pattern 22 , Time (s) 23, Step 11, Adjunct 5 Flip, flip2, flip3: 010 fader 1 pre waiter  10 target FPS   27  Actual FPS: 27.47  delta: -0.5   end waiter: 28
+Pattern 25 spire , Time (s) 30, Step 5, Adjunct 0 Flip, flip2, flip3: 111 fader 7 pre waiter  10 target FPS   40  Actual FPS: 40.00  delta: 0.0   end waiter: 9
+Pattern 29 Raudio, Time (s) 21, Step 4, Adjunct 0 Flip, flip2, flip3: 000 fader 1 pre waiter  10 target FPS   28  Actual FPS: 35.38  delta: -7.4   end waiter: 20
+Pattern 34 RAudio 3, Time (s) 26, Step 4, Adjunct 0 Flip, flip2, flip3: 010 fader 7 pre waiter  10 target FPS   28  Actual FPS: 35.46  delta: -7.5   end waiter: 14
+Pattern 36 RAudio 5, Time (s) 33, Step 3, Adjunct 0 Flip, flip2, flip3: 010 fader 1 pre waiter  10 target FPS   24  Actual FPS: 34.01  delta: -10.0   end waiter: 22
+Pattern 37 RAudio, Time (s) 39, Step 7, Adjunct 4 Flip, flip2, flip3: 111 fader 6 pre waiter  10 target FPS   22  Actual FPS: 22.09  delta: -0.1   end waiter: 31
+Pattern 52 , Time (s) 29, Step 3, Adjunct 5 Flip, flip2, flip3: 100 fader 3 pre waiter  10 target FPS   15  Actual FPS: 15.08  delta: -0.1   end waiter: 58
+Pattern 57 , Time (s) 38, Step 5, Adjunct 0 Flip, flip2, flip3: 100 fader 5 pre waiter  10 target FPS   29  Actual FPS: 28.85  delta: 0.2   end waiter: 19
+Pattern 60 , Time (s) 24, Step 3, Adjunct 0 Flip, flip2, flip3: 000 fader 5 pre waiter  10 target FPS   21  Actual FPS: 20.95  delta: 0.1   end waiter: 32
+Pattern 61 , Time (s) 21, Step 6, Adjunct 0 Flip, flip2, flip3: 000 fader 2 pre waiter  10 target FPS   21  Actual FPS: 20.72  delta: 0.3   end waiter: 38
+Pattern 67 , Time (s) 21, Step 7, Adjunct 0 Flip, flip2, flip3: 110 fader 1 pre waiter  10 target FPS   21  Actual FPS: 20.78  delta: 0.2   end waiter: 36
+Pattern 70 spin2 , Time (s) 26, Step 6, Adjunct 10 Flip, flip2, flip3: 000 fader 6 pre waiter  10 target FPS   24  Actual FPS: 24.51  delta: -0.5   end waiter: 27
+Pattern 72 homer , Time (s) 36, Step 5, Adjunct 8 Flip, flip2, flip3: 001 fader 4 pre waiter  10 target FPS   14  Actual FPS: 13.82  delta: 0.2   end waiter: 62
+Pattern 73 , Time (s) 30, Step 3, Adjunct 0 Flip, flip2, flip3: 101 fader 7 pre waiter  10 target FPS   27  Actual FPS: 36.67  delta: -9.7   end waiter: 23
+Pattern 77 whtwarp w/ eff , Time (s) 24, Step 2, Adjunct 3 Flip, flip2, flip3: 010 fader 5 pre waiter  10 target FPS   6  Actual FPS: 13.40  delta: -7.4   end waiter: 59
+Pattern 80 starz , Time (s) 31, Step 2, Adjunct 6 Flip, flip2, flip3: 110 fader 1 pre waiter  10 target FPS   12  Actual FPS: 13.81  delta: -1.8   end waiter: 64
+Pattern 104 circlearc, Time (s) 31, Step 2, Adjunct 6 Flip, flip2, flip3: 101 fader 1 pre waiter  10 target FPS   25  Actual FPS: 24.83  delta: 0.2   end waiter: 24
+Pattern 105 , Time (s) 29, Step 2, Adjunct 3 Flip, flip2, flip3: 100 fader 4 pre waiter  10 target FPS   60  Actual FPS: 57.25  delta: 2.7   end waiter: 0
+Pattern 110 bubbles, Time (s) 29, Step 7, Adjunct 4 Flip, flip2, flip3: 101 fader 10 pre waiter  10 target FPS   17  Actual FPS: 16.99  delta: 0.0   end waiter: 48
+
+
+
+Good
+Pattern 104 circlearc, Time (s) 34, Step 4, Adjunct 10 Flip, flip2, flip3: 101 fader 5 pre waiter  10 target FPS   27
+Pattern 8 Pym , Time (s) 33, Step 3, Adjunct 10 Flip, flip2, flip3: 010 fader 5 pre waiter  12 target FPS   40
+Pattern 10 Corn , Time (s) 30, Step 5, Adjunct 7 Flip, flip2, flip3: 100 fader 5 pre waiter  16 target FPS   28
+Pattern 11 Wt warp , Time (s) 39, Step 6, Adjunct 0 Flip, flip2, flip3: 111 fader 4 pre waiter  27 target FPS   24
+Pattern 25 spire , Time (s) 34, Step 5, Adjunct 0 Flip, flip2, flip3: 010 fader 7 pre waiter  10 target FPS   40
+Pattern 29 Raudio, Time (s) 30, Step 5, Adjunct 0 Flip, flip2, flip3: 001 fader 6 pre waiter  39 target FPS   29
+Pattern 34 RAudio 3, Time (s) 36, Step 5, Adjunct 0 Flip, flip2, flip3: 101 fader 7 pre waiter  10 target FPS   21
+Pattern 36 RAudio 5, Time (s) 27, Step 7, Adjunct 0 Flip, flip2, flip3: 000 fader 3 pre waiter  10 target FPS   26
+Pattern 37 RAudio, Time (s) 39, Step 5, Adjunct 7 Flip, flip2, flip3: 101 fader 1 pre waiter  10 target FPS   22
+Pattern 52 , Time (s) 27, Step 2, Adjunct 10 Flip, flip2, flip3: 110 fader 3 pre waiter  27 target FPS   15
+=> circle / triangle / square
+Pattern 61 , Time (s) 24, Step 6, Adjunct 0 Flip, flip2, flip3: 011 fader 2 pre waiter  21 target FPS   21
+=> circle / triangle / square
+
+Pattern 67 , Time (s) 26, Step 5, Adjunct 0 Flip, flip2, flip3: 100 fader 1 pre waiter  29 target FPS   23
+=> spiral that sometimes shoots lines?
+
+Pattern 70 spin2 , Time (s) 20, Step 2, Adjunct 7 Flip, flip2, flip3: 000 fader 3 pre waiter  37 target FPS   21
+=> 4 colors spinning around one another
+Pattern 80 starz , Time (s) 36, Step 2, Adjunct 10 Flip, flip2, flip3: 010 fader 3 pre waiter  58 target FPS   7
+Dancing spinning color stars or triangles
+Pattern 105 , Time (s) 28, Step 3, Adjunct 6 Flip, flip2, flip3: 101 fader 3 pre waiter  0 target FPS   60
+
+
+MAybe 
+Pattern 1 Inca , Time (s) 26, Step 7, Adjunct 3 Flip, flip2, flip3: 001 fader 1 pre waiter  10 target FPS   22  Actual FPS: 21.93  delta: 0.1   end waiter: 35
+Pattern 4 Rhole , Time (s) 20, Step 4, Adjunct 7 Flip, flip2, flip3: 010 fader 6 pre waiter  10 target FPS   40p
+Pattern 16 Sol FB ring , Time (s) 33, Step 6, Adjunct 0 Flip, flip2, flip3: 100 fader 3 pre waiter  58 target FPS   15
+Pattern 22 , Time (s) 30, Step 11, Adjunct 5 Flip, flip2, flip3: 101 fader 1 pre waiter  10 target FPS   25
+Pattern 47 , Time (s) 38, Step 5, Adjunct 0 Flip, flip2, flip3: 111 fader 2 pre waiter  10 target FPS   24
+Pattern 57 , Time (s) 23, Step 5, Adjunct 0 Flip, flip2, flip3: 000 fader 7 pre waiter  10 target FPS   22
+Pattern 60 , Time (s) 39, Step 6, Adjunct 0 Flip, flip2, flip3: 111 fader 3 pre waiter  29 target FPS   26
+Pattern 72 homer , Time (s) 23, Step 6, Adjunct 8 Flip, flip2, flip3: 000 fader 2 pre waiter  72 target FPS   6  Actual FPS: 10.14  delta: -4.1   end waiter: 90
+Pattern 73 , Time (s) 25, Step 7, Adjunct 0 Flip, flip2, flip3: 100 fader 4 pre waiter  41 target FPS   21
+=> growing middle circle
+Pattern 77 whtwarp w/ eff , Time (s) 27, Step 5, Adjunct 7 Flip, flip2, flip3: 110 fader 5 pre waiter  75 target FPS   6
+stars flyig awaywith zooming circle
+Pattern 104 circlearc, Time (s) 29, Step 4, Adjunct 3 Flip, flip2, flip3: 010 fader 6 pre waiter  33 target FPS   28
+Pattern 110 bubbles, Time (s) 36, Step 5, Adjunct 8 Flip, flip2, flip3: 110 fader 10 pre waiter  10 target FPS   21
+
+
+
+
+
+Fix null dot:
+Pattern 29 Raudio, Time (s) 30, Step 5, Adjunct 0 Flip, flip2, flip3: 001 fader 6 pre waiter  39 target FPS   29
+
+Smiley upside down
+Pattern 65 , Time (s) 25, Step 3, Adjunct 10 Flip, flip2, flip3: 111 fader 3 pre waiter  66 target FPS   11
+
