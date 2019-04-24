@@ -102,14 +102,15 @@ class Dot {
 		if ((p11 > p00) && (p11 > p01) && (p11 > p10)) setXY(x_pos + 1, y_pos + 1) += color;
 		if ((p00 > p10) && (p01 > p10) && (p11 > p10)) setXY(x_pos - 1, y_pos) += color;
 	    
-		/*
-		setXY(x_pos, y_pos) = CRGB(p00, p00, p00);		// Modifies the color content of the base pixel 
-		setXY(x_pos, y_pos + 1) = CRGB(p01, p01, p01);		// And the 3 immediate pixels on top, to the right and diagonal
-		setXY(x_pos + 1, y_pos) = CRGB(p10, p10, p10);
-		setXY(x_pos + 1, y_pos + 1) = CRGB(p11, p11, p11);
-		*/
+		// On bigger RGBPanels, we can make a bigger explosion
+		if (MATRIX_HEIGHT > 32) {
+			setXY(x_pos, y_pos) = CRGB(p00, p00, p00);		// Modifies the color content of the base pixel 
+			setXY(x_pos, y_pos + 1) = CRGB(p01, p01, p01);		// And the 3 immediate pixels on top, to the right and diagonal
+			setXY(x_pos + 1, y_pos) = CRGB(p10, p10, p10);
+			setXY(x_pos + 1, y_pos + 1) = CRGB(p11, p11, p11);
+		}
     
-	}                    // End of draw function
+	}       // End of draw function
 
 	void Move() {
 //		if( !show) return;
@@ -188,12 +189,16 @@ class Dot {
 Dot *gDot;		// Creates an object named gDot of type Dot class
 //Dot gDot[MAX_SHELLS];
 Dot *gSparks;		// Creates an array object named gSparks of type Dot class
+//Dot gSparks[MAX_SHELLS*MAX_SPARKS];			//Creates an array object named gSparks of type Dot class
 
 void fireworks_setup() {
     gDot    = (Dot *) malloc(MAX_SHELLS * sizeof(Dot));
-    gSparks = (Dot *) malloc(MAX_SHELLS * MATRIX_HEIGHT * sizeof(Dot));
+    gSparks = (Dot *) malloc(MAX_SHELLS * MAX_SPARKS * sizeof(Dot));
+    while (gDot == NULL || gSparks == NULL) {
+	Serial.println("fireworks_setup malloc failed");
+    }
     memset(gDot,    0, MAX_SHELLS * sizeof(Dot));
-    memset(gSparks, 0, MAX_SHELLS * MATRIX_HEIGHT * sizeof(Dot));
+    memset(gSparks, 0, MAX_SHELLS * MAX_SPARKS * sizeof(Dot));
 }
 
 void fireworks() 
@@ -292,7 +297,6 @@ void setup() {
 void loop()
 {
   fireworks();
-  
   matrix->show();
 }
 #endif
