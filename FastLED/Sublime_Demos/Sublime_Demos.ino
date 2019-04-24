@@ -194,6 +194,8 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 			//uint8_t lightning[MATRIX_WIDTH][MATRIX_HEIGHT];
 			// ESP32 does not like static arrays  https://github.com/espressif/arduino-esp32/issues/2567
 			uint8_t *lightning = (uint8_t *) malloc(MATRIX_WIDTH * MATRIX_HEIGHT);
+			while (lightning == NULL) { Serial.println("lightning malloc failed"); }
+
 
 			if (random16() < 72) {		// Odds of a lightning bolt
 				lightning[scale8(random8(), MATRIX_WIDTH-1) + (MATRIX_HEIGHT-1) * MATRIX_WIDTH] = 255;	// Random starting location
@@ -237,6 +239,7 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 			// This is the array that we keep our computed noise values in
 			//static uint8_t noise[MATRIX_WIDTH][cloudHeight];
 			static uint8_t *noise = (uint8_t *) malloc(MATRIX_WIDTH * cloudHeight);
+			while (noise == NULL) { Serial.println("noise malloc failed"); }
 			int xoffset = noiseScale * x + gHue;
 
 			for(int z = 0; z < cloudHeight; z++) {
@@ -498,10 +501,13 @@ void sinelon()
 void sublime_setup() {
     // https://www.geeksforgeeks.org/dynamically-allocate-2d-array-c/
     tempMatrix = (uint8_t **) malloc( (MATRIX_WIDTH+1) * sizeof(int *) );
+    while (tempMatrix == NULL) { Serial.println("tempMatrix malloc failed"); }
     for (uint16_t i=0; i < MATRIX_WIDTH+1; i++) {
         tempMatrix[i] = (uint8_t *) malloc(MATRIX_HEIGHT+1);
+        while (tempMatrix[i] == NULL) { Serial.println("tempMatrix[i] malloc failed"); }
     }
     splashArray = (uint8_t *) malloc(MATRIX_WIDTH);
+    while (splashArray == NULL) { Serial.println("splashArray malloc failed"); }
 }
 
 void sublime_reset() {
