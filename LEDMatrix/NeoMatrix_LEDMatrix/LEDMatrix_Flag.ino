@@ -1,10 +1,12 @@
 #define LEDMATRIX
-#include "neomatrix_config.h"
+#include "config.h"
 
 
 void ledmatrix_setup()
 {
     Serial.println("ledmatrix setup");
+    // This was moved to config.h matrix_setup
+#if 0
     ledmatrix.DrawLine (0, 0, ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 255, 0));
     ledmatrix.DrawPixel(0, 0, CRGB(255, 0, 0));
     ledmatrix.DrawPixel(ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 0, 255));
@@ -13,6 +15,7 @@ void ledmatrix_setup()
     ledmatrix.DrawPixel(ledmatrix.Width() - 5, 4,  CRGB(255, 64, 64));
     ledmatrix.DrawPixel(4, ledmatrix.Height() - 5, CRGB(64, 64, 255));
     matrix->show();
+#endif
     Serial.println("ledmatrix setup done");
 }
 
