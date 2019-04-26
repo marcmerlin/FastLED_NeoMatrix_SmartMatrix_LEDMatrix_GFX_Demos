@@ -4,8 +4,14 @@
 bool init_done = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-#define M16BY16T4
-//#define NEOPIXEL_MATRIX
+// No SmartMatrix on ESP8266, but otherwise default to SmartMatrix
+// unless NEOPIXEL_MATRIX is defined before including this.
+#ifdef ESP8266
+#define M32B8X3
+//#define M16BY16T4
+#define NEOPIXEL_MATRIX
+#endif
+
 #ifndef NEOPIXEL_MATRIX
 #define SMARTMATRIX
 #endif
@@ -247,7 +253,7 @@ const uint8_t MATRIXPIN = 13;
 //---------------------------------------------------------------------------- 
 #elif defined(M64BY64) // 64x64 straight connection (no matrices)
 // http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
-uint8_t matrix_brightness = 32;
+uint8_t matrix_brightness = 64;
 //
 // Used by LEDMatrix
 const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
