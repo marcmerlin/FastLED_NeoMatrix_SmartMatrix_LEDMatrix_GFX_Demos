@@ -37,7 +37,7 @@ class PatternFlowField : public Drawable {
     uint16_t speed = 1;
     uint16_t scale = 26;
 
-    static const int count = 40;
+    static const int count = 64;
 
     byte hue = 0;
 
@@ -57,26 +57,26 @@ class PatternFlowField : public Drawable {
       // CRGB color = effects.ColorFromCurrentPalette(hue);
 
       for (int i = 0; i < count; i++) {
-        Boid boid = boids[i];
+        Boid * boid = &boids[i];
 
-        int ioffset = scale * boid.location.x;
-        int joffset = scale * boid.location.y;
+        int ioffset = scale * boid->location.x;
+        int joffset = scale * boid->location.y;
 
         byte angle = inoise8(x + ioffset, y + joffset, z);
 
-        boid.velocity.x = (float) sin8(angle) * 0.0078125 - 1.0;
-        boid.velocity.y = -((float)cos8(angle) * 0.0078125 - 1.0);
-        boid.update();
+        boid->velocity.x = (float) sin8(angle) * 0.0078125 - 1.0;
+        boid->velocity.y = -((float)cos8(angle) * 0.0078125 - 1.0);
+        boid->update();
 
-        //backgroundLayer.drawPixel(boid.location.x, boid.location.y, effects.ColorFromCurrentPalette(angle + hue)); // color
+        //backgroundLayer.drawPixel(boid->location.x, boid->location.y, effects.ColorFromCurrentPalette(angle + hue)); // color
+        //effects.Pixel(boid->location.x, boid->location.y, color); // color
         CRGB color = effects.ColorFromCurrentPalette(effects.ColorFromCurrentPalette(angle + hue));
-        //effects.Pixel(boid.location.x, boid.location.y, color); // color
-        matrix->drawPixel(boid.location.x, boid.location.y, color);
+        matrix->drawPixel(boid->location.x, boid->location.y, color);
 
-        if (boid.location.x < 0 || boid.location.x >= MATRIX_WIDTH ||
-            boid.location.y < 0 || boid.location.y >= MATRIX_HEIGHT) {
-          boid.location.x = random(MATRIX_WIDTH);
-          boid.location.y = 0;
+        if (boid->location.x < 0 || boid->location.x >= MATRIX_WIDTH ||
+            boid->location.y < 0 || boid->location.y >= MATRIX_HEIGHT) {
+          boid->location.x = random(MATRIX_WIDTH);
+          boid->location.y = 0;
         }
       }
 
