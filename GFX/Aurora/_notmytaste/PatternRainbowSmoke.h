@@ -36,10 +36,10 @@ class PatternRainbowSmoke : public Drawable {
       uint8_t y = 0;
     };
 
-    static const uint8_t NUMCOLORS = 11;
-    static const uint16_t COLOR_COUNT = 1024;
-    uint8_t startx = 15;
-    uint8_t starty = 15;
+    static const uint16_t COLOR_COUNT = NUM_LEDS;
+    float NUMCOLORS = cbrt(COLOR_COUNT);
+    uint8_t startx = MATRIX_CENTRE_X;
+    uint8_t starty = MATRIX_CENTRE_Y;
 
     rgb24 colors[COLOR_COUNT];
     bool hasColor[MATRIX_WIDTH][MATRIX_HEIGHT];
@@ -194,7 +194,7 @@ class PatternRainbowSmoke : public Drawable {
     }
 
     void createPalette() {
-      int colorSort = random(4);
+      int colorSort = random(3);
 
       switch (colorSort) {
         case 0:
@@ -209,9 +209,9 @@ class PatternRainbowSmoke : public Drawable {
           createPaletteBRG();
           shuffleColors();
           break;
-        case 3:
-          createPaletteHSV();
-          break;
+//        case 3:
+//          createPaletteHSV();
+//          break;
       }
     }
 
@@ -285,6 +285,7 @@ class PatternRainbowSmoke : public Drawable {
       }
     }
 
+#if 0
     void createPaletteHSV() {
       int i = 0;
 
@@ -306,6 +307,7 @@ class PatternRainbowSmoke : public Drawable {
         }
       }
     }
+#endif
 
   public:
     PatternRainbowSmoke() {
@@ -335,8 +337,8 @@ class PatternRainbowSmoke : public Drawable {
 
       if (currentColorIndex == 0) {
         // use a random starting point
-        point.x = random(32);
-        point.y = random(32);
+        point.x = random(MATRIX_WIDTH);
+	point.y = random(MATRIX_HEIGHT);
       }
       else {
         point = getAvailablePoint(algorithm, color);

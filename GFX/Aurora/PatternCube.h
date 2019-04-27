@@ -34,11 +34,12 @@
 class PatternCube : public Drawable {
   private:
     float focal = 30; // Focal of the camera
-    int cubeWidth = min(MATRIX_WIDTH-2,MATRIX_HEIGHT-2); // Cube size
+    int cubeWidth = min(MATRIX_WIDTH-4,MATRIX_HEIGHT-4); // Cube size
     float Angx = 20.0, AngxSpeed = 0.05; // rotation (angle+speed) around X-axis
     float Angy = 10.0, AngySpeed = 0.05; // rotation (angle+speed) around Y-axis
     float Ox = MATRIX_WIDTH/2, Oy = MATRIX_HEIGHT/2; // position (x,y) of the frame center
-    int zCamera = 110; // distance from cube to the eye of the camera
+    //int zCamera = 110; // distance from cube to the eye of the camera
+    int zCamera = MATRIX_WIDTH * 5; // distance from cube to the eye of the camera
 
     // Local vertices
     Vertex  local[8];
@@ -162,17 +163,19 @@ class PatternCube : public Drawable {
       if (MATRIX_WIDTH > 32)  {
         blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, 255);
       } else {
-        fadeToBlackBy( matrixleds, NUMMATRIX, 128);
+	// larger numbers = more tails behind
+        fadeToBlackBy( matrixleds, NUMMATRIX, 40);
       }
 #else
-      uint8_t blurAmount = beatsin8(2, 10, 255);
+      uint8_t blurAmount = beatsin8(2, 10, 240);
       effects.DimAll(blurAmount);
 #endif
       //fadeToBlackBy( matrixleds, NUMMATRIX, 128);
 
-      zCamera = beatsin8(2, 100, 140);
-      AngxSpeed = beatsin8(3, 1, 10) / 100.0f;
-      AngySpeed = beatcos8(5, 1, 10) / 100.0f;
+      //zCamera = beatsin8(2, 100, 140);
+      zCamera = beatsin8(2, min(MATRIX_WIDTH*2.5, 120.0), 160);
+      AngxSpeed = beatsin8(3, 1, 5) / 100.0f;
+      AngySpeed = beatcos8(5, 1, 5) / 100.0f;
 
       // Update values
       Angx += AngxSpeed;
