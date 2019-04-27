@@ -42,12 +42,15 @@ public:
 
         // the horizontal position of the head of the infinity sign
         // oscillates from 0 to the maximum horizontal and back
-        int x = (MATRIX_WIDTH - 1) - effects.p[1];
+        //int x = (MATRIX_WIDTH - 1) - effects.p[1];
+	int x = beatsin8(15, 1, MATRIX_WIDTH - 2);
 
         // the vertical position of the head oscillates
         // from 8 to 23 and back (hard-coded for a 32x32 matrix)
-        int y = map8(sin8(effects.osci[3]), 8, 23);
+        //int y = map8(sin8(effects.osci[3]), 8, 23);
+        int y = (MATRIX_HEIGHT - 1) - beatsin8(30, MATRIX_HEIGHT / 4, ((MATRIX_HEIGHT / 4) * 3) - 1);
 
+#if 0
         // the hue oscillates from 0 to 255, overflowing back to 0
         byte hue = sin8(effects.osci[5]);
 
@@ -55,6 +58,19 @@ public:
         effects.Pixel(x, y, hue);
 
         return 15;
+#endif
+	static byte hue = 0;
+	hue++;
+
+	CRGB color = effects.ColorFromCurrentPalette(hue);
+
+	effects.leds[XY(x, y)] = color;
+	effects.leds[XY(x + 1, y)] = color;
+	effects.leds[XY(x, y + 1)] = color;
+	effects.leds[XY(x - 1, y)] = color;
+	effects.leds[XY(x, y - 1)] = color;
+
+	return 0;
     }
 };
 

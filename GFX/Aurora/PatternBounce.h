@@ -37,7 +37,8 @@ public:
     void start() {
         unsigned int colorWidth = 256 / count;
         for (int i = 0; i < count; i++) {
-            Boid boid = Boid(i, 0);
+            //Boid boid = Boid(i, 0);
+	    Boid boid = Boid(i, MATRIX_HEIGHT / 8);
             boid.velocity.x = 0;
             boid.velocity.y = i * -0.01;
             boid.colorIndex = colorWidth * i;
@@ -56,13 +57,26 @@ public:
 
             boid.applyForce(gravity);
 
+	    float oldY = boid.location.y;
             boid.update();
+
+	    CRGB color = effects.ColorFromCurrentPalette(boid.colorIndex);
+	    if(boid.location.y > oldY) {
+		for(float y = oldY; y < boid.location.y; y++) {
+		    //backgroundLayer.drawPixel(boid.location.x, y, effects.ColorFromCurrentPalette(boid.colorIndex));
+		    matrix->drawPixel          (boid.location.x, y, color);
+		  }
+		} else {
+		  for(float y = boid.location.y; y < oldY; y++) {
+		    //backgroundLayer.drawPixel(boid.location.x, y, effects.ColorFromCurrentPalette(boid.colorIndex));
+		    matrix->drawPixel          (boid.location.x, y, color);
+		  }
+		}
 
 	    // backgroundLayer.drawPixel(boid.location.x, boid.location.y, effects.ColorFromCurrentPalette(boid.colorIndex));
 	    // this writes an out of bounds pixel that looks bad
             //effects.leds[XY(boid.location.x, boid.location.y)] = effects.ColorFromCurrentPalette(boid.colorIndex);
 	    // drawPixel takes care of it
-	    CRGB color = effects.ColorFromCurrentPalette(boid.colorIndex);
             matrix->drawPixel(boid.location.x, boid.location.y, color);
 
             if (boid.location.y >= MATRIX_HEIGHT - 1) {

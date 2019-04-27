@@ -30,8 +30,8 @@
 
 class PatternInvaders : public Drawable {
   private:
-    uint8_t x = 1;
-    uint8_t y = 1;
+    uint8_t x = 2;
+    uint8_t y = 2;
 
   public:
     PatternInvaders() {
@@ -64,12 +64,12 @@ class PatternInvaders : public Drawable {
       }
 
       x += 6;
-      if (x > 25) {
-        x = 1;
+      if (x > MATRIX_WIDTH - 7) {
+        x = 2;
         y += 6;
       }
 
-      if (y > 25) y = x = 1;
+      if (y > MATRIX_HEIGHT - 7) y = x = 2;
 
       return 125;
     }
@@ -77,8 +77,8 @@ class PatternInvaders : public Drawable {
 
 class PatternInvadersMedium : public Drawable {
   private:
-    uint8_t x = 0;
-    uint8_t y = 0;
+    uint8_t x = 1;
+    uint8_t y = 1;
 
   public:
     PatternInvadersMedium() {
@@ -109,13 +109,14 @@ class PatternInvadersMedium : public Drawable {
         }
       }
 
-      x += 11;
-      if (x > 22) {
-        x = 0;
-        y += 11;
+      x += 13;
+	 
+      if (x > MATRIX_WIDTH - 11) {
+        x = 1;
+        y += 13;
       }
-
-      if (y > 22) y = x = 0;
+      
+      if (y > MATRIX_HEIGHT - 11) y = x = 1;
 
       return 500;
     }

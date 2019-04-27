@@ -50,7 +50,12 @@ class PatternSwirl : public Drawable {
 
 #if FASTLED_VERSION >= 3001000
       // FIXME: the 2D blur isnot blurry/spread enough on higher res screens
-      blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, blurAmount);
+      if (MATRIX_WIDTH < 25) {
+	  blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, blurAmount);
+      } else {
+	  // Never mind, on my 64x96 array, the dots are just too small
+	  blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, 172);
+      }
 #else
       effects.DimAll(blurAmount);
 #endif
