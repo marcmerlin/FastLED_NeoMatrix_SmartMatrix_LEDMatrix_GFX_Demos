@@ -90,6 +90,7 @@ void loop() {
 	Serial.print(item);
 	Serial.print(": ");
 	Serial.println(pattern->name);
+	matrix->clear();
     }
     pattern->drawFrame();
     matrix->show();
@@ -110,6 +111,7 @@ void setup() {
 
     effects.leds = matrixleds;
     effects.Setup();
+    matrix->clear();
 }
 
 // vim:sts=4:sw=4
