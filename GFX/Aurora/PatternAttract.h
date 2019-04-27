@@ -26,7 +26,7 @@
 
 class PatternAttract : public Drawable {
 private:
-    const int count = max(MATRIX_HEIGHT/3, AVAILABLE_BOID_COUNT);
+    const int count = min(MATRIX_HEIGHT/3, AVAILABLE_BOID_COUNT);
     Attractor attractor;
 
 public:
