@@ -45,8 +45,10 @@ public:
     bool operator==(Vector2& v) {
         return x == v.x && y == v.y;
     }
-
     bool operator!=(Vector2& v) {
+	// squelch compiler warning for likely buggy code below
+	v.x = v.x;
+	// this looks buggy
         return !(x == y);
     }
 
