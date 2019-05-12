@@ -96,7 +96,11 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 
 	matrix->clear();
 	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
-	matrix->setCursor(10-size*0.55+offset, mh*2/3+size*0.75);
+#ifdef M32B8X3
+	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
+#else
+ 	matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
+#endif
 	matrix->print(letters[l]);
 	if (size<18) size++; 
 	else if (zoom_type == 0) { done = 1; delayframe = max((speed - faster*10) * 1, 3); } 
@@ -112,7 +116,11 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 	matrix->setTextColor(txtcolor); 
 	matrix->clear();
 	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
-	matrix->setCursor(10-size*0.55+offset, mh*2/3+size*0.75);
+#ifdef M32B8X3
+	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
+#else
+ 	matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
+#endif
 	matrix->print(letters[l]);
 	if (size>3) size--; else { done = 1; direction = 1; delayframe = max((speed-faster*10)/2, 3); };
     }
