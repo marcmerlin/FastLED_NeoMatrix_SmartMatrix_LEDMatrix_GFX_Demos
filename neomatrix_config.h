@@ -245,11 +245,7 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG + 
     NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
 
-#ifdef ESP8266
-const uint8_t MATRIXPIN = 5;
-#else
 const uint8_t MATRIXPIN = 13;
-#endif
 
 
 //---------------------------------------------------------------------------- 
@@ -363,6 +359,7 @@ float matrix_gamma = 1; // higher number is darker, needed for Neomatrix more th
 
 // Like XY, but for a mirror image from the top (used by misconfigured code)
 int XY2( int x, int y, bool wrap=false) { 
+    wrap = wrap; // squelch compiler warning
     return matrix->XY(x,MATRIX_HEIGHT-1-y);
 }
 
@@ -378,6 +375,7 @@ int wrapX(int x) {
 
 
 void matrix_setup(int reservemem = 40000) {
+    reservemem = reservemem; // squelch compiler warning if var is unused.
     if (init_done) {
 	Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
 	return;
