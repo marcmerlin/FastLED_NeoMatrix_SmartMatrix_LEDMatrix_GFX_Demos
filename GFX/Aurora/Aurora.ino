@@ -101,11 +101,6 @@ void setup() {
     Serial.begin(115200);
 
     matrix_setup();
-    Serial.print("Matrix Size: ");
-    Serial.print(mw);
-    Serial.print(" ");
-    Serial.println(mh);
-
     effects.leds = matrixleds;
     effects.Setup();
 }

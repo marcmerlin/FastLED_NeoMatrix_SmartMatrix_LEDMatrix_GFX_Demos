@@ -4,11 +4,12 @@
 bool init_done = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+
 // No SmartMatrix on ESP8266, but otherwise default to SmartMatrix
 // unless NEOPIXEL_MATRIX is defined before including this.
 #ifdef ESP8266
 #define SSD1331
-#define SSD1331_ROTATE 0
+#define SSD1331_ROTATE 1
 //#define M32B8X3
 //#define M16BY16T4
 #define NEOPIXEL_MATRIX
@@ -451,6 +452,9 @@ int wrapX(int x) {
 	return x;
 }
 
+void show_free_mem() {
+    Framebuffer_GFX::show_free_mem();
+}
 
 void matrix_setup(int reservemem = 40000) {
     reservemem = reservemem; // squelch compiler warning if var is unused.
@@ -492,7 +496,7 @@ void matrix_setup(int reservemem = 40000) {
 #elif defined(SSD1331)
     // Need to init the underlying TFT SPI engine
     display->begin();
-    Serial.println("For extra speed, try 80Mhz, may be less stable");
+    Serial.println("For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
     //display->begin(80000000);
     display->setAddrWindow(0, 0, mw, mh);
 
@@ -553,6 +557,7 @@ void matrix_setup(int reservemem = 40000) {
         #endif // ESP32
     #endif // ESP32_16PINS
 #endif
+    show_free_mem();
     matrix->begin();
 
     Serial.print("Setting Brightness: ");
