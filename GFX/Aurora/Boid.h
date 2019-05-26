@@ -325,6 +325,6 @@ class Boid {
 };
 
 // ESP32's newer compiler fails on both 'max' and the 2nd line
-static const uint8_t AVAILABLE_BOID_COUNT = MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT;
+const uint8_t AVAILABLE_BOID_COUNT = MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT;
 //Boid boids[AVAILABLE_BOID_COUNT]; // this should work, but a compiler bug(?) for ESP32 does not like it anymore
 Boid boids[MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT];

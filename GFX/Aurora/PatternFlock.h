@@ -43,7 +43,7 @@ class PatternFlock : public Drawable {
       name = (char *)"Flock";
     }
 
-    static const int boidCount = min(MATRIX_WIDTH/3, AVAILABLE_BOID_COUNT);
+    static const int boidCount = mmin(MATRIX_WIDTH/3, AVAILABLE_BOID_COUNT);
     Boid predator;
 
     PVector wind;
