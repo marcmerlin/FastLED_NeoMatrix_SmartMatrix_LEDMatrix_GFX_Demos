@@ -105,8 +105,6 @@ void setup() {
     Serial.print(mw);
     Serial.print(" ");
     Serial.println(mh);
-    matrix->begin();
-    matrix->setTextWrap(false);
 
     effects.leds = matrixleds;
     effects.Setup();

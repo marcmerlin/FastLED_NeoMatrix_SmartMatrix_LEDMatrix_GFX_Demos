@@ -551,7 +551,6 @@ void setup() {
   delay( 1000 ); //safety startup delay
   Serial.begin(115200);
   matrix_setup();
-  matrix->begin();
   sublime_setup();
   Serial.println("Setup done");
 }

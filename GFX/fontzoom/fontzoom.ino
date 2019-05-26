@@ -171,7 +171,6 @@ void setup() {
     Serial.begin(115200);
 
     matrix_setup();
-    matrix->begin();
     matrix->setTextWrap(false);
     if (mw >= 48 && mh >=64) matrix->setTextSize(2);
 }

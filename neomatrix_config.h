@@ -7,7 +7,9 @@ bool init_done = 0;
 // No SmartMatrix on ESP8266, but otherwise default to SmartMatrix
 // unless NEOPIXEL_MATRIX is defined before including this.
 #ifdef ESP8266
-#define M32B8X3
+#define SSD1331
+#define SSD1331_ROTATE 0
+//#define M32B8X3
 //#define M16BY16T4
 #define NEOPIXEL_MATRIX
 #endif
@@ -74,16 +76,18 @@ uint8_t matrix_brightness = 255;
 #ifdef ESP32
 #pragma message "Compiling for ESP32 with 64x32 16 scan panel"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
+const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
 #elif defined(__MK66FX1M0__) // my teensy 3.6 is connected to a 64x64 panel
 #pragma message "Compiling for Teensy with 64x64 32 scan panel"
+//const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
 #else
 #error Unknown architecture (not ESP32 or teensy 3.5/6)
 #endif
 // Used by LEDMatrix
-const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
 const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
@@ -139,6 +143,82 @@ void show_callback() {
 #endif
 }
 
+//---------------------------------------------------------------------------- 
+#elif defined(SSD1331)
+
+#include <Adafruit_SSD1331.h>
+#include <FastLED_SPITFT_GFX.h>
+
+uint8_t matrix_brightness = 255;
+#if SSD1331_ROTATE == 0
+const uint8_t MATRIX_TILE_WIDTH = 96; 
+const uint8_t MATRIX_TILE_HEIGHT= 64; 
+#else
+const uint8_t MATRIX_TILE_WIDTH = 64; 
+const uint8_t MATRIX_TILE_HEIGHT= 96; 
+#endif
+//
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint16_t NUMMATRIX = mw*mh;
+
+// Compat for some other demos
+const uint16_t NUM_LEDS = NUMMATRIX; 
+const uint8_t MATRIX_HEIGHT = mh;
+const uint8_t MATRIX_WIDTH = mw;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines 
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix;
+
+// cLEDMatrix creates a FastLED array inside its object and we need to retrieve
+// a pointer to its first element to act as a regular FastLED array, necessary
+// for NeoMatrix and other operations that may work directly on the array like FadeAll.
+CRGB *matrixleds = ledmatrix[0];
+#else
+CRGB matrixleds[NUMMATRIX];
+#endif
+
+/*
+SD1331 Pin	    Arduino	ESP8266		rPi
+1 GND
+2 VCC
+3 SCL/SCK/CLK/D0	13	GPIO14/D5	GPIO11/SPI0-SCLK	
+4 SDA/MOSI/D1		11	GPIO13/D7	GPIO10/SPI0-MOSI	
+5 RES/RST		9	GPIO15/D8	GPIO24			
+6 DC/A0 (data)		8	GPIO05/D1	GPIO23			
+7 CS			10	GPIO04/D2	GPIO08		
+*/
+// You can use any (4 or) 5 pins
+// hwspi hardcodes those pins, no need to redefine them
+#define sclk 14
+#define mosi 13
+#define cs   4
+#define rst  15
+#define dc   5
+
+// Option 1: use any pins but a little slower
+//#pragma message "Using SWSPI"
+//Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
+
+// Option 2: must use the hardware SPI pins
+// (for UNO thats sclk = 13 and sid = 11) and pin 10 must be
+// an output. This is much faster - also required if you want
+// to use the microSD card (see the image drawing example)
+#pragma message "Using HWSPI"
+Adafruit_SSD1331 *display = new Adafruit_SSD1331(&SPI, cs, dc, rst);
+
+#if SSD1331_ROTATE == 0
+FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, display, 0);
+#else
+FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, display, 1);
+#endif
 
 //---------------------------------------------------------------------------- 
 #elif defined(M32B8X3)
@@ -243,11 +323,7 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG + 
     NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
 
-#ifdef ESP8266
-const uint8_t MATRIXPIN = 5;
-#else
 const uint8_t MATRIXPIN = 13;
-#endif
 
 
 //---------------------------------------------------------------------------- 
@@ -361,6 +437,7 @@ float matrix_gamma = 1; // higher number is darker, needed for Neomatrix more th
 
 // Like XY, but for a mirror image from the top (used by misconfigured code)
 int XY2( int x, int y, bool wrap=false) { 
+    wrap = wrap; // squelch compiler warning
     return matrix->XY(x,MATRIX_HEIGHT-1-y);
 }
 
@@ -376,6 +453,7 @@ int wrapX(int x) {
 
 
 void matrix_setup(int reservemem = 40000) {
+    reservemem = reservemem; // squelch compiler warning if var is unused.
     if (init_done) {
 	Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
 	return;
@@ -389,7 +467,11 @@ void matrix_setup(int reservemem = 40000) {
     matrixLayer.addLayer(&backgroundLayer); 
     // SmartMatrix takes all the RAM it can get its hands on. Get it to leave some
     // free RAM so that other libraries can work too.
+#ifdef ESP32
     if (reservemem) matrixLayer.begin(reservemem); else matrixLayer.begin();
+#else
+    matrixLayer.begin();
+#endif
     // This sets the neomatrix and LEDMatrix pointers
     show_callback();
     matrixLayer.setRefreshRate(240);
@@ -405,8 +487,15 @@ void matrix_setup(int reservemem = 40000) {
     show_callback();
     delay(1000);
 #endif
-
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
+
+#elif defined(SSD1331)
+    // Need to init the underlying TFT SPI engine
+    display->begin();
+    Serial.println("For extra speed, try 80Mhz, may be less stable");
+    //display->begin(80000000);
+    display->setAddrWindow(0, 0, mw, mh);
+
 // Example of parallel output
 #elif defined(M32B8X3)
     // Init Matrix
@@ -464,6 +553,7 @@ void matrix_setup(int reservemem = 40000) {
         #endif // ESP32
     #endif // ESP32_16PINS
 #endif
+    matrix->begin();
 
     Serial.print("Setting Brightness: ");
     Serial.println(matrix_brightness);

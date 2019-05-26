@@ -355,7 +355,6 @@ void setup() {
   delay( 1000 ); //safety startup delay
   Serial.begin(115200);
   matrix_setup();
-  matrix->begin();
   Serial.println("Setup done");
 
 #else // TWINKLEFOX_INCLUDE
