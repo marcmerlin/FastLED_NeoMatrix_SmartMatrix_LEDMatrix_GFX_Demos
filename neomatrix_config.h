@@ -498,7 +498,9 @@ void matrix_setup(int reservemem = 40000) {
     display->begin();
     Serial.println("For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
     //display->begin(80000000);
-    display->setAddrWindow(0, 0, mw, mh);
+    // This is very important, or FastLED_SPITFT_GFX::show will not work.
+    // Size is hardcoded by TFT size.
+    display->setAddrWindow(0, 0, 96, 64);
 
 // Example of parallel output
 #elif defined(M32B8X3)
