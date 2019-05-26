@@ -153,7 +153,7 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 		// Step 1.  Move each dot down one cell
 		for (int i = 0; i < MATRIX_HEIGHT; i++) {
 			if (tempMatrix[x][i] >= backgroundDepth) {	// Don't move empty cells
-				tempMatrix[x][i-1] = tempMatrix[x][i];
+				if (i > 0) tempMatrix[x][i-1] = tempMatrix[x][i];
 				tempMatrix[x][i] = 0;
 			}
 		}

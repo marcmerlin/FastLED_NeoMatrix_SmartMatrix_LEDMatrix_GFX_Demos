@@ -74,16 +74,18 @@ uint8_t matrix_brightness = 255;
 #ifdef ESP32
 #pragma message "Compiling for ESP32 with 64x32 16 scan panel"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
+const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
 #elif defined(__MK66FX1M0__) // my teensy 3.6 is connected to a 64x64 panel
 #pragma message "Compiling for Teensy with 64x64 32 scan panel"
+//const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
 #else
 #error Unknown architecture (not ESP32 or teensy 3.5/6)
 #endif
 // Used by LEDMatrix
-const uint8_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
 const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
@@ -243,11 +245,7 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG + 
     NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
 
-#ifdef ESP8266
-const uint8_t MATRIXPIN = 5;
-#else
 const uint8_t MATRIXPIN = 13;
-#endif
 
 
 //---------------------------------------------------------------------------- 
@@ -361,6 +359,7 @@ float matrix_gamma = 1; // higher number is darker, needed for Neomatrix more th
 
 // Like XY, but for a mirror image from the top (used by misconfigured code)
 int XY2( int x, int y, bool wrap=false) { 
+    wrap = wrap; // squelch compiler warning
     return matrix->XY(x,MATRIX_HEIGHT-1-y);
 }
 
@@ -376,6 +375,7 @@ int wrapX(int x) {
 
 
 void matrix_setup(int reservemem = 40000) {
+    reservemem = reservemem; // squelch compiler warning if var is unused.
     if (init_done) {
 	Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
 	return;
@@ -389,7 +389,11 @@ void matrix_setup(int reservemem = 40000) {
     matrixLayer.addLayer(&backgroundLayer); 
     // SmartMatrix takes all the RAM it can get its hands on. Get it to leave some
     // free RAM so that other libraries can work too.
+#ifdef ESP32
     if (reservemem) matrixLayer.begin(reservemem); else matrixLayer.begin();
+#else
+    matrixLayer.begin();
+#endif
     // This sets the neomatrix and LEDMatrix pointers
     show_callback();
     matrixLayer.setRefreshRate(240);

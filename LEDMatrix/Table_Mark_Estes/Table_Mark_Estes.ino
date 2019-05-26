@@ -134,7 +134,7 @@ void loop()
       break;
   }
 
-  runpattern();//got generate a updted screen
+  runpattern();//got generate a updated screen
   counter++;//increment the counter which is used for many things
   matrix->show();
   delay(waiter[pattern]);//frame rate control

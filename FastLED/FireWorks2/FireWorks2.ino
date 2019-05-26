@@ -17,6 +17,7 @@
 
 CRGB& setXY( int x, int y) 
 {
+	// This code is reversed in Y axis, so XY2 fixes this.
 	return matrixleds[XY2(wrapX(x),y)];
 }
 
@@ -103,7 +104,7 @@ class Dot {
 		if ((p00 > p10) && (p01 > p10) && (p11 > p10)) setXY(x_pos - 1, y_pos) += color;
 	    
 		// On bigger RGBPanels, we can make a bigger explosion
-		if (MATRIX_HEIGHT > 32) {
+		if (MATRIX_HEIGHT > 32 && y_pos+1 < MATRIX_HEIGHT && x_pos+1 < MATRIX_WIDTH) {
 			setXY(x_pos, y_pos) = CRGB(p00, p00, p00);		// Modifies the color content of the base pixel 
 			setXY(x_pos, y_pos + 1) = CRGB(p01, p01, p01);		// And the 3 immediate pixels on top, to the right and diagonal
 			setXY(x_pos + 1, y_pos) = CRGB(p10, p10, p10);
@@ -267,7 +268,7 @@ void fireworks()
 			gBursty = gDot[a].y;
 			int nsparks = random8(MIN_SPARKS, MAX_SPARKS+1);
 			for( int b = 0; b < nsparks; b++) {
-				gSparks[a*MATRIX_HEIGHT+b].Skyburst( gBurstx, gBursty, gBurstcolor);
+				gSparks[a*MAX_SPARKS+b].Skyburst( gBurstx, gBursty, gBurstcolor);
 			}
 			gDot[a].theType = SPARK;
 		}
@@ -276,11 +277,11 @@ void fireworks()
 		gDot[a].Draw();					// Scale the position of the shell on the LED matrix 
 
 		for( int b = 0; b < MAX_SPARKS; b++) {		// Always moves and draws the MAX number of sparks not the actual number of sparks (Wasteful!?)
-			gSparks[a*MATRIX_HEIGHT+b].Move();
-			gSparks[a*MATRIX_HEIGHT+b].color.r = gSparks[a*MATRIX_HEIGHT+b].color.r * 255 /256;
-			gSparks[a*MATRIX_HEIGHT+b].color.g = gSparks[a*MATRIX_HEIGHT+b].color.g * 255 /256;
-			gSparks[a*MATRIX_HEIGHT+b].color.b = gSparks[a*MATRIX_HEIGHT+b].color.b * 255 /256;
-			gSparks[a*MATRIX_HEIGHT+b].Draw();
+			gSparks[a*MAX_SPARKS+b].Move();
+			gSparks[a*MAX_SPARKS+b].color.r = gSparks[a*MAX_SPARKS+b].color.r * 255 /256;
+			gSparks[a*MAX_SPARKS+b].color.g = gSparks[a*MAX_SPARKS+b].color.g * 255 /256;
+			gSparks[a*MAX_SPARKS+b].color.b = gSparks[a*MAX_SPARKS+b].color.b * 255 /256;
+			gSparks[a*MAX_SPARKS+b].Draw();
 		}
 	}
 }

@@ -701,7 +701,7 @@ public:
   }
 
   CRGB ColorFromCurrentPalette(uint8_t index = 0, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) {
-    return ColorFromPalette(currentPalette, index, brightness, currentBlendType);
+    return ColorFromPalette(currentPalette, index, brightness, blendType);
   }
 
   CRGB HsvToRgb(uint8_t h, uint8_t s, uint8_t v) {
