@@ -39,8 +39,21 @@ class PatternIncrementalDrift : public Drawable {
       {
         CRGB color = effects.ColorFromCurrentPalette((i - 2) * (240 / (MATRIX_WIDTH / 2)));
 
-        uint8_t x = beatcos8((17 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
-        uint8_t y = beatsin8((17 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
+	// This looked good, even on a 64x96 screens
+	//uint8_t x = beatcos8((17 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
+        //uint8_t y = beatsin8((17 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
+
+	// This didn't look so good if the screen wasn't square
+        //uint8_t x = beatcos8((MATRIX_CENTER_X + 1 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
+        //uint8_t y = beatsin8((MATRIX_CENTER_Y + 1 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
+
+	// This looks not bad
+        //uint8_t x = beatcos8((min(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
+        //uint8_t y = beatsin8((min(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
+
+	// This looks better on a non square thing, feels more dense
+        uint8_t x = beatcos8((max(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
+        uint8_t y = beatsin8((max(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
 
         //backgroundLayer.drawPixel(x, y, color);
         matrix->drawPixel(x, y, color);

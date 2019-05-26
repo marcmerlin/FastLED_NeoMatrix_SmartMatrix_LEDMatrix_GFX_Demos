@@ -85,8 +85,8 @@ private:
         }
     };
 
-    static const int width = 16;
-    static const int height = 16;
+    static const int width = MATRIX_WIDTH / 2;
+    static const int height = MATRIX_HEIGHT / 2;
 
     int imageWidth = width * 2;
     int imageHeight = height * 2;
@@ -95,7 +95,7 @@ private:
 
     Point point;
 
-    Point cells[256];
+    Point cells[NUM_LEDS / 4];
     int cellCount = 0;
 
     int algorithm = 0;
