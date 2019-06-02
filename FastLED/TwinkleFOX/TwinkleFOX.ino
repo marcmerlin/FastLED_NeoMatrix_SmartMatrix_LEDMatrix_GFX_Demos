@@ -210,8 +210,8 @@ void drawTwinkles( )
   }
 
   uint8_t backgroundBrightness = bg.getAverageLight();
-  
-  for ( uint16_t idx=0; idx < NUMMATRIX; idx++) {
+  // 320x240 = 76800, so we need an int32
+  for ( uint32_t idx=0; idx < NUMMATRIX; idx++) {
     PRNG16 = (uint16_t)(PRNG16 * 2053) + 1384; // next 'random' number
     uint16_t myclockoffset16= PRNG16; // use that number as clock offset
     PRNG16 = (uint16_t)(PRNG16 * 2053) + 1384; // next 'random' number
