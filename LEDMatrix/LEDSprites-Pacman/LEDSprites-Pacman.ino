@@ -332,16 +332,16 @@ cSprite SprEyes(MY_SPRITE_WIDTH, MY_SPRITE_HEIGHT, EyesData, 1, _2BIT, EyesColTa
 void setup()
 {
     matrix_setup();
+    Serial.print("Top X for sprite: ");
+    Serial.print(max_x);
+    Serial.print(". Top Y for sprite: ");
+    Serial.println(max_y);
 
     // Rate is a divider, higher rate is slower.
     SprPacmanRight.SetPositionFrameMotionOptions(0/*X*/, -10/*Y*/, 0/*Frame*/, 4/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_DETECT_EDGE | SPRITE_DETECT_COLLISION);
     Sprites.AddSprite(&SprPacmanRight);
     SprPinky.SetPositionFrameMotionOptions(     0 /*X*/, -62/*Y*/, 0/*Frame*/, 2/*FrameRate*/, 0/*XChange*/, 0/*XRate*/, 1/*YChange*/, 1/*YRate*/, SPRITE_Y_KEEPIN | SPRITE_DETECT_EDGE);
     Sprites.AddSprite(&SprPinky);
-    Serial.print("Top X for sprite: ");
-    Serial.print(max_x);
-    Serial.print(". Top Y for sprite: ");
-    Serial.println(max_y);
 }
 
 void loop()
@@ -353,16 +353,16 @@ void loop()
 
     uint8_t pcmr = SprPacmanRight.GetFlags();
 
-    int8_t pcmrx = SprPacmanRight.m_X;
-    int8_t pcmry = SprPacmanRight.m_Y;
-    int8_t pcmlx = SprPacmanLeft.m_X;
-    int8_t pcmly = SprPacmanLeft.m_Y;
-    int8_t gx = SprGhost.m_X;
-    int8_t gy = SprGhost.m_Y;
-    int8_t px = SprPinky.m_X;
-    int8_t py = SprPinky.m_Y;
-    int8_t ex = SprEyes.m_X;
-    int8_t ey = SprEyes.m_Y;
+    int16_t pcmrx = SprPacmanRight.m_X;
+    int16_t pcmry = SprPacmanRight.m_Y;
+    int16_t pcmlx = SprPacmanLeft.m_X;
+    int16_t pcmly = SprPacmanLeft.m_Y;
+    int16_t gx = SprGhost.m_X;
+    int16_t gy = SprGhost.m_Y;
+    int16_t px = SprPinky.m_X;
+    int16_t py = SprPinky.m_Y;
+    int16_t ex = SprEyes.m_X;
+    int16_t ey = SprEyes.m_Y;
 
     matrix->clear();
     Sprites.UpdateSprites();
