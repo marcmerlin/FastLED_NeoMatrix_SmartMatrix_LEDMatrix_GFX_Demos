@@ -56,7 +56,6 @@ uint32_t Wheel(byte WheelPos) {
 // There are some magic numbers I had to hand tune for a 24x32 array.
 // You'll have to adjust for your own array size
 uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
-    static uint16_t state;
     static uint16_t direction;
     static uint16_t size;
     static uint8_t l;
@@ -69,7 +68,6 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 
     if (matrix_reset_demo == 1) {
 	matrix_reset_demo = 0;
-	state = 1;
 	direction = 1;
 	size = 3;
 	l = 0;

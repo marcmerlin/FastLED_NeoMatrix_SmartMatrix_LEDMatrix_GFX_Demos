@@ -17,7 +17,7 @@ bool init_done = 0;
 // Teensy 3.6
 #ifdef __MK66FX1M0__
 #define ILI9341
-#define ILI_ROTATE 0
+#define ILI_ROTATE 1
 #define NEOPIXEL_MATRIX
 #endif
 
@@ -162,7 +162,7 @@ const uint16_t MATRIX_TILE_WIDTH = 320;
 const uint16_t MATRIX_TILE_HEIGHT= 240; 
 #else
 const uint16_t MATRIX_TILE_WIDTH = 240; 
-const uint16_t MATRIX_TILE_HEIGHT= 320
+const uint16_t MATRIX_TILE_HEIGHT= 320;
 #endif
 //
 // Used by LEDMatrix
@@ -215,11 +215,7 @@ Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 #endif
 
-#if ILI_ROTATE == 0
-FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 320, 240, tft, 0);
-#else
-FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 240, 320, tft, 1);
-#endif
+FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
 
 //---------------------------------------------------------------------------- 
 //---------------------------------------------------------------------------- 
@@ -541,6 +537,10 @@ void matrix_setup(int reservemem = 40000) {
 	return;
     }
     init_done = 1;
+    // Teensy takes a while to initialize serial port.
+#ifdef TEENSYDUINO
+    delay(3000);
+#endif
     Serial.begin(115200);
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
     matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
@@ -673,6 +673,7 @@ void matrix_setup(int reservemem = 40000) {
 // LEDMatrix alignment is tricky, this test helps make sure things are aligned correctly
 #ifndef DISABLE_MATRIX_TEST
 #ifdef LEDMATRIX
+    Serial.println("LEDMatrix Test");
     ledmatrix.DrawLine (0, 0, ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 255, 0));
     ledmatrix.DrawPixel(0, 0, CRGB(255, 0, 0));
     ledmatrix.DrawPixel(ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 0, 255));
@@ -689,6 +690,7 @@ void matrix_setup(int reservemem = 40000) {
     // serial output gets looped back into serial input
     // Hence, flush input.
     while(Serial.available() > 0) { char t = Serial.read(); t = t; }
+    Serial.println("neomatrix_config setup done");
 }
 
 #endif // neomatrix_config_h
