@@ -46,8 +46,8 @@ to use, set the define before you include the file.
 
     #ifdef ESP32
     //#define ST7735_128b128
-    #define ST7735_128b160
-    //#define SMARTMATRIX
+    //#define ST7735_128b160
+    #define SMARTMATRIX
     #endif
 
     // Teensy 3.6
