@@ -14,19 +14,19 @@
 
 float mscale = 2.2, fps;
 float radius, xslope[MATRIX_WIDTH * 3], yslope[MATRIX_WIDTH * 3], xfire[MATRIX_WIDTH * 3], yfire[MATRIX_WIDTH * 3], cangle, sangle;
-byte  xxx, yyy, dot = 3, radius2, rr, gg, bb, adjunct = 3,  fcount[MATRIX_WIDTH * 3], fcolor[MATRIX_WIDTH * 3], fcountr[MATRIX_WIDTH * 3];
-byte pointy, laps, hue, steper,  xblender, hhowmany, blender = 128, radius3, xpoffset[MATRIX_WIDTH * 3];
+int16_t  xxx, yyy, dot = 3, radius2, rr, gg, bb, adjunct = 3,  fcount[MATRIX_WIDTH * 3], fcolor[MATRIX_WIDTH * 3], fcountr[MATRIX_WIDTH * 3];
+int16_t pointy, laps, hue, steper,  xblender, hhowmany, blender = 128, radius3, xpoffset[MATRIX_WIDTH * 3];
 unsigned int  counter, ringdelay, bringdelay, sumthum;
-byte  pointyfix, fpeed[MATRIX_WIDTH * 3], targetfps = 40;
+int16_t  pointyfix, fpeed[MATRIX_WIDTH * 3], targetfps = 40;
 boolean adio, ringme = false, blackringme = false;
 int waiter[mpatterns];
 boolean flip = true, flip2 = false, flip3 = true, mixit = false, rimmer[MATRIX_WIDTH * 2], xbouncer[MATRIX_WIDTH * 2], ybouncer[MATRIX_WIDTH * 2];
-byte ccoolloorr, why1, why2, why3, eeks1, eeks2, eeks3, h = 0, oldpattern, howmany, xhowmany, kk;
+uint16_t ccoolloorr, why1, why2, why3, eeks1, eeks2, eeks3, h = 0, oldpattern, howmany, xhowmany, kk;
 unsigned long lasttest, lastmillis, dwell = 5000,  longhammer;
 float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle;
-byte raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
-byte shifty = 6, pattern = 0, poffset;
-byte sinewidth, mstep, faudio[MATRIX_HEIGHT], inner, bfade = 6;
+int16_t raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
+int16_t shifty = 6, pattern = 0, poffset;
+int16_t sinewidth, mstep, faudio[MATRIX_HEIGHT], inner, bfade = 6;
 int directn = 1, quash = 5;
 
 // This allows a selection of only my favourite patterns.
@@ -51,7 +51,7 @@ void setup()
 
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
-  mstep = byte( 256 / (MATRIX_WIDTH - 1)); //mstep is the step size to distribute 256 over an array the width of the matrix
+  mstep = byte( 256 / min((MATRIX_WIDTH - 1), 255)); //mstep is the step size to distribute 256 over an array the width of the matrix
 
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
@@ -65,7 +65,7 @@ void setup()
   fakenoise();
   cangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation gives a float value between -1 and 1
   sangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation in the y direction gives a float value between -1 and 1
-  for (byte i = 0; i < mpatterns; i++)  //set up initial delay for animation timing
+  for (uint16_t i = 0; i < mpatterns; i++)  //set up initial delay for animation timing
     waiter[i] = 10;
   whatami();//this prints out the current status of stuff
   smile2();// make one frame of the smile 2 pattern
@@ -1440,7 +1440,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 void Diamondhole()//eff 0
 {
   // ** Fill LED's with diagonal stripes
-  for (byte x = 0; x < (MATRIX_WIDTH  + MATRIX_HEIGHT); x++)
+  for (uint16_t x = 0; x < (MATRIX_WIDTH  + MATRIX_HEIGHT); x++)
   {
     zeds.DrawLine(x - MATRIX_HEIGHT, MATRIX_HEIGHT - 1, x, 0, CHSV(h * 2 + x * steper, 255, 255 - MATRIX_HEIGHT * 2 + 2 * x));
 
@@ -1451,7 +1451,7 @@ void Diamondhole()//eff 0
 void Inca()//eff 1
 {
   // ** Fill LED's with horizontal stripes
-  for (byte y = 0; y < MATRIX_HEIGHT; y += dot)
+  for (uint16_t y = 0; y < MATRIX_HEIGHT; y += dot)
   {
     zeds.DrawLine(0, y, MATRIX_WIDTH  - 1, y, CHSV(h * 2 + y * steper , 255, 255));
 
@@ -1461,7 +1461,7 @@ void Inca()//eff 1
 
 void Ringo()// eff 2
 {
-  for (byte x = 0; x < (MATRIX_WIDTH * 2); x += dot)
+  for (uint16_t x = 0; x < (MATRIX_WIDTH * 2); x += dot)
   {
     zeds.DrawLine(x - MATRIX_HEIGHT, MATRIX_HEIGHT - 1, x, 0, CHSV(h + x * steper / 3 , 255, 255));
 
@@ -1472,7 +1472,7 @@ void Ringo()// eff 2
 void diagonally()// eff 3
 {
 
-  for (byte y = 0; y <= MATRIX_HEIGHT * 2 / 3  + 4 ; y += dot)
+  for (uint16_t y = 0; y <= MATRIX_HEIGHT * 2 / 3  + 4 ; y += dot)
   {
     zeds.DrawCircle(driftx, drifty , MATRIX_HEIGHT * 2 / 3 + 3 - y, CHSV(h * 3 + y * 2, 255, 255 - y));
   }
@@ -1482,7 +1482,7 @@ void diagonally()// eff 3
 void Roundhole()// eff4
 {
   solid();
-  for (byte y = 0; y < byte(MATRIX_HEIGHT ) ; y += dot)
+  for (uint16_t y = 0; y < byte(MATRIX_HEIGHT < 255 ? MATRIX_HEIGHT : 255) ; y += dot)
   {
     zeds.DrawCircle(driftx, drifty, MATRIX_HEIGHT - y, CHSV(h * 2 + y * steper, 255, 255));
 
@@ -1494,7 +1494,7 @@ void drifter()//pattern=5
 
   if (flip2 || flip3)
     solid();
-  for (byte y = 0; y <= MATRIX_HEIGHT  + 1 ; y += dot - 1)
+  for (uint16_t y = 0; y <= MATRIX_HEIGHT  + 1 ; y += dot - 1)
   {
     zeds.DrawFilledCircle(driftx, drifty , MATRIX_HEIGHT  + 5 - y, CHSV(h + y * steper, 255, 255));
   }
@@ -1510,7 +1510,7 @@ void volcano()//pattern=7
 {
   if (flip3 || flip2)
     solid2();
-  for (byte y = 0; y <  MATRIX_WIDTH  ; y += dot - 1)
+  for (uint16_t y = 0; y <  MATRIX_WIDTH  ; y += dot - 1)
   {
     zeds.DrawFilledCircle(driftx , drifty  ,  MATRIX_WIDTH  - y, CHSV(h + y * steper, 255, 255));
 
@@ -1522,7 +1522,7 @@ void pyrimid()//pattern=8
 {
   solid2();
 
-  for (byte y = MATRIX_WIDTH; y > 1; y -= dot)
+  for (uint16_t y = MATRIX_WIDTH; y > 1; y -= dot)
   {
     zeds.DrawFilledCircle(driftx, drifty,  y, CHSV(h + 85 + y * steper, 255, 255));
 
@@ -1534,7 +1534,7 @@ void solidpyrimid()//pattern=9
 {
   if (counter == 0)
     rr = random(200, 255);
-  for (byte y = MATRIX_WIDTH; y > 0; y -= dot - 1)
+  for (uint16_t y = MATRIX_WIDTH; y > 0; y -= dot - 1)
   {
     zeds.DrawRectangle(0 , 0,  MATRIX_WIDTH - y + 1, MATRIX_HEIGHT - y + 1, CHSV(h + y * steper, rr, 255));
 
@@ -1569,7 +1569,7 @@ void corner()//pattern=10
   zeds.DrawFilledRectangle(0 , 0,  MATRIX_WIDTH, MATRIX_HEIGHT, CHSV(h, 255, 255));
   h += steper;
 
-  for (byte y = 0; y <= MATRIX_WIDTH / 2 - 1 ; y++)
+  for (uint16_t y = 0; y <= MATRIX_WIDTH / 2 - 1 ; y++)
   {
     zeds.DrawFilledCircle(MIDLX, MIDLY, (MATRIX_WIDTH / 2 + 1 - y) / 3, CHSV(h  + y * steper, 255, 255));
     zeds.DrawFilledCircle(0, 0, MATRIX_WIDTH / 2 - y, CHSV(64 + h + y * steper, 255, 255));
@@ -1584,7 +1584,7 @@ void fireball() {// with colored dots in pairs sometimes
   {
     ccoolloorr = random8();
     howmany = random(MATRIX_WIDTH , MATRIX_WIDTH * 2);
-    for (byte u = 0; u < howmany; u++) {
+    for (uint16_t u = 0; u < howmany; u++) {
       xfire[u] = driftx;
       yfire[u] =   drifty;
       fpeed[u] = random(1, 5);
@@ -1599,7 +1599,7 @@ void fireball() {// with colored dots in pairs sometimes
     }
   }
 
-  for (byte u = 0; u < howmany; u++) {
+  for (uint16_t u = 0; u < howmany; u++) {
     zeds(xfire[u], yfire[u]) = CHSV(fcolor[u], 255, 255);
     xfire[u] = xfire[u] + xslope[u];
     yfire[u] = yfire[u] + yslope[u];
@@ -1627,7 +1627,7 @@ void streaker() {
     solid();
     ccoolloorr = random8();
     howmany = random(MATRIX_WIDTH * 2 / 3, MATRIX_WIDTH * 3 / 2);
-    for (byte u = 0; u < howmany; u++) {
+    for (uint16_t u = 0; u < howmany; u++) {
       xfire[u] = driftx;
       yfire[u] = drifty;
       fpeed[u] = random(1, 5);
@@ -1641,7 +1641,7 @@ void streaker() {
     }
   }
 
-  for (byte u = 0; u < howmany; u++)
+  for (uint16_t u = 0; u < howmany; u++)
   {
     zeds(xfire[u], yfire[u]) = CHSV(fcolor[u], 255, 255);
     xfire[u] = xfire[u] + xslope[u] * fpeed[u];
@@ -1832,7 +1832,7 @@ void bubbles() {
   {
     howmany = random (MIDLX >> 1, MIDLX );
 
-    for (byte u = 0; u < howmany; u++) {
+    for (uint16_t u = 0; u < howmany; u++) {
       xfire[u] = random(MATRIX_WIDTH);
       yfire[u]  = random(MATRIX_HEIGHT);
       fcolor[u] = random8(); //color
@@ -1846,7 +1846,7 @@ void bubbles() {
     }
   }
 
-  for (byte u = 0; u < howmany; u++) {
+  for (uint16_t u = 0; u < howmany; u++) {
 
     zeds.DrawFilledCircle(xfire[u],  yfire[u] - fcount[u] / 2, fcount[u], CHSV(fcolor[u], 255, 255));
     if (rimmer[u])
@@ -1894,7 +1894,7 @@ void bubbles2() {
   {
     howmany = random (MIDLX >> 1, MIDLX );
 
-    for (byte u = 0; u < howmany; u ++) {
+    for (uint16_t u = 0; u < howmany; u ++) {
       xfire[u] = random(MIDLX / 2, MIDLX * 3 / 2 );
       yfire[u]  = random(MIDLY / 2, MIDLY * 3 / 2);
       fcolor[u] = random8(); //color
@@ -1915,7 +1915,7 @@ void bubbles2() {
     }
   }
 
-  for (byte u = 0; u < howmany; u++) {
+  for (uint16_t u = 0; u < howmany; u++) {
     if (xbouncer[u])
       xfire[u] = xfire[u] + fpeed[u] * (sin8(xslope[u]) - 128.0) / 128.0;
     else
@@ -1957,7 +1957,7 @@ void sticks() {
 
 void  Bargraph() {
   if (counter == 0)
-    for (byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++) {
+    for (uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++) {
       fcolor[hhh] = random(MIDLY / 2, MATRIX_HEIGHT - MIDLY / 2 - 1);
       if (pattern == 22)
         fcolor[hhh] = random(MIDLY >> 2, MIDLY - 1);
@@ -1967,7 +1967,7 @@ void  Bargraph() {
     }
 
 
-  for (byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+  for (uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
   {
     if (fcount[hhh] > fpeed[hhh])
     {
@@ -2129,7 +2129,7 @@ void spire3() {
     else
       radius2++;
   }
-  for (byte i = 0; i < howmany; i++) {
+  for (uint16_t i = 0; i < howmany; i++) {
     float xer = driftx + radius * (cos8(2 * h + i * 256 / howmany) - 128.0) / 128.0;
     float yer = drifty + radius * (sin8(2 * h + i * 256 / howmany) - 128.0) / 128.0;
     if ( flip3)
@@ -2302,36 +2302,36 @@ void warp() {
     zeds(xfire[howmany - 1], yfire[howmany - 1]) = CRGB::White;
 }
 
-void lfado(byte bbc)
+void lfado(int16_t bbc)
 {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       zeds(hhh, jjj).fadeToBlackBy(bbc);//% = bbc/255
 }
 
 
 
-void redfado(byte bbc) {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+void redfado(int16_t bbc) {
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flip2)
         zeds(hhh, jjj) -= CRGB(random(bbc / 2), random(bbc), random(bbc));//leave more red
       else
         zeds(hhh, jjj) -= CRGB(random(bbc / 2), random(bbc / 2), random(bbc));// leave more yellow
 }
 
-void greenfado(byte bbc) {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+void greenfado(int16_t bbc) {
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (!flip3)
         zeds(hhh, jjj) -= CRGB(random(bbc ), random(bbc / 2), random(bbc));
       else
         zeds(hhh, jjj) -= CRGB(random(bbc ), random(bbc / 2), random(bbc / 2));// leave more teal
 }
 
-void bluefado(byte bbc) {
-  for ( byte hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
-    for (byte jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
+void bluefado(int16_t bbc) {
+  for ( uint16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
+    for (uint16_t jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flip2)
         zeds(hhh, jjj) -= CRGB(random(bbc ), random(bbc), random(bbc / 2));
       else
@@ -2438,7 +2438,7 @@ void Raudio4() // multi color  ring witht variable height outward non rotational
 
 void Raudio5()  // multi color  ring witht variable height
 {
-  for (byte i = 0; i < MATRIX_WIDTH ; i++) {
+  for (uint16_t i = 0; i < MATRIX_WIDTH ; i++) {
     xangle =  (sin8(i * mstep  - h) - 128.0) / 128.0;
     yangle =  (cos8(i * mstep  - h) - 128.0) / 128.0;
     zeds.DrawLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - faudio[i] / (mscale )) , MIDLY + yangle * (MIDLY - faudio[i] / (mscale )), CHSV(i * mstep  + 2 * h, 255, 255));
@@ -2647,12 +2647,12 @@ void splat()
       break;
 
     case 5:
-      for (byte i = 7; i > 0 ; i--)
+      for (int16_t i = 7; i > 0 ; i--)
         zeds.DrawFilledRectangle(locusx - i, locusy - i , locusx + 2 * i , locusy + 2 * i, CHSV(ccoolloorr + i * steper, 255, 255));
       break;
 
     case 6:
-      for (byte i = raad; i > 0; i--)
+      for (int16_t i = raad; i > 0; i--)
         zeds.DrawFilledCircle(locusx, locusy , i, CHSV(ccoolloorr + i * steper , 255, 255));
       break;
 
@@ -2734,7 +2734,7 @@ void bounce()
   }
 }
 
-//void triangle(byte xloc, byte yloc, byte bigg, byte angle, byte kolor)
+//void triangle(int16_t xloc, uint16_t yloc, uint16_t bigg, uint16_t angle, uint16_t kolor)
 void starbounce()
 {
 
@@ -2773,7 +2773,7 @@ void starbounce()
   { drawstar(locusx, locusy, raad / 2, raad / 4, howmany, -h * 3, ccoolloorr + 2 * h + 128);
     drawstar(locusx, locusy, raad / 4, raad / 8 - 1, howmany, h * 3, ccoolloorr + 2 * h);
   }// random multipoint star
-  //void triangle(byte xloc, byte yloc, byte bigg, byte angle, byte kolor)
+  //void triangle(int16_t xloc, uint16_t yloc, uint16_t bigg, uint16_t angle, uint16_t kolor)
 }
 
 void triforce() {
@@ -2782,7 +2782,7 @@ void triforce() {
   else if (flip && !flip2)
     solid();
 
-  for (byte i = 0; i < MIDLX; i += 7) {
+  for (uint16_t i = 0; i < MIDLX; i += 7) {
     triangle(MIDLX, MIDLY, MIDLX + 2 - i, h,  h - 85);
     if (i % 2 == 0)
       triangle(MIDLX, MIDLY, MIDLX + 2 - i, h,  h + 85);
@@ -3060,7 +3060,7 @@ void hypnoduck4()
   }
 }
 
-//void drawstar(byte xlocl, byte ylocl, byte biggy, byte little, byte points, byte dangle, byte koler)// random multipoint star
+//void drawstar(int16_t xlocl, int16_t ylocl, int16_t biggy, int16_t little, int16_t points, int16_t dangle, int16_t koler)// random multipoint star
 
 void starer() {
   if (counter == 0)
@@ -3083,7 +3083,7 @@ void bkstarer() {
   {
     if (counter - bringdelay <= MATRIX_WIDTH + 20)
     {
-      //void drawstar(byte xlocl, byte ylocl, byte biggy, byte little, byte points, byte dangle, byte koler)// random multipoint star
+      //void drawstar(int16_t xlocl, int16_t ylocl, int16_t biggy, int16_t little, int16_t points, int16_t dangle, int16_t koler)// random multipoint star
       drawstar(driftx, drifty, 2 * (MATRIX_WIDTH - (counter - bringdelay) + 15), 15 + MATRIX_WIDTH - (counter - bringdelay), pointyfix, blender - h, h  - 60);
       drawstar(driftx, drifty, 2 * (MATRIX_WIDTH - (counter - bringdelay) + 10), 10 + MATRIX_WIDTH - (counter - bringdelay), pointyfix, blender - h, h  - 50);
       drawstar(driftx, drifty, 2 * (MATRIX_WIDTH - (counter - bringdelay) + 5), 5 + MATRIX_WIDTH - (counter - bringdelay), pointyfix, blender - h, h  - 40);
@@ -3112,11 +3112,11 @@ void triangler() {
 
 void zoro() {
   zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, CRGB::Black);
-  for ( byte i = MIDLX; i > 6; i -= 6) {
+  for ( int16_t i = MIDLX; i > 6; i -= 6) {
     zeds.DrawFilledCircle(driftx, drifty, i, CHSV(i * 21 + 16, 205, 105));
 
   }
-  for ( byte i = 0; i < MIDLX; i += 6) {
+  for ( int16_t i = 0; i < MIDLX; i += 6) {
     zeds.DrawCircle(MIDLX, MIDLY, i, CHSV(i * 37, 255, 255));
 
   }
@@ -3198,7 +3198,7 @@ void homer2() {// growing egg
       ccoolloorr = random8();
     }
   }
-  byte tempo = dot * 2 + 50;
+  int16_t tempo = dot * 2 + 50;
   if (counter % tempo == 0) {
     dot++;
     counter = counter + tempo;
@@ -3250,7 +3250,7 @@ void homer3() {
   //zeds.DrawFilledCircle( MIDLX  , MIDLY, dot-1, CHSV(h+128, 255, 255));
 }
 
-void nringer(byte i) {
+void nringer(int16_t i) {
 
   if (flip && flip2 && !flip3)
   {
@@ -3267,7 +3267,7 @@ void nringer(byte i) {
 
 void drawtriangle()
 {
-  for (byte i = 0; i < MIDLX; i ++)
+  for (uint16_t i = 0; i < MIDLX; i ++)
   {
     zeds.DrawLine(i, i, MATRIX_WIDTH - i, i, CHSV(h + i * 4, 255, 255));
     zeds.DrawLine(i, i, MIDLX, MATRIX_HEIGHT - i, CHSV(h + i * 4, 255, 255));
@@ -3278,21 +3278,21 @@ void drawtriangle()
 
 
 
-void triangle(byte xloc, byte yloc, byte bigg, byte angle, byte kolor)
+void triangle(int16_t xloc, uint16_t yloc, uint16_t bigg, uint16_t angle, uint16_t kolor)
 {
-  byte ax = xloc + bigg * (sin8(angle) - 128.0) / 128;
-  byte ay = yloc + bigg * (cos8(angle) - 128.0) / 128;
-  byte bx = xloc + bigg * (sin8(angle + 85) - 128.0) / 128;
-  byte by = yloc + bigg * (cos8(angle + 85) - 128.0) / 128;
-  byte cx = xloc + bigg * (sin8(angle - 85) - 128.0) / 128;
-  byte cy = yloc + bigg * (cos8(angle - 85) - 128.0) / 128;
+  uint16_t ax = xloc + bigg * (sin8(angle) - 128.0) / 128;
+  uint16_t ay = yloc + bigg * (cos8(angle) - 128.0) / 128;
+  uint16_t bx = xloc + bigg * (sin8(angle + 85) - 128.0) / 128;
+  uint16_t by = yloc + bigg * (cos8(angle + 85) - 128.0) / 128;
+  uint16_t cx = xloc + bigg * (sin8(angle - 85) - 128.0) / 128;
+  uint16_t cy = yloc + bigg * (cos8(angle - 85) - 128.0) / 128;
 
   zeds.DrawLine(ax, ay, bx, by, CHSV(kolor, 255, 255));
   zeds.DrawLine(cx, cy, bx, by, CHSV(kolor, 255, 255));
   zeds.DrawLine(ax, ay, cx, cy, CHSV(kolor, 255, 255));
 }
 
-void drawstar(byte xlocl, byte ylocl, byte biggy, byte little, byte points, byte dangle, byte koler)// random multipoint star
+void drawstar(int16_t xlocl, int16_t ylocl, int16_t biggy, int16_t little, int16_t points, int16_t dangle, int16_t koler)// random multipoint star
 {
   if (counter == 0) {
     shifty = 3;//move quick
@@ -3642,7 +3642,7 @@ void swirl() {//not round orbits
   {
     howmany = random(MATRIX_HEIGHT / 2, MATRIX_WIDTH * 2 / 3);
     blender = random(192);
-    for ( byte i = 0; i < howmany; i++)
+    for ( uint16_t i = 0; i < howmany; i++)
     {
       xfire[i] = random(4, MIDLX + 9); //xradius
       yfire[i] =  random(xfire[i] - 2, xfire[i] + 2); //yradius
@@ -3654,7 +3654,7 @@ void swirl() {//not round orbits
       fcount[i] = random8(); //poffset
     }
   }
-  for ( byte i = 0; i < howmany; i++) {
+  for ( uint16_t i = 0; i < howmany; i++) {
     zeds(driftx + xfire[i] * (sin8(h * fpeed[i] + fcount[i]) - 128.0) / 128 , drifty + yfire[i] * (cos8(h * fpeed[i] + fcount[i]) - 128.0) / 128) = CHSV(fcolor[i], 255, 255);
     if (i % 9 == 0)
       zeds(driftx + xfire[i] * (sin8(h * fpeed[i] + fcount[i]) - 128.0) / 128 , drifty + yfire[i] * (cos8(h * fpeed[i] + fcount[i]) - 128.0) / 128) = CRGB::White;
@@ -3670,7 +3670,7 @@ void swirl2() {//round orbit backwards
   {
     xhowmany = random(MATRIX_HEIGHT * 2 / 3, MATRIX_WIDTH * 3 / 2);
     xblender = random(192);
-    for ( byte i = 0; i < xhowmany; i++)
+    for ( uint16_t i = 0; i < xhowmany; i++)
     {
       xslope[i] = random(4, MIDLX + 12); //radius
       fpeed[i] = random(1, 7); //speed
@@ -3678,7 +3678,7 @@ void swirl2() {//round orbit backwards
       fcountr[i] = random8(); //poffset
     }
   }
-  for ( byte i = 0; i < xhowmany; i++) {
+  for ( uint16_t i = 0; i < xhowmany; i++) {
     zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], 255, 255);
     if (i % 7 == 0)
       zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CRGB::White;
@@ -3690,7 +3690,7 @@ void swirl3() {// inner
   {
     xhowmany = random(MATRIX_HEIGHT * 2 / 3, MATRIX_WIDTH * 3 / 2);
     xblender = random(192);
-    for ( byte i = 0; i < xhowmany; i++)
+    for ( uint16_t i = 0; i < xhowmany; i++)
     {
       xslope[i] = random(4, MIDLX + 9); //radius
       fpeed[i] = random(1, 6); //speed
@@ -3699,7 +3699,7 @@ void swirl3() {// inner
     }
   }
 
-  for ( byte i = 0; i < xhowmany; i++) {
+  for ( uint16_t i = 0; i < xhowmany; i++) {
     if (counter % int(6 * (fpeed[i] + xslope[i])) == 0)
       xslope[i]--;
     if (xslope[i] == 1)
@@ -3715,7 +3715,7 @@ void swirl4() {// outer
   {
     xhowmany = random(MATRIX_HEIGHT * 2 / 3, MATRIX_WIDTH * 3 / 2);
     xblender = random(192);
-    for ( byte i = 0; i < xhowmany; i++)
+    for ( uint16_t i = 0; i < xhowmany; i++)
     {
       xslope[i] = random(4, MIDLX + 9); //radius
       fpeed[i] = random(2, 9); //speed
@@ -3724,7 +3724,7 @@ void swirl4() {// outer
     }
   }
 
-  for ( byte i = 0; i < xhowmany; i++) {
+  for ( uint16_t i = 0; i < xhowmany; i++) {
     if (counter % int(4 * fpeed[i] + 35 - xslope[i]) == 0)
       xslope[i]++;
     if (xslope[i] > MATRIX_WIDTH - 6)
@@ -3740,7 +3740,7 @@ void swirl5() {// both directions not round
   {
     xhowmany = random(MATRIX_HEIGHT * 2 / 3, MATRIX_WIDTH * 3 / 2);
     xblender = random8();
-    for ( byte i = 0; i < xhowmany; i++)
+    for ( uint16_t i = 0; i < xhowmany; i++)
     {
       xslope[i] = random(4, MIDLX + 9); //radius
       //yslope[i] = random(4, MIDLX + 9); //radius
@@ -3749,7 +3749,7 @@ void swirl5() {// both directions not round
       fcountr[i] = random8(); //poffset
     }
   }
-  for ( byte i = 0; i < xhowmany; i++) {
+  for ( uint16_t i = 0; i < xhowmany; i++) {
     zeds(driftx + xslope[i] * (sin8(h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + yslope[i] * (cos8(h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(blender +  i, 255, 255);
     if (i % 5 == 0)
       zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + yslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(blender + 2 * i, 255, 255);
@@ -3778,18 +3778,18 @@ void audioprocess()
         break;
       }
     }
-    for (byte qq = 0; qq < 31; qq ++)
+    for (uint16_t qq = 0; qq < 31; qq ++)
     {
       faudio[qq * 2] = music.audio[qq];
       faudio[qq * 2 + 1] = (music.audio[qq] + music.audio[qq + 1]) >> 1;
     }
 
-    for (byte qq = 0; qq < 8; qq ++)
+    for (uint16_t qq = 0; qq < 8; qq ++)
     {
       faudio[qq] = music.audio[qq];
     }
 
-    for (byte qq = 4; qq < 24; qq ++)
+    for (uint16_t qq = 4; qq < 24; qq ++)
     {
       faudio[qq * 2 + 1] = music.audio[qq + 8];
       faudio[qq * 2 ] = (music.audio[qq + 8] + music.audio[qq + 7]) >> 1;
@@ -3801,7 +3801,7 @@ void audioprocess()
 void fakenoise()
 {
   faudio[0] = random(1, MIDLY);
-  for (byte i = 1; i < MATRIX_WIDTH; i++) {
+  for (uint16_t i = 1; i < MATRIX_WIDTH; i++) {
     faudio[i] = faudio[i - 1] + random(10) - 7;
     faudio[i] = constrain(faudio[i ], 1, MATRIX_HEIGHT - 2);
   }
