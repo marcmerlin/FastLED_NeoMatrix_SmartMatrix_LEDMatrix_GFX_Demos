@@ -22,12 +22,15 @@
 */
 
 
-#include <EasyTransfer.h>// used for exchange with 2nd arduino for audio processing
-
 #define LEDMATRIX
 #include "matrix.h"
 //#include "neomatrix_config.h"
 #define zeds ledmatrix
+
+#ifdef TME_AUDIO
+#include <EasyTransfer.h>// used for exchange with 2nd arduino for audio processing
+EasyTransfer ETin;
+#endif
 
 #include "Effects.h"
 #include "Drawable.h"
@@ -82,12 +85,10 @@ int8_t item = random(13);
 #define MIDLX               (MATRIX_WIDTH/2)
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           (167)// max number of patterns
-#define NUM_STRIPS          8
 #define TIMING              99//seconds per pattern
-#define LATCH               23
+#define LATCH               23 // Beware, this conflicts with SmartMatrix pin mapping on ESP32
 #define  BallCount          14
 
-EasyTransfer ETin;
 struct RECEIVE_DATA_STRUCTURE {
   byte laudio[17];
   byte raudio[17];
@@ -120,10 +121,13 @@ long  ClockTimeSinceLastBounce[BallCount];
 
 void setup()
 {
-  Serial.begin(9600);
   matrix_setup();
   Serial.println("Reset");
+  #ifdef ESP32
+  randomSeed(analogRead(32) - analogRead(33) + analogRead(34) + analogRead(35) + analogRead(36) + analogRead(39));
+  #else
   randomSeed(analogRead(0) - analogRead(3) + analogRead(5));  // This breaks ESP32 + SmartMatrix as some of those lines are used for input
+  #endif
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / min((MATRIX_WIDTH - 1), 255)); //mstep is the step size to distribute 256 over an array the width of the matrix
@@ -138,14 +142,13 @@ void setup()
   sangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation in the y direction gives a float value between -1 and 1
 
   whatami();//this prints out the current status of stuff
-  // smile2();// make one frame of the smile 2 pattern
+  smile2();// make one frame of the smile 2 pattern
+  matrix->show();
+  delay(2000);
   effects.leds = matrixleds;
   effects.Setup();
-  matrix->show();
   // delay(1000);
 }
-
-
 
 void loop()
 {
@@ -1795,7 +1798,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 160:
-      Serial.print("auroura pattern: ");
+      Serial.print("aurora pattern: ");
       item = random(13);
 
       Serial.print(item);
@@ -1809,7 +1812,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 161:
-      Serial.print("auroura pattern: ");
+      Serial.print("aurora pattern: ");
       item = 2;
       bfade = 1;
       Serial.print(item);
@@ -1824,7 +1827,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       else fancy = 23;
       break;
     case 162:
-      Serial.print("auroura pattern: ");
+      Serial.print("aurora pattern: ");
       item = 4;
       bfade = 1;
       Serial.print(item);
@@ -1839,7 +1842,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
       break;
     case 163:
-      Serial.print("auroura pattern: ");
+      Serial.print("aurora pattern: ");
       item = 5;
       bfade = 1;
       Serial.print(item);
@@ -1853,7 +1856,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 164:
-      Serial.print("auroura pattern: ");
+      Serial.print("aurora pattern: ");
       item = 12;
       bfade = 1;
       Serial.print(item);
@@ -1867,7 +1870,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 165:
-      Serial.print("auroura pattern: ");
+      Serial.print("aurora pattern: ");
       item = random(13);
       bfade = 0;
       Serial.print(item);
@@ -7232,11 +7235,13 @@ void beatflash(byte brit)//colors rotate forward
 void noisetest() {
   gmusic = false;
 
+#if TME_AUDIO
   while (ETin.receiveData() == false)
   { digitalWrite(LATCH, LOW);
     delay(1);
     digitalWrite(LATCH, HIGH);
   }
+#endif
   /*if (music.laudio[0] == 0) music.laudio[0] = music.laudio[1] ;*/
   for (byte ppp = 0; ppp < 16; ppp ++)
   {
