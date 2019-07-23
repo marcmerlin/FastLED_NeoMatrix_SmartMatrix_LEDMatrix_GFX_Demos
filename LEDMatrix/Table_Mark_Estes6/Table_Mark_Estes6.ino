@@ -97,8 +97,8 @@ struct RECEIVE_DATA_STRUCTURE {
 };
 RECEIVE_DATA_STRUCTURE music;
 
-byte pattern = 159;//this picks the pattern to start with...
-byte  bpm[32], fcool[MATRIX_WIDTH], velo = 30 , pointyfix, fpeed[MATRIX_WIDTH * 3], targetfps = 40;
+byte pattern = 1;//this picks the pattern to start with...
+byte  bpm[32], fcool[MATRIX_WIDTH], velo = 30 , pointyfix=4 , fpeed[MATRIX_WIDTH * 3], targetfps = 40;
 byte  how, cool, sparky = 90, ccc, xxx, yyy, dot = 3, radius2, rr, gg, bb, adjunct = 3,  fcount[MATRIX_WIDTH * 3], fvelo[MATRIX_WIDTH * 3], fcolor[MATRIX_WIDTH * 3], fcountr[MATRIX_WIDTH * 3];
 byte maxiq, maxiaud, pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3, xpoffset[MATRIX_WIDTH * 3], quietcount, ccoolloorr,  h = 0,  howmany, xhowmany;
 byte heatz[MATRIX_WIDTH][MATRIX_HEIGHT], dot2 = 6, sdot, phew, raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth, mstep, LLaudio[64], RRaudio[64], inner, bfade = 3;
@@ -118,6 +118,20 @@ float Gravity = -9.81;
 int StartHeighty = 1, Positiony[BallCount], Positionx[BallCount];
 float Heighty[BallCount], ImpactVelocityStart = sqrt( -2 * Gravity * StartHeighty ), ImpactVelocity[BallCount], TimeSinceLastBounce[BallCount], Dampening[BallCount];
 long  ClockTimeSinceLastBounce[BallCount];
+
+// This allows a selection of only my favourite patterns.
+// Comment this out to get all the patterns -- merlin
+//#define BESTPATTERNS
+#ifdef BESTPATTERNS
+uint8_t bestpatterns[] = { 
+10, 11, 25, 29, 36, 37, 52, 61, 67, 70, 72, 73, 77, 80, 105, 110,};
+//4, 22, 34, 57, 60, 72, 104, };		     // ok
+#define numbest           sizeof(bestpatterns)
+#define lastpatindex numbest
+#else
+#define lastpatindex mpatterns
+// mixit = true;
+#endif
 
 void setup()
 {
@@ -149,6 +163,8 @@ void setup()
   effects.Setup();
   // delay(1000);
 }
+
+char readchar;
 
 void loop()
 {
@@ -407,8 +423,8 @@ void loop()
   counter++;//increment the counter which is used for many things
   matrix->show();
   delay(waiter);//frame rate control
-
-  if (millis() > lastmillis + dwell || nextsong) //when to change patterns
+  if (Serial.available()) readchar = Serial.read(); else readchar = 0;
+  if (readchar > 31 || millis() > lastmillis + dwell || nextsong) //when to change patterns
   {
     Serial.print("  Actual FPS: ");
     Serial.println (fps, 2);
@@ -418,11 +434,71 @@ void loop()
 
 void newpattern()//generates all the randomness for each new pattern
 {
+  int16_t new_pattern = 0;
+  // Allows keeping a pattern index for selecting bestof patterns
+  static uint8_t local_pattern = 0;
+
+#ifndef BESTPATTERNS
+  local_pattern = pattern;
+#endif
+
+  if (readchar) {
+    while ((readchar >= '0') && (readchar <= '9')) {
+      new_pattern = 10 * new_pattern + (readchar - '0');
+      readchar = 0;
+      if (Serial.available()) readchar = Serial.read();
+    }
+
+    if (new_pattern) {
+      Serial.print("Got new pattern via serial ");
+      Serial.println(new_pattern);
+      local_pattern = new_pattern;
+    } else {
+      Serial.print("Got serial char ");
+      Serial.println(readchar);
+    }
+  }
+
+  if (readchar == 'n') { local_pattern++; Serial.println("Serial => next"); }
+  else if (readchar == 'p') { local_pattern--; Serial.println("Serial => previous"); }
+  else if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
+    local_pattern = random(mpatterns);
+    if (!adio)//this skips the audio based patterns unless audio is enabled
+      while (pattern >= 29 && pattern <= 44)
+        local_pattern = random(mpatterns);
+  }
+  else if (!new_pattern) {
+    local_pattern ++;
+  }
+
+#ifdef BESTPATTERNS
+  // wrap around from 0 to last pattern.
+  if (!new_pattern) {
+    if (local_pattern >= 250) local_pattern = numbest-1;
+    if (local_pattern >= numbest) local_pattern = 0;
+
+    pattern = bestpatterns[local_pattern];
+    Serial.print("Mapping best pattern idx ");
+    Serial.print(local_pattern);
+    Serial.print(" to ");
+    Serial.println(pattern);
+  } else {
+    // In bestof mode, a specific pattern called by number is not sticky
+    // next time around, the next bestof pattern will play
+    pattern = new_pattern;
+  }
+#else
+  if (local_pattern >= 250) local_pattern = lastpatindex-1;
+  if (local_pattern >= lastpatindex) local_pattern = 0;
+
+  pattern = local_pattern;
+#endif
+
   // digitalWrite(LATCH, LOW);
   velo = random8();
   nextsong = false;
   quietcount = 0;
-  // matrix->clear();//????
+  matrix->clear(); // without clear, some pattern transitions via blending look weird
   targetfps = random(slowest, fastest);
   bfade = random(1, 9);
   wind = random8() >> 2;
@@ -430,12 +506,6 @@ void newpattern()//generates all the randomness for each new pattern
   dot = random(2, 6);// controls the size of a circle in many animations
   dot2 = random(2, 6);
   adjunct = random(32);//controls which screen wide effect is used if any
-  if (mixit) {//when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flop[0] this flag to make the progression random
-    pattern = random(mpatterns);
-    /*while (pattern > 27 && pattern < 53)pattern = random(mpatterns);*/
-  }
-  else
-    pattern ++;
   dwell = 1000 * (random(TIMING * 0.85, TIMING * 1.35)); //set how long the pattern will play
   ringdelay = random(30, 90);//sets how often one of the effects will happen
   bringdelay = random(70, 115);//sets how often one of the effects will happen
@@ -470,6 +540,9 @@ void newpattern()//generates all the randomness for each new pattern
 
 void whatami()// set some parameters specific to the pattern and send some data to the serial port for trouble shooting/ tweaking
 {
+  Serial.print("Pattern ");
+  Serial.print(pattern);
+  Serial.print(" ");
   lastmillis = millis();
   switch (pattern)
   {
