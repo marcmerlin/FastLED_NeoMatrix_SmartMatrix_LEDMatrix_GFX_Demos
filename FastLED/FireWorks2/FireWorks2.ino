@@ -153,7 +153,7 @@ class Dot {
 		gGravity = map8(speed, 0, 6)+3;
 		// Vertical velocity = Minimum velocity + Random maximum difference
 		if (MATRIX_HEIGHT <= 32) yv = ((20*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*5);	
-		else if (MATRIX_HEIGHT < 64)  yv = ((14*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*3);
+		else if (MATRIX_HEIGHT <= 64)  yv = ((14*(MATRIX_HEIGHT+(3*(gGravity*0.8))))-(MATRIX_HEIGHT*5)) + random16(MATRIX_HEIGHT*3);
 		else yv = ((10*(MATRIX_HEIGHT+(1.5*(gGravity*0.8))))-(MATRIX_HEIGHT*2)) + random16(MATRIX_HEIGHT*2);
 		xv = random16(350) - 175;			// Generates a signed int value between +/- 175  (Nice width but always inside of frame)      
 		y = 0;						// Ground launch
