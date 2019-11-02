@@ -16,12 +16,6 @@ uint8_t matrix_reset_demo = 1;
 // Shared functions
 // ---------------------------------------------------------------------------
 
-uint16_t Color24toColor16(uint32_t color) {
-  return ((uint16_t)(((color & 0xFF0000) >> 16) & 0xF8) << 8) |
-         ((uint16_t)(((color & 0x00FF00) >>  8) & 0xFC) << 3) |
-                    (((color & 0x0000FF) >>  0)         >> 3);
-}
-
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
 uint32_t Wheel(byte WheelPos) {
@@ -48,6 +42,9 @@ uint32_t Wheel(byte WheelPos) {
 // ---------------------------------------------------------------------------
 // Matrix Code
 // ---------------------------------------------------------------------------
+// How many ms used for each matrix update
+#define MX_UPD_TIME 10
+#define matrix_show matrix->show
 
 // type 0 = up, type 1 = up and down
 // The code is complicated looking, but the state machine is so that
@@ -62,9 +59,9 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
     static int16_t faster = 0;
     static bool dont_exit;
     static uint16_t delayframe;
-    char letters[] = { 'H', 'E', 'L', 'l', 'O' };
+    const char letters[] = { 'T', 'F', 'S', 'F' };
     bool done = 0;
-    uint8_t repeat = 3;
+    uint8_t repeat = 4;
 
     if (matrix_reset_demo == 1) {
 	matrix_reset_demo = 0;
@@ -72,12 +69,14 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 	size = 3;
 	l = 0;
 	if (matrix_loop == -1) { dont_exit = 1; delayframe = 2; faster = 0; };
+	if (mw >= 48 && mh >=64) matrix->setTextSize(2); else matrix->setTextSize(1);
     }
+
 
     if (--delayframe) {
 	// reset how long a frame is shown before we switch to the next one
 	// Serial.println("delayed frame");
-	matrix->show(); // make sure we still run at the same speed.
+	delay(MX_UPD_TIME);
 	return repeat;
     }
     delayframe = max((speed / 10) - faster , 1);
@@ -85,45 +84,49 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
     if (dont_exit == 0) { dont_exit = 1; return 0; }
     if (direction == 1) {
 	int8_t offset = 0; // adjust some letters left or right as needed
-	if (letters[l] == 'H') offset = -3 * size/15;
-	if (letters[l] == 'O') offset = -3 * size/15;
-	if (letters[l] == 'l') offset = +5 * size/15;
+	if (mw >= 98 && mh >=64) {
 
-	uint16_t txtcolor = Color24toColor16(Wheel(map(letters[l], '0', 'Z', 0, 255)));
-	matrix->setTextColor(txtcolor); 
+	} else {
+	    if (letters[l] == 'T') offset = -2 * size/15;
+	    if (letters[l] == '8') offset = 2 * size/15;
 
-	matrix->clear();
-	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
-#ifdef M32B8X3
-	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
-#else
- 	matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
-#endif
-	matrix->print(letters[l]);
-	if (size<18) size++; 
-	else if (zoom_type == 0) { done = 1; delayframe = max((speed - faster*10) * 1, 3); } 
+	    matrix->clear();
+	    matrix->setPassThruColor(Wheel(map(letters[l], '0', 'Z', 255, 0)));
+
+	    matrix->setFont( &Century_Schoolbook_L_Bold[size] );
+
+    #ifdef M32B8X3
+	    matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
+    #else
+	    matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
+    #endif
+	    matrix->print(letters[l]);
+	}
+	matrix->setPassThruColor();
+	if (size<18) size++;
+	else if (zoom_type == 0) { done = 1; delayframe = max((speed - faster*10) * 1, 3); }
 	     else direction = 2;
 
     } else if (zoom_type == 1) {
 	int8_t offset = 0; // adjust some letters left or right as needed
-	uint16_t txtcolor = Color24toColor16(Wheel(map(letters[l], '0', 'Z', 255, 0)));
-	if (letters[l] == 'H') offset = -3 * size/15;
-	if (letters[l] == 'O') offset = -3 * size/15;
-	if (letters[l] == 'l') offset = +5 * size/15;
 
-	matrix->setTextColor(txtcolor); 
 	matrix->clear();
+	matrix->setPassThruColor(Wheel(map(letters[l], '0', 'Z', 64, 192)));
+	if (letters[l] == 'T') offset = -2 * size/15;
+	if (letters[l] == '8') offset = 2 * size/15;
+
 	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
 #ifdef M32B8X3
 	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
 #else
- 	matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
+	matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
 #endif
 	matrix->print(letters[l]);
+	matrix->setPassThruColor();
 	if (size>3) size--; else { done = 1; direction = 1; delayframe = max((speed-faster*10)/2, 3); };
     }
 
-    matrix->show();
+    matrix_show();
     //Serial.println("done?");
     if (! done) return repeat;
     direction = 1;
@@ -140,7 +143,7 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
     dont_exit =  0;
     // Serial.print("delayframe on last letter ");
     // Serial.println(delayframe);
-    // After showing the last letter, pause longer 
+    // After showing the last letter, pause longer
     // unless it's a zoom in zoom out.
     if (zoom_type == 0) delayframe *= 5; else delayframe *= 3;
     return repeat;
