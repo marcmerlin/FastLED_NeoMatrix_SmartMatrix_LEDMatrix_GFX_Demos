@@ -89,7 +89,7 @@ int8_t item = random(13);
 
 //int countdownMS = Watchdog.enable(4000);
 byte pattern = 159;//this picks the pattern to start with...
-byte   afancy, fcool[MATRIX_WIDTH * 2], velo = 30 , pointyfix, fpeed[MATRIX_WIDTH * 2], targetfps = 40;
+byte   afancy, fcool[MATRIX_WIDTH * 2], velo = 30 , pointyfix=4, fpeed[MATRIX_WIDTH * 2], targetfps = 40;
 byte  how, cool, sparky = 90, ccc, xxx, yyy, dot = 3, radius2, rr, adjunct = 3,  fcount[MATRIX_WIDTH * 2], fvelo[MATRIX_WIDTH * 2], fcolor[MATRIX_WIDTH * 2], fcountr[MATRIX_WIDTH * 2];
 byte maxiq,  pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3, xpoffset[MATRIX_WIDTH * 2],  ccoolloorr,  h = 0,  howmany, xhowmany;
 byte heatz[MATRIX_WIDTH][MATRIX_HEIGHT], dot2 = 6, sdot, phew, raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth, mstep,  inner, bfade = 3;
@@ -97,7 +97,7 @@ int  directn = 1, quash = 5, quiet = 0, waiter = 7;
 int xvort[MATRIX_WIDTH * 2], yvort[MATRIX_WIDTH * 2];
 unsigned int  counter, ringdelay, bringdelay, firedelay, hitcounter;
 byte slowest = 5, fastest = 20;
-boolean  flop[10] , adio = true, ringme = false, blackringme = false, nextsong = false;
+boolean  flop[10] , ringme = false, blackringme = false, nextsong = false;
 boolean rimmer[MATRIX_WIDTH * 2], xbouncer[MATRIX_WIDTH * 2], ybouncer[MATRIX_WIDTH * 2];
 
 boolean mixit = false, slowme = true;
@@ -137,8 +137,7 @@ void setup()
   lastmillis = millis();
   lasttest = millis();
   hue = random8();//get a starting point for the color progressions
-  adio = false; // turn off audio
-  if (!adio) mscale = 2.2;
+  mscale = 2.2;
   //Watchdog.reset();
   cangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation gives a float value between -1 and 1
   sangle = (sin8(random(25, 220)) - 128.0) / 128.0;//angle of movement for the center of animation in the y direction gives a float value between -1 and 1
@@ -495,8 +494,8 @@ void loop()
   counter++;//increment the counter which is used for many things
   matrix->show();
   delay(waiter);//frame rate control
-
-  if (millis() > lastmillis + dwell || nextsong) //when to change patterns
+  if (Serial.available()) readchar = Serial.read(); else readchar = 0;
+  if (readchar > 31 || millis() > lastmillis + dwell || nextsong) //when to change patterns
   {
     Serial.print("  Actual FPS: ");
     Serial.println (fps, 2);
@@ -506,10 +505,64 @@ void loop()
 
 void newpattern()//generates all the randomness for each new pattern
 {
+  int16_t new_pattern = 0;
+  // Allows keeping a pattern index for selecting bestof patterns
+  static uint8_t local_pattern = 0;
+
+#ifndef BESTPATTERNS
+  local_pattern = pattern;
+#endif
+
+  if (readchar) {
+    while ((readchar >= '0') && (readchar <= '9')) {
+      new_pattern = 10 * new_pattern + (readchar - '0');
+      readchar = 0;
+      if (Serial.available()) readchar = Serial.read();
+    }
+
+    if (new_pattern) {
+      Serial.print("Got new pattern via serial ");
+      Serial.println(new_pattern);
+    } else {
+      Serial.print("Got serial char ");
+      Serial.println(readchar);
+    }
+  }
+
+  if (readchar == 'n') { local_pattern++; Serial.println("Serial => next"); }
+  else if (readchar == 'p') { local_pattern--; Serial.println("Serial => previous"); }
+  else if (!new_pattern) {
+    // when set to true, plays the patterns in random order, if not, they increment, I start with increment and eventually flip this flag to make the progression random
+    if (mixit) local_pattern = random(mpatterns); else local_pattern ++;
+  }
+
+#ifdef BESTPATTERNS
+  // wrap around from 0 to last pattern.
+  if (!new_pattern) {
+    if (local_pattern >= 250) local_pattern = numbest-1;
+    if (local_pattern >= numbest) local_pattern = 0;
+
+    pattern = bestpatterns[local_pattern];
+    Serial.print("Mapping best pattern idx ");
+    Serial.print(local_pattern);
+    Serial.print(" to ");
+    Serial.println(pattern);
+  }
+#else
+  if (local_pattern >= 250) local_pattern = lastpatindex-1;
+  if (local_pattern >= lastpatindex) local_pattern = 0;
+
+  pattern = local_pattern;
+#endif
+  if (new_pattern) pattern = new_pattern;
+  // Skip missing pattern
+  if ( pattern > 26 && pattern < 54) pattern = 54;
+  if ( pattern == 64) pattern = 65;
+
   velo = 0; // random8()/2;
   nextsong = false;
 
-  // matrix->clear();//????
+  matrix->clear(); // without clear, some pattern transitions via blending look weird
   targetfps = random(slowest, fastest);
   bfade = random(0, 9);
   wind = random(70) ;
@@ -518,11 +571,6 @@ void newpattern()//generates all the randomness for each new pattern
   dot = random(2, 6);// controls the size of a circle in many animations
   dot2 = random(2, 6);
   adjunct = random(38);//controls which screen wide effect is used if any
-
-  pattern = random(mpatterns);
-  while ( pattern > 26 && pattern < 54)
-    pattern = random(mpatterns);
-  /*while (pattern > 27 && pattern < 53)pattern = random(mpatterns);*/
 
   dwell = 1000 * (random(TIMING * 0.85, TIMING * 1.35)); //set how long the pattern will play
   ringdelay = random(30, 90);//sets how often one of the effects will happen
@@ -6306,3 +6354,4 @@ void Fire()
 
   }
 }
+// vim:sts=2:sw=2
