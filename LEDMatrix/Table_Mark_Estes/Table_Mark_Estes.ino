@@ -34,7 +34,7 @@ int directn = 1, quash = 5;
 #define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-10, 11, 25, 29, 36, 37, 52, 61, 67, 70, 72, 73, 77, 80, 105, 110,};
+10, 11, 25, 29, 36, 37, 52, 61, 67, 70, 72, 73, 77, 80, 105};
 //4, 22, 34, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
@@ -3048,7 +3048,7 @@ void hypnoduck4()
     else
       zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CRGB::White);
   }
-  for (uint32_t jj = 890; jj > 166 - (counter % 160); jj -= 5)
+  for (uint32_t jj = 1200; jj > 166 - (counter % 160); jj -= 3)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
