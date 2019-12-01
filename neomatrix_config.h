@@ -31,6 +31,9 @@ definitions and/or changing pin mappings for TFT screens. To choose which backen
 to use, set the define before you include the file.
 */
 
+//#define ST7735_128b128
+#define SSD1331
+
 #if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_160x128) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64)
     /*
     For my own benefit, I use some CPU architectures to default to some backends
