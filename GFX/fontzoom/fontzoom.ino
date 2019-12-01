@@ -69,7 +69,7 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 	size = 3;
 	l = 0;
 	if (matrix_loop == -1) { dont_exit = 1; delayframe = 2; faster = 0; };
-	if (mw >= 48 && mh >=64) matrix->setTextSize(2); else matrix->setTextSize(1);
+	matrix->setTextSize(1);
     }
 
 
@@ -84,16 +84,21 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
     if (dont_exit == 0) { dont_exit = 1; return 0; }
     if (direction == 1) {
 	int8_t offset = 0; // adjust some letters left or right as needed
-	if (mw >= 98 && mh >=64) {
-
+	matrix->clear();
+	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
+	if (mw >= 48 && mh >=64) {
+	    matrix->setPassThruColor(0xD7E1EB);
+	    matrix->setCursor(10-size*0.55+offset, 36+size*0.75);
+	    matrix->print("TF");
+	    matrix->setPassThruColor(0x05C1FF);
+	    matrix->setCursor(24-size*0.55+offset, 68+size*0.75);
+	    matrix->print("SF");
 	} else {
 	    if (letters[l] == 'T') offset = -2 * size/15;
 	    if (letters[l] == '8') offset = 2 * size/15;
 
-	    matrix->clear();
 	    matrix->setPassThruColor(Wheel(map(letters[l], '0', 'Z', 255, 0)));
 
-	    matrix->setFont( &Century_Schoolbook_L_Bold[size] );
 
     #ifdef M32B8X3
 	    matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
@@ -112,16 +117,25 @@ uint8_t font_zoom(uint8_t zoom_type, uint8_t speed) {
 
 	matrix->clear();
 	matrix->setPassThruColor(Wheel(map(letters[l], '0', 'Z', 64, 192)));
-	if (letters[l] == 'T') offset = -2 * size/15;
-	if (letters[l] == '8') offset = 2 * size/15;
-
 	matrix->setFont( &Century_Schoolbook_L_Bold[size] );
-#ifdef M32B8X3
-	matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
-#else
-	matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
-#endif
-	matrix->print(letters[l]);
+	if (mw >= 48 && mh >=64) {
+	    matrix->setPassThruColor(0xD7E1EB);
+	    matrix->setCursor(10-size*0.55+offset, 36+size*0.75);
+	    matrix->print("TF");
+	    matrix->setPassThruColor(0x05C1FF);
+	    matrix->setCursor(24-size*0.55+offset, 68+size*0.75);
+	    matrix->print("SF");
+	} else {
+	    if (letters[l] == 'T') offset = -2 * size/15;
+	    if (letters[l] == '8') offset = 2 * size/15;
+
+    #ifdef M32B8X3
+	    matrix->setCursor(10-size*0.55+offset, 17+size*0.75);
+    #else
+	    matrix->setCursor(3*mw/6-size*1.75+offset, mh*7/12+size*1.60);
+    #endif
+	    matrix->print(letters[l]);
+	}   
 	matrix->setPassThruColor();
 	if (size>3) size--; else { done = 1; direction = 1; delayframe = max((speed-faster*10)/2, 3); };
     }
