@@ -31,7 +31,7 @@ definitions and/or changing pin mappings for TFT screens. To choose which backen
 to use, set the define before you include the file.
 */
 
-#if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64)
+#if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(FASTLED_SDL)
     /*
     For my own benefit, I use some CPU architectures to default to some backends
     in the defines below, but you should define your own before including this
@@ -90,7 +90,7 @@ bool init_done = 0;
     #pragma message "Compiling for NEOMATRIX"
 #else
     // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
-    #define GPIOPINOUT 3
+    #define GPIOPINOUT 4
     #pragma message "Compiling for SMARTMATRIX with NEOMATRIX API"
     #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware
     #include <SmartMatrix3.h>
@@ -112,7 +112,7 @@ bool init_done = 0;
 uint8_t matrix_brightness = 255;
 
 #ifdef ESP32
-#pragma message "Compiling for ESP32 with 64x32 16 scan panel"
+#pragma message "Compiling for ESP32 with 64x32 16 scan panel and 64x96 resolution"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint16_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
@@ -445,7 +445,7 @@ const uint8_t MATRIXPIN = 13;
 
 
 //----------------------------------------------------------------------------
-#elif defined(M64BY64) // 64x64 straight connection (no matrices)
+#elif defined(M64BY64) || defined(FASTLED_SDL) // 64x64 straight connection (no matrices)
 // http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
 uint8_t matrix_brightness = 128;
 //
@@ -462,15 +462,23 @@ const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
 const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 const uint32_t NUMMATRIX = mw*mh;
 
+CRGB *matrixleds;
+#if defined(M64BY64)
 #ifdef LEDMATRIX
 // cLEDMatrix defines
 cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmatrix(false);
 #endif
-CRGB *matrixleds;
-
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
     NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
+#else
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_MATRIX> ledmatrix(false);
+#endif
+FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
+    NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
+#endif
 #else
 #error "Please write a matrix config or choose one of the definitions above"
 #endif // end Matrix resolution and display defines
@@ -663,7 +671,7 @@ void matrix_setup(int reservemem = 40000) {
     Serial.print(" running on pin: ");
     Serial.println(MATRIXPIN);
 // 64x64 straight wiring
-#else
+#elif defined(M64BY64) // 64x64 straight connection (no matrices)
     // https://github.com/FastLED/FastLED/wiki/Multiple-Controller-Examples
     FastLED.addLeds<WS2812B,23, GRB>(matrixleds, 0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
     #ifdef ESP32
@@ -687,6 +695,12 @@ void matrix_setup(int reservemem = 40000) {
     Serial.print("Neomatrix 16 pin via RMT/I2S 16 way parallel output, total LEDs: ");
     Serial.println(NUMMATRIX);
     #endif // ESP32
+#elif defined(FASTLED_SDL) // 64x64 straight connection (no matrices)
+    FastLED.addLeds<SDL, mw, mh>(matrixleds, NUMMATRIX);
+    Serial.print("Neomatrix on top of SDL, total LEDs: ");
+    Serial.println(NUMMATRIX);
+#else
+#error "Undefined Matrix"
 #endif
     show_free_mem("Before matrix->begin");
     matrix->begin();
