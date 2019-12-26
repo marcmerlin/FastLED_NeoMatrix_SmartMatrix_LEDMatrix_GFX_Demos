@@ -327,4 +327,5 @@ class Boid {
 // ESP32's newer compiler fails on both 'max' and the 2nd line
 const uint8_t AVAILABLE_BOID_COUNT = MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT;
 //Boid boids[AVAILABLE_BOID_COUNT]; // this should work, but a compiler bug(?) for ESP32 does not like it anymore
+// convert to malloc?
 Boid boids[MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT];
