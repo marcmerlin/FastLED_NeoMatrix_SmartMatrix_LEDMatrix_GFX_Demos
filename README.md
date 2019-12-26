@@ -10,6 +10,7 @@ As of this writing, you can run on top of
 - https://github.com/marcmerlin/FastLED_NeoMatrix/
 - https://github.com/marcmerlin/SmartMatrix_GFX/
 - https://github.com/marcmerlin/FastLED_SPITFT_GFX (SSD1331, ILI9341, and ST7735 TFTs)
+- https://github.com/marcmerlin/FastLEDonPc
 
 This demo collection started after I wrote https://github.com/marcmerlin/FastLED_NeoMatrix which 
 was designed to add GFX compatiblity for FastLED supported backends.
