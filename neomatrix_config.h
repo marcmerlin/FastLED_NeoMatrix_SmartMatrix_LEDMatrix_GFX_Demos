@@ -19,6 +19,8 @@ Backends you should choose from (define 1):
 - Everything below is NeoMatrix in different patterns:
   M32B8X3 M16BY16T4 M64BY64 are 3 examples of NEOMATRIX defines
   (3 tiled 32x8, 4 tiled 16x16, and a single zigzag 64x64 array)
+- FASTLED_SDL is auto defined if you use https://github.com/MarcFork/FastLEDonPc
+- ARDUINOONPC is auto defined by https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix
 
 LEDMATRIX is a separate define you'd set before including this file and
 adds the LEDMatrix API if you need it.
@@ -31,7 +33,7 @@ definitions and/or changing pin mappings for TFT screens. To choose which backen
 to use, set the define before you include the file.
 */
 
-#if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(FASTLED_SDL)
+#if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(FASTLED_SDL) && !defined(ARDUINOONPC)
     /*
     For my own benefit, I use some CPU architectures to default to some backends
     in the defines below, but you should define your own before including this
@@ -40,6 +42,7 @@ to use, set the define before you include the file.
     #ifdef ESP8266
     #define SSD1331
     #define SSD1331_ROTATE 1
+    // ESP8266 shirt with neopixel strips
     //#define M32B8X3
     //#define M16BY16T4
     #endif
@@ -71,23 +74,13 @@ bool init_done = 0;
 // The ESP32 FastLED defines below must be defined before FastLED.h is loaded
 #ifndef SMARTMATRIX
     #ifdef ESP32
-	// Allow infrared
+	// Allow infrared for old FastLED versions
 	#define FASTLED_ALLOW_INTERRUPTS 1
+	// Newer Samguyver ESP32 FastLED has a new I2S implementation that can be
+	// better (or worse) than then default RMT which only supports 8 channels.
+	#define FASTLED_ESP32_I2S
 	#pragma message "Please use https://github.com/samguyer/FastLED.git if stock FastLED is unstable with ESP32"
     #endif
-
-    #if !defined(M16BY16T4)
-        #ifdef ESP32
-            // 64x64 matrix with optional 16 pin parallel driver
-            #define M64BY64
-        #elif ESP8266
-            // ESP8266 shirt with neopixel strips
-            #define M32B8X3
-        #endif
-    #endif
-
-    #include <FastLED_NeoMatrix.h>
-    #pragma message "Compiling for NEOMATRIX"
 #else
     // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
     #define GPIOPINOUT 4
@@ -97,7 +90,6 @@ bool init_done = 0;
     #include <SmartMatrix_GFX.h>
 #endif // SMARTMATRIX
 
-#define FASTLED_ESP32_I2S
 #include <FastLED.h>
 
 #ifdef LEDMATRIX
@@ -226,6 +218,35 @@ Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
 
 //----------------------------------------------------------------------------
+#elif defined(ARDUINOONPC)
+
+#include "TFT_LinuxWrapper.h"
+#include <FastLED_TFTWrapper_GFX.h>
+
+uint8_t matrix_brightness = 255;
+const uint16_t MATRIX_TILE_WIDTH = 160;
+const uint16_t MATRIX_TILE_HEIGHT= 128;
+//
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(160, 128);
+FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, mw, mh, tft);
+
+//----------------------------------------------------------------------------
 #elif defined(ST7735_128b128) || defined(ST7735_128b160) 
 
 #include <Adafruit_ST7735.h>
@@ -285,7 +306,6 @@ Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
 
-//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 #elif defined(SSD1331)
 
@@ -363,6 +383,8 @@ FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, 
 
 //----------------------------------------------------------------------------
 #elif defined(M32B8X3)
+#include <FastLED_NeoMatrix.h>
+
 uint8_t matrix_brightness = 64;
 // Used by LEDMatrix
 const uint16_t MATRIX_TILE_WIDTH = 8; // width of EACH NEOPIXEL MATRIX (not total display)
@@ -417,6 +439,8 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
 
 //----------------------------------------------------------------------------
 #elif defined(M16BY16T4)
+#include <FastLED_NeoMatrix.h>
+
 uint8_t matrix_brightness = 64;
 
 const uint16_t MATRIX_TILE_WIDTH = 16; // width of EACH NEOPIXEL MATRIX (not total display)
@@ -446,6 +470,8 @@ const uint8_t MATRIXPIN = 13;
 
 //----------------------------------------------------------------------------
 #elif defined(M64BY64) || defined(FASTLED_SDL) // 64x64 straight connection (no matrices)
+#include <FastLED_NeoMatrix.h>
+
 // http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
 uint8_t matrix_brightness = 128;
 //
@@ -619,6 +645,12 @@ void matrix_setup(int reservemem = 40000) {
 #endif
     // Seems that filllscreen further initializes the tft so that it works
     tft->fillScreen(ILI9341_DARKGREY);
+
+#elif defined(ARDUINOONPC)
+    // Need to init the underlying TFT SPI engine
+    Serial.println("ARDUINOONPC tft begin");
+    tft->begin();
+    matrix->fillScreen(LTDC_BLACK);
 
 #elif defined(ST7735_128b128)
     Serial.println("ST7735_128b128: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
