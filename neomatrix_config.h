@@ -33,7 +33,17 @@ definitions and/or changing pin mappings for TFT screens. To choose which backen
 to use, set the define before you include the file.
 */
 
-#if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(FASTLED_SDL) && !defined(ARDUINOONPC)
+#if defined(ARDUINOONPC)
+#if defined(__ARMEL__)
+#pragma message "Detected ARDUINOONPC on ARM (guessing rPi), will use FastLED_RPIRGBPanel_GFX"
+#define RPIRGBPANEL
+#else
+#pragma message "Detected ARDUINOONPC, will use FastLED_TFTWrapper_GFX"
+#define TFTWRAPPER
+#endif
+#endif
+
+#if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64)
     /*
     For my own benefit, I use some CPU architectures to default to some backends
     in the defines below, but you should define your own before including this
@@ -218,7 +228,7 @@ Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
 
 //----------------------------------------------------------------------------
-#elif defined(ARDUINOONPC)
+#elif defined(TFTWRAPPER)
 
 #include "TFT_LinuxWrapper.h"
 #include <FastLED_TFTWrapper_GFX.h>
@@ -245,6 +255,38 @@ CRGB *matrixleds;
 
 TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(160, 128);
 FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, tft);
+
+//----------------------------------------------------------------------------
+#elif defined(RPIRGBPANEL)
+
+#include <FastLED_RPIRGBPanel_GFX.h>
+// https://github.com/hzeller/rpi-rgb-led-matrix
+// Arduino min/max conflict with g++ math min/max
+#undef min
+#undef max
+#include <led-matrix.h>
+
+uint8_t matrix_brightness = 255;
+const uint16_t MATRIX_TILE_WIDTH = 128;
+const uint16_t MATRIX_TILE_HEIGHT= 192;
+
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+FastLED_RPIRGBPanel_GFX *matrix = new FastLED_RPIRGBPanel_GFX(matrixleds, mw, mh);
 
 //----------------------------------------------------------------------------
 #elif defined(ST7735_128b128) || defined(ST7735_128b160) 
@@ -646,11 +688,31 @@ void matrix_setup(int reservemem = 40000) {
     // Seems that filllscreen further initializes the tft so that it works
     tft->fillScreen(ILI9341_DARKGREY);
 
-#elif defined(ARDUINOONPC)
+#elif defined(TFTWRAPPER)
     // Need to init the underlying TFT SPI engine
     Serial.println("ARDUINOONPC tft begin");
     tft->begin();
     matrix->fillScreen(LTDC_BLACK);
+
+#elif defined(RPIRGBPANEL)
+    Serial.println("Using rpi-rgb-led-matrix");
+
+    rgb_matrix::RGBMatrix::Options defaults;
+    defaults.hardware_mapping = "regular"; // or e.g. "adafruit-hat"
+    defaults.rows = 64;
+    defaults.cols = 128;
+    defaults.chain_length = 1;
+    defaults.parallel = 3;
+    defaults.pwm_lsb_nanoseconds = 20;
+    defaults.pwm_bits = 7;
+    defaults.led_rgb_sequence = "RBG";
+    defaults.panel_type = "FM6126A";
+    
+    rgb_matrix::RuntimeOptions ropt;
+    rgb_matrix::Canvas *canvas = rgb_matrix::CreateMatrixFromOptions(defaults, ropt);
+    while (canvas == NULL) Serial.println("Canvas did not initialize");
+    matrix->setCanvas(canvas);
+    Serial.println("RGBPanel Canvas initialized");
 
 #elif defined(ST7735_128b128)
     Serial.println("ST7735_128b128: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
@@ -775,3 +837,4 @@ void matrix_setup(int reservemem = 40000) {
 }
 
 #endif // neomatrix_config_h
+//vim:sts=4:sw=4
