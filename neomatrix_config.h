@@ -19,8 +19,11 @@ Backends you should choose from (define 1):
 - Everything below is NeoMatrix in different patterns:
   M32B8X3 M16BY16T4 M64BY64 are 3 examples of NEOMATRIX defines
   (3 tiled 32x8, 4 tiled 16x16, and a single zigzag 64x64 array)
-- FASTLED_SDL is auto defined if you use https://github.com/MarcFork/FastLEDonPc
 - ARDUINOONPC is auto defined by https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix
+  - On ARM, we assume rPi and define RPIRGBPANEL
+  - Elsewhere, we assume rendering on linux/X11
+    - LINUX_RENDERER_X11 is the default with ArduinoOnPc-FastLED-GFX-LEDMatrix
+    - LINUX_RENDERER_SDL can be defined in ArduinoOnPc-FastLED-GFX-LEDMatrix's Makefile
 
 LEDMATRIX is a separate define you'd set before including this file and
 adds the LEDMatrix API if you need it.
@@ -34,13 +37,18 @@ to use, set the define before you include the file.
 */
 
 #if defined(ARDUINOONPC)
-#if defined(__ARMEL__)
-#pragma message "Detected ARDUINOONPC on ARM (guessing rPi), will use FastLED_RPIRGBPanel_GFX"
-#define RPIRGBPANEL
-#else
-#pragma message "Detected ARDUINOONPC, will use FastLED_TFTWrapper_GFX"
-#define TFTWRAPPER
-#endif
+    #if defined(__ARMEL__)
+	#pragma message "Detected ARDUINOONPC on ARM (guessing rPi), will use FastLED_RPIRGBPanel_GFX"
+	#define RPIRGBPANEL
+    #else
+	#ifndef LINUX_RENDERER_SDL
+	#pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 FastLED_TFTWrapper_GFX Rendering"
+	#define LINUX_RENDERER_X11
+	#else
+	#pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_SDL FastLED_NeoMatrix Rendering."
+	#pragma message "Comment out LINUX_RENDERER_SDL for X11 rendering instead of SDL. Use + for brighter."
+	#endif
+    #endif
 #endif
 
 #if !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(M32B8X3) && !defined(M16BY16T4) && !defined(M64BY64)
@@ -228,7 +236,7 @@ Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
 
 //----------------------------------------------------------------------------
-#elif defined(TFTWRAPPER)
+#elif defined(LINUX_RENDERER_X11)
 
 #include "TFT_LinuxWrapper.h"
 #include <FastLED_TFTWrapper_GFX.h>
@@ -255,6 +263,31 @@ CRGB *matrixleds;
 
 TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(160, 128);
 FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, tft);
+//
+//----------------------------------------------------------------------------
+#elif defined(LINUX_RENDERER_SDL)
+#include <FastLED_NeoMatrix.h>
+
+uint8_t matrix_brightness = 128;
+//
+// Used by LEDMatrix
+const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint16_t MATRIX_TILE_HEIGHT= 128; // height of each matrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+CRGB *matrixleds;
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_MATRIX> ledmatrix(false);
+#endif
+FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
+    NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
 
 //----------------------------------------------------------------------------
 #elif defined(RPIRGBPANEL)
@@ -509,9 +542,8 @@ FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH,
 
 const uint8_t MATRIXPIN = 13;
 
-
 //----------------------------------------------------------------------------
-#elif defined(M64BY64) || defined(FASTLED_SDL) // 64x64 straight connection (no matrices)
+#elif defined(M64BY64) // 64x64 straight connection (no matrices)
 #include <FastLED_NeoMatrix.h>
 
 // http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
@@ -531,7 +563,6 @@ const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 const uint32_t NUMMATRIX = mw*mh;
 
 CRGB *matrixleds;
-#if defined(M64BY64)
 #ifdef LEDMATRIX
 // cLEDMatrix defines
 cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmatrix(false);
@@ -539,14 +570,8 @@ cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmat
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
     NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
     NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
-#else
-#ifdef LEDMATRIX
-// cLEDMatrix defines
-cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_MATRIX> ledmatrix(false);
-#endif
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
-    NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
-#endif
+
+//============================================================================
 #else
 #error "Please write a matrix config or choose one of the definitions above"
 #endif // end Matrix resolution and display defines
@@ -688,11 +713,16 @@ void matrix_setup(int reservemem = 40000) {
     // Seems that filllscreen further initializes the tft so that it works
     tft->fillScreen(ILI9341_DARKGREY);
 
-#elif defined(TFTWRAPPER)
+#elif defined(LINUX_RENDERER_X11)
     // Need to init the underlying TFT SPI engine
-    Serial.println("ARDUINOONPC tft begin");
+    Serial.println("ARDUINOONPC LINUX_RENDERER_X11 tft begin");
     tft->begin();
     matrix->fillScreen(LTDC_BLACK);
+
+#elif defined(LINUX_RENDERER_SDL)
+    FastLED.addLeds<SDL, mw, mh>(matrixleds, NUMMATRIX);
+    Serial.print("Neomatrix on top of SDL. Please use '+' on numeric keypad for brighter, total LEDs: ");
+    Serial.println(NUMMATRIX);
 
 #elif defined(RPIRGBPANEL)
     Serial.println("Using rpi-rgb-led-matrix");
@@ -789,10 +819,6 @@ void matrix_setup(int reservemem = 40000) {
     Serial.print("Neomatrix 16 pin via RMT/I2S 16 way parallel output, total LEDs: ");
     Serial.println(NUMMATRIX);
     #endif // ESP32
-#elif defined(FASTLED_SDL) // 64x64 straight connection (no matrices)
-    FastLED.addLeds<SDL, mw, mh>(matrixleds, NUMMATRIX);
-    Serial.print("Neomatrix on top of SDL, total LEDs: ");
-    Serial.println(NUMMATRIX);
 #else
 #error "Undefined Matrix"
 #endif
