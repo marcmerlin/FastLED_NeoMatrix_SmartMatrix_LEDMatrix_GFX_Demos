@@ -47,6 +47,7 @@ to use, set the define before you include the file.
     #ifdef ESP32
     //#define ST7735_128b128
     //#define ST7735_128b160
+    //#define ILI9341
     #define SMARTMATRIX
     //#define M64BY64
     #endif
@@ -207,23 +208,54 @@ CRGB *matrixleds;
 #define TFT_DC 10
 #define TFT_RST 23
 #define TFT_CS 22
-//Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 
 #else
-// HWSPI default
-#define TFT_MISO 19
-#define TFT_CLK 18
-#define TFT_MOSI 23
+// HWSPI default    // sparkfun 18 green 23 blue 19 yellow
+#define TFT_MISO 19  // yellow
+#define TFT_CLK 18   // green
+#define TFT_MOSI 23  // blue
 #define TFT_DC 27
 // this is the TFT reset pin. It seems required on my board
 #define TFT_RST 26
 #define TFT_CS 25
 
-Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 #endif
 
+//Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
+
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
+
+//#define malloc ps_malloc
+
+//----------------------------------------------------------------------------
+#elif defined(M5STACK)
+
+#include <M5Stack.h>
+#include <FastLED_SPITFT_GFX.h>
+
+uint8_t matrix_brightness = 255;
+const uint16_t MATRIX_TILE_WIDTH = 320;
+const uint16_t MATRIX_TILE_HEIGHT= 240;
+//
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+// M5 gets defined in M5Stack
+FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, &M5.lcd, 100);
 
 //----------------------------------------------------------------------------
 #elif defined(ST7735_128b128) || defined(ST7735_128b160) 
@@ -535,16 +567,28 @@ void show_free_mem(const char *pre=NULL) {
     Framebuffer_GFX::show_free_mem(pre);
 }
 
-void *mallocordie(const char *varname, uint32_t req) {
+void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
+#ifndef BOARD_HAS_PSRAM
+    psram = false;
+#endif
+    if (psram) Serial.print("PS");
     Serial.print("Malloc ");
     Serial.print(varname);
     Serial.print(" . Requested bytes: ");
     Serial.println(req);
-    void *mem = malloc(req);
+    void *mem;
+    if (psram) { 
+	mem = ps_malloc(req);
+    } else {
+	mem = malloc(req);
+    }
+
     if (mem) {
 	return mem;
     } else {
-	Serial.print("FATAL: malloc failed for ");
+	Serial.print("FATAL: ");
+	if (psram) Serial.print("ps_");
+	Serial.print("malloc failed for ");
 	Serial.println(varname);
 	show_free_mem();
 	while (1);
@@ -567,9 +611,13 @@ void matrix_setup(int reservemem = 40000) {
     Serial.begin(115200);
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
     show_free_mem("Memory after setup() starts");
+    
+// Smartmatrix defines the framebuffers itself. Other methods make their own allocation here  
+#if !defined(SMARTMATRIX)
     // ESP32 has more memory available for allocation in setup than in global
     // (if this were a global array), so we use malloc here.
-    matrixleds = (CRGB *) mallocordie("matrixleds", sizeof(CRGB) * NUMMATRIX);
+    // https://forum.arduino.cc/index.php?topic=647833
+    matrixleds = (CRGB *) mallocordie("matrixleds", sizeof(CRGB) * NUMMATRIX, 1);
     // and then fix the until now NULL pointer in the object.
     matrix->newLedsPtr(matrixleds);
     show_free_mem("After matrixleds malloc");
@@ -577,6 +625,8 @@ void matrix_setup(int reservemem = 40000) {
     ledmatrix.SetLEDArray(matrixleds);
 #endif
     matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
+#endif
+
 #if defined(SMARTMATRIX)
     matrix_gamma = 1; // SmartMatrix should be good by default.
     matrixLayer.addLayer(&backgroundLayer);
@@ -602,6 +652,13 @@ void matrix_setup(int reservemem = 40000) {
     delay(1000);
 #endif
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
+
+#elif defined(M5STACK)
+    // Need to init the underlying TFT SPI engine
+    Serial.println("M5STACK begin");
+    M5.begin();
+    M5.Power.begin();
+    M5.Lcd.fillScreen(BLUE);
 
 #elif defined(ILI9341)
     // Need to init the underlying TFT SPI engine
@@ -735,7 +792,7 @@ void matrix_setup(int reservemem = 40000) {
 #endif
 #endif
 
-    Serial.println("neomatrix_config setup done");
+    Serial.println("matrix_setup done");
     // At least on teensy, due to some framework bug it seems, early
     // serial output gets looped back into serial input
     // Hence, flush input.
