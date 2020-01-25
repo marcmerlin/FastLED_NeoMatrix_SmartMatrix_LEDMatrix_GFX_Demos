@@ -87,18 +87,10 @@ bool init_done = 0;
         #endif
     #endif
 
+    #define FASTLED_ESP32_I2S  // this is newer (better?) than RMT, but maybe not as stable either
     #include <FastLED_NeoMatrix.h>
-    #pragma message "Compiling for NEOMATRIX"
-#else
-    // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
-    #define GPIOPINOUT 4
-    #pragma message "Compiling for SMARTMATRIX with NEOMATRIX API"
-    #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware
-    #include <SmartMatrix3.h>
-    #include <SmartMatrix_GFX.h>
 #endif // SMARTMATRIX
 
-#define FASTLED_ESP32_I2S
 #include <FastLED.h>
 
 #ifdef LEDMATRIX
@@ -110,15 +102,20 @@ bool init_done = 0;
 #endif
 
 #if defined(SMARTMATRIX)
+// CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
+#define GPIOPINOUT 4 // if on ESP32, this selects which wiring is used. Teensy uses the define below
+#include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware on teensy
+#include <SmartMatrix3.h>
+#include <SmartMatrix_GFX.h>
 uint8_t matrix_brightness = 255;
 
 #ifdef ESP32
-#pragma message "Compiling for ESP32 with 64x32 16 scan panel and 64x96 resolution"
+#pragma message "SmartMatrix for ESP32 with 64x32 16 scan panel and 64x96 resolution"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
 const uint16_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
 #elif defined(__MK66FX1M0__) // my teensy 3.6 is connected to a 64x64 panel
-#pragma message "Compiling for Teensy with 64x64 32 scan panel"
+#pragma message "SmartMatrix for Teensy with 64x64 32 scan panel"
 //const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
 const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
@@ -168,6 +165,7 @@ void show_callback() {
 #ifdef LEDMATRIX
     ledmatrix.SetLEDArray(matrixleds);
 #endif
+    matrix->showfps();
 }
 
 //----------------------------------------------------------------------------
