@@ -668,11 +668,15 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
     Serial.print(" . Requested bytes: ");
     Serial.println(req);
     void *mem;
+#ifdef ESP32
     if (psram) { 
 	mem = ps_malloc(req);
     } else {
 	mem = malloc(req);
     }
+#else
+    mem = malloc(req);
+#endif
 
     if (mem) {
 	return mem;
