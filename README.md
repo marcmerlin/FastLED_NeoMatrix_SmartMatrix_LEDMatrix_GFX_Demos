@@ -10,6 +10,7 @@ As of this writing, you can run on top of
 - https://github.com/marcmerlin/FastLED_NeoMatrix/
 - https://github.com/marcmerlin/SmartMatrix_GFX/
 - https://github.com/marcmerlin/FastLED_SPITFT_GFX (SSD1331, ILI9341, and ST7735 TFTs)
+- https://github.com/marcmerlin/FastLEDonPc
 
 This demo collection started after I wrote https://github.com/marcmerlin/FastLED_NeoMatrix which 
 was designed to add GFX compatiblity for FastLED supported backends.
@@ -36,26 +37,30 @@ For instance, look at https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatri
 What you end up with are demos that run with multiple APIs (GFX, FastLED, and LEDMAtrix) on top of multiple hardware backends (listed above).
 
 Demos examples:
-- Aurora Incremental Drift (GFX):  https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/blob/master/GFX/Aurora/incrementaldrift/
+- Table Mark Estes + Sublime (LEDMatrix + FastLED/FastLEDonPc)
+![102_demo_snaps](https://user-images.githubusercontent.com/1369412/71480161-a982c800-27ac-11ea-8f0e-fb149b6a9ae2.jpg)
+![103_demo_snaps](https://user-images.githubusercontent.com/1369412/71480163-abe52200-27ac-11ea-9cb1-f4d23bdf96ac.jpg)
+
+- Aurora Incremental Drift (GFX/SmartMatrix):  https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/blob/master/GFX/Aurora/incrementaldrift/
 ![134_20190409_RGBPanels_Diffusers](https://user-images.githubusercontent.com/1369412/55811896-c81a2500-5a9e-11e9-9301-0d09083f48cb.jpg)
 
-- Aurora Cube (GFX) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/GFX/Aurora/cube
+- Aurora Cube (GFX/SmartMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/GFX/Aurora/cube
 ![218_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55811825-ac168380-5a9e-11e9-9fa3-78903c3c821a.jpg)
 
-- https://github.com/marcmerlin/NeoMatrix-FastLED-IR (GFX)
+- https://github.com/marcmerlin/NeoMatrix-FastLED-IR (GFX/SmartMatrix)
 ![203_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55816208-a15fec80-5aa6-11e9-890e-fcb6d66e8de4.jpg)
 
-- Sublime Demos Matrix Rain (FastLED) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/FastLED/Sublime_Demos
+- Sublime Demos Matrix Rain (FastLED/SmartMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/FastLED/Sublime_Demos
 ![200_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55816516-437fd480-5aa7-11e9-9a37-35bc21276812.jpg)
 
-- TwinkleFox (FastLED) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/FastLED/TwinkleFOX
+- TwinkleFox (FastLED/SmartMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/FastLED/TwinkleFOX
 ![201_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55816588-73c77300-5aa7-11e9-9503-82d8f55a52d0.jpg)
 
 
-- Table Mark Estes (LEDMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/LEDMatrix/Table_Mark_Estes
+- Table Mark Estes (LEDMatrix/SmartMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/LEDMatrix/Table_Mark_Estes
 ![225_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55811839-b0db3780-5a9e-11e9-9b9e-42a38b99ca20.jpg)
 
-- Table Mark Estes (LEDMatrix) 
+- Table Mark Estes (LEDMatrix/SmartMatrix) 
 ![245_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55811847-b5075500-5a9e-11e9-91da-5857d2fb1bcc.jpg)
 
 Enjoy,  

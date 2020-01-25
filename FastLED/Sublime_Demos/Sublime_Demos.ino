@@ -234,7 +234,7 @@ void rain(byte backgroundDepth, byte maxBrightness, byte spawnFreq, byte tailLen
 		// Step 6. Add clouds if called for
 		if (clouds) {
 			uint16_t noiseScale = 250;	// A value of 1 will be so zoomed in, you'll mostly see solid colors. A value of 4011 will be very zoomed out and shimmery
-			const uint8_t cloudHeight = (MATRIX_HEIGHT*0.2)+1;
+			const uint16_t cloudHeight = (MATRIX_HEIGHT*0.2)+1;
 
 			// This is the array that we keep our computed noise values in
 			//static uint8_t noise[MATRIX_WIDTH][cloudHeight];
@@ -289,7 +289,7 @@ void bpm()
 	uint8_t beat = beatsin8(map8(speed,30,150), 64, 255);
 	CRGBPalette16 palette = palettes[currentPaletteIndex];
 	for ( int r = 0; r < MATRIX_HEIGHT; r++) {
-		for (uint8_t i = 0; i < MATRIX_WIDTH; i++) {
+		for (uint16_t i = 0; i < MATRIX_WIDTH; i++) {
 			#ifdef REVERSE_ORDER
 			matrixleds[XY2(i,MATRIX_HEIGHT-1-r)] = ColorFromPalette(palette, gHue + (r * 2), beat - gHue + (r * 10));
 			#else
@@ -330,7 +330,7 @@ void juggle()
 	fadeToBlackBy(matrixleds, NUM_LEDS, faderate);
 	for ( int i = 0; i < numdots; i++) {
 		uint16_t pos_n = beatsin16(basebeat + i + numdots, 0, MATRIX_HEIGHT-1);
-		for (uint8_t c = 0; c < MATRIX_WIDTH; c++) {
+		for (uint16_t c = 0; c < MATRIX_WIDTH; c++) {
 			matrixleds[XY2(c,pos_n)] += CHSV(gHue + curhue, thissat, thisbright);
 		}
 		curhue += hueinc;
@@ -387,7 +387,7 @@ void colorwaves( CRGB* ledarray, uint16_t numleds, CRGBPalette16& palette)
 		uint16_t pixelnumber = i;
 		pixelnumber = (numleds - 1) - pixelnumber;
 
-		for (uint8_t c = 0; c < MATRIX_WIDTH; c++) {
+		for (uint16_t c = 0; c < MATRIX_WIDTH; c++) {
 			#ifdef REVERSE_ORDER
 			nblend( ledarray[XY2(c,numleds-1-pixelnumber)], newcolor, 128);
 			#else
@@ -427,7 +427,7 @@ void pride()
 	sHue16 += deltams * beatsin88( 400, 5, 9);
 	uint16_t brightnesstheta16 = sPseudotime;
 
-	for ( uint16_t i = 0 ; i < NUMMATRIX; i++) {
+	for ( uint32_t i = 0 ; i < NUMMATRIX; i++) {
 		hue16 += hueinc16;
 		uint8_t hue8 = hue16 / 256;
 
@@ -455,7 +455,7 @@ void rainbow()
 	CRGB tempHeightStrip[MATRIX_HEIGHT];
 	fill_rainbow(tempHeightStrip, MATRIX_HEIGHT, gHue, 10);
 
-	for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
+	for (uint16_t x = 0; x < MATRIX_WIDTH; x++) {
 		for (int y = 0; y < MATRIX_HEIGHT; y++) {
 			#ifdef REVERSE_ORDER
 			matrixleds[XY2(x,y)] = tempHeightStrip[y];
@@ -490,8 +490,8 @@ void sinelon()
 		fill_solid( tempHeightStrip+prevpos, (pos-prevpos)+1, color);
 	}
 
-	for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
-		for (int y = 0; y < MATRIX_HEIGHT; y++) {
+	for (uint16_t x = 0; x < MATRIX_WIDTH; x++) {
+		for (uint16_t y = 0; y < MATRIX_HEIGHT; y++) {
 			matrixleds[XY2(x,y)] = tempHeightStrip[y];
 		}
 	}

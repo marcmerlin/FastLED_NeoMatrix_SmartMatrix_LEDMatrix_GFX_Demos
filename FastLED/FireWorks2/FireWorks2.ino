@@ -72,10 +72,10 @@ class Dot {
     
 		screenscale( x, y, p00, p01, p10, p11);
 
-		uint8_t x_pos = x >> 11;		// Scaling to get x pixel position 0 - 32
+		uint16_t x_pos = x >> 11;		// Scaling to get x pixel position 0 - 32
 		x_pos = map(x_pos, 0, 32, 0, MATRIX_WIDTH-1);	// Scale to Matrix width
 
-		uint8_t y_pos = y >> 10;		// Scaling to get y pixel position 0 - 64
+		uint16_t y_pos = y >> 10;		// Scaling to get y pixel position 0 - 64
 		y_pos = map(y_pos, 0, 64, 0, MATRIX_HEIGHT-1);	// Scale to Matrix height
 
 		if (yv > 0){				// In case of equal values, just adding 1 or 2 to any pixel's percentage
@@ -217,7 +217,7 @@ void fireworks()
 	CRGB sky2(64,64,128);				// Alternate sky color to create a star twinkle effect 
 #endif
 
-	for( uint8_t h = 0; h < MATRIX_WIDTH; h++) {	// All leds will be set to 'sky1' (very dark blue) 
+	for( uint16_t h = 0; h < MATRIX_WIDTH; h++) {	// All leds will be set to 'sky1' (very dark blue) 
 		for( int v = 0; v < MATRIX_HEIGHT; v++) {
 			matrixleds[XY2(h,v)] = sky1;
 		}

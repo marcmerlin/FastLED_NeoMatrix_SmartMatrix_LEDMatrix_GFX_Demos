@@ -8,6 +8,7 @@
 #define MIDLX               (MATRIX_WIDTH/2)
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           113// max number of patterns
+#define min(a,b) ((a)<(b)?(a):(b))
 
 
 // yes, I use a lot of global variables, likey some of these are redundant or not even used...
@@ -34,8 +35,8 @@ int directn = 1, quash = 5;
 #define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-10, 11, 25, 29, 36, 37, 52, 61, 67, 70, 72, 73, 77, 80, 105};
-//4, 22, 34, 57, 60, 72, 104, };		     // ok
+10, 11, 25, 52, 61, 67, 70, 72, 73, 77, 80, 105, // good
+4, 22, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
@@ -3146,15 +3147,17 @@ void hypnoduck4()
   if (flip2) quash = 8; else quash = -8;
 
   if (flip3)
-
     zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CRGB::Black);
   else
-  { if (flip)
+  { //if (flip)
       zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CHSV(h + 35, 255, 155));
-    else
-      zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CRGB::White);
+    //else
+    //  zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CRGB::White);
   }
-  for (uint32_t jj = 1200; jj > 166 - (counter % 160); jj -= 3)
+#define hd4size 1200 // 890 for 64x64, need 1200 for 96x96
+#define hdcenter 120 // 166 for 64x64, decrease to 120 for 96x96
+#define hd4step 3 // 5 is ok for 64x64, but need to decrease to 3 or 2 for 96x96
+  for (uint32_t jj = hd4size; jj > 166 - (counter % 160); jj -= hd4step)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
