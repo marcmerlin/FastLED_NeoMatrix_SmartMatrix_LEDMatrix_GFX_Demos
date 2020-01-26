@@ -24,7 +24,7 @@
 
 #include "matrix.h"
 
-class PatternAttract : public Drawable {
+class PatternAttract : public AuroraDrawable {
 private:
     const int count = mmin(MATRIX_HEIGHT/3, AVAILABLE_BOID_COUNT);
     Attractor attractor;

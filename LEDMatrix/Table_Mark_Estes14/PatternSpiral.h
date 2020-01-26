@@ -28,7 +28,7 @@
 
 #include "matrix.h"
 
-class PatternSpiral : public Drawable {
+class PatternSpiral : public AuroraDrawable {
 private:
     // Timer stuff (Oszillators)
     struct timer {

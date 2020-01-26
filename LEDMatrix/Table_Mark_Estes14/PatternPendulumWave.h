@@ -36,7 +36,7 @@
 #ifndef PatternPendulumWave_H
 #define PatternPendulumWave_H
 
-class PatternPendulumWave : public Drawable {
+class PatternPendulumWave : public AuroraDrawable {
   public:
     PatternPendulumWave() {
       name = (char *)"Pendulum Wave";

@@ -29,7 +29,7 @@
 
 #include "matrix.h"
 
-class PatternSwirl : public Drawable {
+class PatternSwirl : public AuroraDrawable {
   private:
     const uint8_t borderWidth = 2;
 

@@ -24,7 +24,7 @@
 
 #include "matrix.h"
 
-class PatternBounce : public Drawable {
+class PatternBounce : public AuroraDrawable {
 private:
     static const int count = mmin(MATRIX_WIDTH, AVAILABLE_BOID_COUNT);
     PVector gravity = PVector(0, 0.0125);

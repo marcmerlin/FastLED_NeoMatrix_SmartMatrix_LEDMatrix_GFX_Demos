@@ -37,7 +37,7 @@
 #ifndef PatternFlock_H
 #define PatternFlock_H
 
-class PatternFlock : public Drawable {
+class PatternFlock : public AuroraDrawable {
   public:
     PatternFlock() {
       name = (char *)"Flock";

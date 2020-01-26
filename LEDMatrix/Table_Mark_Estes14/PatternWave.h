@@ -25,7 +25,7 @@
 #ifndef PatternWave_H
 #define PatternWave_H
 
-class PatternWave : public Drawable {
+class PatternWave : public AuroraDrawable {
 private:
     byte thetaUpdate = 0;
     byte thetaUpdateFrequency = 0;

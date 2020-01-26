@@ -24,7 +24,7 @@
 
 #ifndef PatternFlowField_H
 
-class PatternFlowField : public Drawable {
+class PatternFlowField : public AuroraDrawable {
   public:
     PatternFlowField() {
       name = (char *)"FlowField";

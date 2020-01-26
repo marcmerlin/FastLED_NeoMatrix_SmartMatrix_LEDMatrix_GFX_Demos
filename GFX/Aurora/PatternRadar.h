@@ -24,7 +24,7 @@
 
 #include "matrix.h"
 
-class PatternRadar : public Drawable {
+class PatternRadar : public AuroraDrawable {
   private:
     byte theta = 0;
     byte hueoffset = 0;

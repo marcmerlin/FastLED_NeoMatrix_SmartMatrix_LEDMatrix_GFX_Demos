@@ -25,7 +25,7 @@
 #ifndef PatternIncrementalDrift_H
 #define PatternIncrementalDrift_H
 
-class PatternIncrementalDrift : public Drawable {
+class PatternIncrementalDrift : public AuroraDrawable {
   public:
     PatternIncrementalDrift() {
       name = (char *)"Incremental Drift";

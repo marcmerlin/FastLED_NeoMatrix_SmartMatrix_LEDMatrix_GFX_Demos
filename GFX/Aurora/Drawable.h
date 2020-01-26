@@ -20,10 +20,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef Drawable_H
-#define Drawable_H
+#ifndef AuroraDrawable_H
+#define AuroraDrawable_H
 
-class Drawable{
+class AuroraDrawable{
 public:
     char* name;
 

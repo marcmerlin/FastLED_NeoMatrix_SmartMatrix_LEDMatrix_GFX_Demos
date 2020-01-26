@@ -31,7 +31,7 @@
 
 #include "matrix.h"
 
-class PatternCube : public Drawable {
+class PatternCube : public AuroraDrawable {
   private:
     float focal = 30; // Focal of the camera
     int cubeWidth = min(MATRIX_WIDTH-4,MATRIX_HEIGHT-4); // Cube size

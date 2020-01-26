@@ -32,7 +32,7 @@ PatternSwirl swirl;
 #include "PatternWave.h"
 PatternWave wave;
 
-Drawable* items[] = {
+AuroraDrawable* items[] = {
     &attract,
     &bounce,
     &cube,
@@ -47,7 +47,7 @@ Drawable* items[] = {
     &swirl,
     &wave,
 };
-Drawable *pattern;
+AuroraDrawable *pattern;
 
 int8_t item = -1;
 uint8_t numitems = sizeof(items) / sizeof(items[0]);

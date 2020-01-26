@@ -24,7 +24,7 @@
 
 #ifndef PatternSpiro_H
 
-class PatternSpiro : public Drawable {
+class PatternSpiro : public AuroraDrawable {
   private:
     byte theta1 = 0;
     byte theta2 = 0;
