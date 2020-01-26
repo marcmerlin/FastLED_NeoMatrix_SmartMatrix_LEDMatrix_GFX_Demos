@@ -57,7 +57,7 @@ PatternSwirl swirl;
 #include "PatternWave.h"
 PatternWave wave;
 
-Drawable* items[] = {
+AuroraDrawable* items[] = {
   &attract,//0
   &bounce,//1
   &cube,//2
@@ -72,7 +72,7 @@ Drawable* items[] = {
   &swirl,//11
   &wave,//12
 };
-Drawable *patternz;
+AuroraDrawable *patternz;
 int8_t item = random(13);
 
 #define MIDLX               (MATRIX_WIDTH/2)
@@ -867,8 +867,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 22:
       adjunct = 5;
       steper = mstep;
-      break;
       Serial.print("BarG mirror");
+      break;
     case 23:
       if (flop[5])
         afancy = 25;
@@ -1358,6 +1358,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = 0;
       targetfps = random(15, 45);
       Serial.print("volcano bubbles");
+      break;
 
     case 124:
       //fancy = 0;
@@ -5154,7 +5155,7 @@ void hypnoduck2()  // growing spirals
       whitewarp();
   }
 
-  for (int jj = 20; jj < 30 + (counter % 630); jj += 5)
+  for (uint32_t jj = 20; jj < 30 + (counter % 630); jj += 5)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
