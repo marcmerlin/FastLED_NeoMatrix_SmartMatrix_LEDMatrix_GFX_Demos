@@ -88,7 +88,7 @@ int8_t item = random(13);
 
 
 //int countdownMS = Watchdog.enable(4000);
-byte pattern = 159;//this picks the pattern to start with...
+byte pattern = 0;//this picks the pattern to start with...
 byte   afancy, fcool[MATRIX_WIDTH * 2], velo = 30 , pointyfix=4, fpeed[MATRIX_WIDTH * 2], targetfps = 40;
 byte  how, cool, sparky = 90, ccc, xxx, yyy, dot = 3, radius2, rr, adjunct = 3,  fcount[MATRIX_WIDTH * 2], fvelo[MATRIX_WIDTH * 2], fcolor[MATRIX_WIDTH * 2], fcountr[MATRIX_WIDTH * 2];
 byte maxiq,  pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3, xpoffset[MATRIX_WIDTH * 2],  ccoolloorr,  h = 0,  howmany, xhowmany;
@@ -124,12 +124,138 @@ uint8_t bestpatterns[] = {
 // mixit = true;
 #endif
 
+void newpattern();
+void whatami();
+void runpattern();
+void Diamondhole();
+void Inca(byte brit);
+void Ringo();
+void tuber2();
+void diagonally();
+void Roundhole();
+void drifter();
+void volcano(byte brit);
+void pyrimid();
+void solidpyrimid();
+void solid2(byte brit);
+void solid3(byte brit);
+void solid4();
+void solid(byte brit);
+void solid5();
+void solid6(byte klr);
+void fuzzy();
+void corner();
+void tuber();
+void fireball();
+void fireworks();
+void streaker();
+void ringer();
+void bkringer();
+void sinx();
+void drip();
+void mirror();
+void roger();
+void rogerv();
+void confetti();
+void confetti3();
+void confetti4();
+void confetti2();
+void bubbles();
+void bubbles2();
+void tinybubbles();
+void koi();
+void squarebubbles();
+void starbubbles88();
+void tinybubbles2();
+void tinybubbles3();
+void sticks();
+void  Bargraph();
+void adjustme();
+void spire2();
+void spire3();
+void spire();
+void triple();
+void siny();
+void whitewarp();
+void warp();
+void spiralz();
+void spiral2();
+void spiral3();
+void lfado(byte bbc);
+void redfado(byte bbc);
+void greenfado(byte bbc);
+void bluefado(byte bbc);
+void xspin();
+void spin2();
+void magictime();
+void rmagictime();
+void splat();
+void bouncez();
+void starbounce();
+void triforce();
+void seasick3();
+void seasickness();
+void seasick2();
+void seasick();
+void seasick4();
+void seasick5();
+void smile();
+void smile2();
+void smile4();
+void smile3();
+void hypnoduck();
+void hypnoduck2();
+void hypnoduck3();
+void hypnoduck4();
+void starer();
+void bkstarer();
+void triangler();
+void boxer();
+void bkboxer();
+void homer();
+void homer2();
+void homer3();
+void nringer(byte i);
+void drawtriangle();
+void triangle(byte xloc, byte yloc, byte bigg, byte angle, byte kolor);
+void drawstar(byte xlocl, byte ylocl, byte biggy, byte little, byte points, byte dangle, byte koler);
+void whitestar(byte xlocl, byte ylocl, byte biggy, byte little, byte points, byte dangle, byte koler);
+void starz();
+void starz3();
+void starz2();
+void spoker();
+void spoker3();
+void circlearc();
+void wheelz();
+void wheelz2();
+void swirlz();
+void swirl2();
+void swirl3();
+void swirl4a();
+void swirl4();
+void swirl5();
+void drops();
+void drips();
+void twister();
+void slowmo();
+void dualwind();
+void scales();
+void eastwestwind();
+void spiralwind();
+void BouncingBalls(int Ballz);
+void Bouncingtri(int Ballz);
+void snow(byte ccc);
+void VORTEX();
+void Fire();
+
 void setup()
 {
   matrix_setup();
   Serial.println("Reset");
   // WARNING: make sure that none of those pins are used by SmartMatrix, or the output will be broken
+#ifndef ARDUINOONPC
   randomSeed(analogRead(1) - analogRead(2) + analogRead(5));  //
+#endif
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / min((MATRIX_WIDTH - 1), 255)); //mstep is the step size to distribute 256 over an array the width of the matrix
