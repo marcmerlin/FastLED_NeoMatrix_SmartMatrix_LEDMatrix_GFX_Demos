@@ -301,8 +301,8 @@ FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, 
 uint8_t matrix_brightness = 128;
 //
 // Used by LEDMatrix
-const uint16_t MATRIX_TILE_WIDTH = 255; // width of EACH NEOPIXEL MATRIX (not total display)
-const uint16_t MATRIX_TILE_HEIGHT= 255; // height of each matrix
+const uint16_t MATRIX_TILE_WIDTH = 127; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint16_t MATRIX_TILE_HEIGHT= 127; // height of each matrix
 const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
 const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
