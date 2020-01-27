@@ -21,6 +21,9 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+// Randomly slowdown animation. Nice in principle, but not great when debugging performance
+//#define RANDOMSLOWME
+
 #define LEDMATRIX
 #include "matrix.h"
 //#include "neomatrix_config.h"
@@ -100,7 +103,7 @@ byte slowest = 5, fastest = 20;
 boolean  flop[10] , ringme = false, blackringme = false, nextsong = false;
 boolean rimmer[MATRIX_WIDTH * 2], xbouncer[MATRIX_WIDTH * 2], ybouncer[MATRIX_WIDTH * 2];
 
-boolean mixit = false, slowme = true;
+boolean mixit = false, slowme = false;
 unsigned long lasttest, lastmillis, dwell = 120000;
 float  mscale = 1.4, fps = 30, Gravity = -9.81;
 float radius, xslope[MATRIX_WIDTH * 2], yslope[MATRIX_WIDTH * 2], xfire[MATRIX_WIDTH * 2], yfire[MATRIX_WIDTH * 2], cangle, sangle;
@@ -115,7 +118,10 @@ long  ClockTimeSinceLastBounce[BallCount];
 //#define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-10, 11, 25, 29, 36, 37, 52, 61, 67, 70, 72, 73, 77, 80, 105, 110,};
+   4,  15,  16,  17,  19,  21,  26,  58,  59,  62,  66,  72,  73,  77,  80,  82,
+  84,  87,  89,  99, 102, 103, 105, 111, 114, 119, 120, 124, 133, 134, 135, 145,
+};
+
 //4, 22, 34, 57, 60, 72, 104, };		     // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
@@ -715,8 +721,10 @@ void newpattern()//generates all the randomness for each new pattern
   for (byte i = 0; i < MATRIX_HEIGHT; i++)
     fcool[i] = random (9, 22);
   slowme = false;
+#ifdef RANDOMSLOWME
   if (random8() > 74)
     slowme = true;
+#endif
   hue += random(69);//picks the next color basis
   h = hue;
   // new drift factors for x and y drift

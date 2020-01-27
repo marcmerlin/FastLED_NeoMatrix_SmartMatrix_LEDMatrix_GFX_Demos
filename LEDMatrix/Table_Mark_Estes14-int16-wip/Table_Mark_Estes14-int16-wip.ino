@@ -21,6 +21,9 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+// Randomly slowdown animation. Nice in principle, but not great when debugging performance
+//#define RANDOMSLOWME
+
 #define LEDMATRIX
 #include "matrix.h"
 //#include "neomatrix_config.h"
@@ -99,7 +102,9 @@ uint16_t fcount[MATRIX_WIDTH * 2], fvelo[MATRIX_WIDTH * 2], fcolor[MATRIX_WIDTH 
 // this was defined as byte, -128 to 127, not related to array size.
 int8_t fcool[MATRIX_WIDTH * 2], fcountr[MATRIX_WIDTH * 2], xpoffset[MATRIX_WIDTH * 2], xvort[MATRIX_WIDTH * 2], yvort[MATRIX_WIDTH * 2];
 // TOOD(merlin)): share heatz array with another one from aurora to save space
-int8_t heatz[MATRIX_WIDTH][MATRIX_HEIGHT];
+//int8_t heatz[MATRIX_WIDTH][MATRIX_HEIGHT];
+// re-use array from aurora to avoid duplicating memory usage requirements.
+#define heatz noise
 boolean rimmer[MATRIX_WIDTH * 2], xbouncer[MATRIX_WIDTH * 2], ybouncer[MATRIX_WIDTH * 2];
 
 int16_t maxiq,  pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3,  ccoolloorr,  h = 0,  howmany, xhowmany;
@@ -110,7 +115,7 @@ uint32_t  counter, ringdelay, bringdelay, firedelay, hitcounter;
 int16_t slowest = 5, fastest = 20;
 boolean  flop[10] , ringme = false, blackringme = false, nextsong = false;
 
-boolean mixit = false, slowme = true;
+boolean mixit = false, slowme = false;
 uint64_t lasttest, lastmillis, dwell = 120000;
 float  mscale = 1.4, fps = 30, Gravity = -9.81;
 float radius, xslope[MATRIX_WIDTH * 2], yslope[MATRIX_WIDTH * 2], xfire[MATRIX_WIDTH * 2], yfire[MATRIX_WIDTH * 2], cangle, sangle;
@@ -125,8 +130,9 @@ long  ClockTimeSinceLastBounce[BallCount];
 //#define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-10, 11, 25, 29, 36, 37, 52, 61, 67, 70, 72, 73, 77, 80, 105, 110,};
-//4, 22, 34, 57, 60, 72, 104, };		     // ok
+   4,  15,  16,  17,  19,  21,  26,  58,  59,  62,  66,  72,  73,  77,  80,  82,
+  84,  87,  89,  99, 102, 103, 105, 111, 114, 119, 120, 124, 133, 134, 135, 145,
+};
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
@@ -725,8 +731,10 @@ void newpattern()//generates all the randomness for each new pattern
   for (int16_t i = 0; i < MATRIX_HEIGHT; i++)
     fcool[i] = random (9, 22);
   slowme = false;
+#ifdef RANDOMSLOWME
   if (random8() > 74)
     slowme = true;
+#endif
   hue += random(69);//picks the next color basis
   h = hue;
   // new drift factors for x and y drift
