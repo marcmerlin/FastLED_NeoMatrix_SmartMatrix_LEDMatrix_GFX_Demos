@@ -66,6 +66,8 @@ to use, set the define before you include the file.
     #endif
 
     #ifdef ESP32
+    //#define SSD1331
+    //#define SSD1331_ROTATE 1
     //#define ST7735_128b128
     //#define ST7735_128b160
     //#define ILI9341
@@ -179,6 +181,35 @@ void show_callback() {
 }
 
 //----------------------------------------------------------------------------
+#elif defined(M5STACK)
+
+#include <M5Stack.h>
+#include <FastLED_SPITFT_GFX.h>
+
+uint8_t matrix_brightness = 255;
+const uint16_t MATRIX_TILE_WIDTH = 320;
+const uint16_t MATRIX_TILE_HEIGHT= 240;
+//
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+// M5 gets defined in M5Stack
+FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, &M5.lcd, 100);
+
+//----------------------------------------------------------------------------
 #elif defined(ILI9341)
 
 #include "Adafruit_ILI9341.h"
@@ -220,8 +251,8 @@ CRGB *matrixleds;
 #else
 // HWSPI default    // sparkfun 18 green 23 blue 19 yellow
 #define TFT_MISO 19  // yellow
-#define TFT_CLK 18   // green
 #define TFT_MOSI 23  // blue
+#define TFT_CLK 18   // green
 #define TFT_DC 27
 // this is the TFT reset pin. It seems required on my board
 #define TFT_RST 26
@@ -233,123 +264,6 @@ CRGB *matrixleds;
 Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
-
-//#define malloc ps_malloc
-
-//----------------------------------------------------------------------------
-#elif defined(M5STACK)
-
-#include <M5Stack.h>
-#include <FastLED_SPITFT_GFX.h>
-
-uint8_t matrix_brightness = 255;
-const uint16_t MATRIX_TILE_WIDTH = 320;
-const uint16_t MATRIX_TILE_HEIGHT= 240;
-//
-// Used by LEDMatrix
-const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-// Used by NeoMatrix
-const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-const uint32_t NUMMATRIX = mw*mh;
-
-#ifdef LEDMATRIX
-// cLEDMatrix defines
-cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
-    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
-#endif
-CRGB *matrixleds;
-
-// M5 gets defined in M5Stack
-FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, &M5.lcd, 100);
-
-//----------------------------------------------------------------------------
-#elif defined(LINUX_RENDERER_X11)
-
-#include "TFT_LinuxWrapper.h"
-#include <FastLED_TFTWrapper_GFX.h>
-
-uint8_t matrix_brightness = 255;
-const uint16_t MATRIX_TILE_WIDTH = 127;
-const uint16_t MATRIX_TILE_HEIGHT= 127;
-//
-// Used by LEDMatrix
-const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-// Used by NeoMatrix
-const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-const uint32_t NUMMATRIX = mw*mh;
-
-#ifdef LEDMATRIX
-// cLEDMatrix defines
-cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
-    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
-#endif
-CRGB *matrixleds;
-
-TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT);
-FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, tft);
-//
-//----------------------------------------------------------------------------
-#elif defined(LINUX_RENDERER_SDL)
-#include <FastLED_NeoMatrix.h>
-
-uint8_t matrix_brightness = 128;
-//
-// Used by LEDMatrix
-const uint16_t MATRIX_TILE_WIDTH = 127; // width of EACH NEOPIXEL MATRIX (not total display)
-const uint16_t MATRIX_TILE_HEIGHT= 127; // height of each matrix
-const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-// Used by NeoMatrix
-const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-const uint32_t NUMMATRIX = mw*mh;
-
-CRGB *matrixleds;
-#ifdef LEDMATRIX
-// cLEDMatrix defines
-cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_MATRIX> ledmatrix(false);
-#endif
-FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
-    NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
-
-//----------------------------------------------------------------------------
-#elif defined(RPIRGBPANEL)
-
-#include <FastLED_RPIRGBPanel_GFX.h>
-// https://github.com/hzeller/rpi-rgb-led-matrix
-// Arduino min/max conflict with g++ math min/max
-#undef min
-#undef max
-#include <led-matrix.h>
-
-uint8_t matrix_brightness = 255;
-const uint16_t MATRIX_TILE_WIDTH = 128;
-const uint16_t MATRIX_TILE_HEIGHT= 192;
-
-// Used by LEDMatrix
-const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-// Used by NeoMatrix
-const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-const uint32_t NUMMATRIX = mw*mh;
-
-#ifdef LEDMATRIX
-// cLEDMatrix defines
-cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
-    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
-#endif
-CRGB *matrixleds;
-
-FastLED_RPIRGBPanel_GFX *matrix = new FastLED_RPIRGBPanel_GFX(matrixleds, mw, mh);
 
 //----------------------------------------------------------------------------
 #elif defined(ST7735_128b128) || defined(ST7735_128b160) 
@@ -485,6 +399,92 @@ FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, 
 #else
 FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 1);
 #endif
+
+//----------------------------------------------------------------------------
+#elif defined(LINUX_RENDERER_X11)
+
+#include "TFT_LinuxWrapper.h"
+#include <FastLED_TFTWrapper_GFX.h>
+
+uint8_t matrix_brightness = 255;
+const uint16_t MATRIX_TILE_WIDTH = 127;
+const uint16_t MATRIX_TILE_HEIGHT= 127;
+//
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT);
+FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, tft);
+//
+//----------------------------------------------------------------------------
+#elif defined(LINUX_RENDERER_SDL)
+#include <FastLED_NeoMatrix.h>
+
+uint8_t matrix_brightness = 128;
+//
+// Used by LEDMatrix
+const uint16_t MATRIX_TILE_WIDTH = 127; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint16_t MATRIX_TILE_HEIGHT= 127; // height of each matrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+CRGB *matrixleds;
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_MATRIX> ledmatrix(false);
+#endif
+FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
+    NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
+
+//----------------------------------------------------------------------------
+#elif defined(RPIRGBPANEL)
+
+#include <FastLED_RPIRGBPanel_GFX.h>
+// https://github.com/hzeller/rpi-rgb-led-matrix
+// Arduino min/max conflict with g++ math min/max
+#undef min
+#undef max
+#include <led-matrix.h>
+
+uint8_t matrix_brightness = 255;
+const uint16_t MATRIX_TILE_WIDTH = 128;
+const uint16_t MATRIX_TILE_HEIGHT= 192;
+
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint32_t NUMMATRIX = mw*mh;
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+FastLED_RPIRGBPanel_GFX *matrix = new FastLED_RPIRGBPanel_GFX(matrixleds, mw, mh);
 
 //----------------------------------------------------------------------------
 #elif defined(M32B8X3)
@@ -757,8 +757,18 @@ void matrix_setup(int reservemem = 40000) {
 
 #elif defined(ILI9341)
     // Need to init the underlying TFT SPI engine
+    Serial.println("");
     Serial.println("ILI9341 tft begin");
-    tft->begin(40000000);
+    Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires <<<<");
+    Serial.println("");
+    // This is counter intuitive. On ESP32, higher is faster until it becomes slower again.
+    // 60: 3fps | 30: 3fps | 20: 5fps | 15: 4fps | 10: 4fps
+
+    // graphicstest screen fill speed
+    // - Adafruit::ILI9341 speed at 80Mhz is 8.1fps and 5fps at 40Mhz
+    // - WROVER at 24Mhz is 5fps, doesn't seem to work any faster
+    // - https://github.com/loboris/ESP32_TFT_lib (DMA) at 24Mhz is only 7fps
+    tft->begin(20000000);
 #if ILI_ROTATE == 0
     tft->setRotation(1);
     // This is very important, or FastLED_SPITFT_GFX::show will not work.
@@ -805,7 +815,8 @@ void matrix_setup(int reservemem = 40000) {
 
 #elif defined(ST7735_128b128)
     Serial.println("ST7735_128b128: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
-    //tft->begin(80000000);
+    // 12fps by default, 34fps with non working 80Mhz
+    //tft->begin(40000000);
     // fillScreen below does the job
     //tft->setAddrWindow(0, 0, 128, 128);
     tft->initR(INITR_144GREENTAB);
@@ -814,7 +825,9 @@ void matrix_setup(int reservemem = 40000) {
 
 #elif defined(ST7735_128b160)
     Serial.println("ST7735_128b160: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
-    //tft->begin(80000000);
+    // 10fps by default
+    // tft->setSPISpeed(80000000); // not working
+    //tft->begin(80000000); // protected
     // fillScreen below does the job
     //tft->setAddrWindow(0, 0, 128, 160);
     tft->initR(INITR_BLACKTAB);
