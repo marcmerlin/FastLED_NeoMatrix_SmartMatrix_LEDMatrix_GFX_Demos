@@ -991,7 +991,11 @@ void matrix_setup(int reservemem = 40000) {
 #endif
     before = millis();
     for (uint8_t i=0; i<5; i++) {
+#ifdef BOARD_HAS_PSRAM
       matrix->show(0);
+#else
+      matrix->show();
+#endif
     }
     Serial.print("Matrix->show() Speed Test fps: ");
     Serial.println((5* 1000/(millis() - before)));
