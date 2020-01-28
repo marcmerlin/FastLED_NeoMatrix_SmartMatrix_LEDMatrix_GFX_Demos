@@ -12,10 +12,10 @@ the other libraries define their own FastLED CRGB buffer (RGB888) ).
 
 Backends you should choose from (define 1):
 - SMARTMATRIX
-- SSD1331 (96x64 TFT)
-- ST7735_128b128
-- ST7735_128b160
 - ILI9341
+- ST7735_128b160
+- ST7735_128b128
+- SSD1331 (96x64 TFT)
 - Everything below is NeoMatrix in different patterns:
   M32B8X3 M16BY16T4 M64BY64 are 3 examples of NEOMATRIX defines
   (3 tiled 32x8, 4 tiled 16x16, and a single zigzag 64x64 array)
@@ -66,11 +66,11 @@ to use, set the define before you include the file.
     #endif
 
     #ifdef ESP32
+    //#define ILI9341
+    //#define ST7735_128b160
+    //#define ST7735_128b128
     //#define SSD1331
     //#define SSD1331_ROTATE 1
-    //#define ST7735_128b128
-    //#define ST7735_128b160
-    //#define ILI9341
     #define SMARTMATRIX
     //#define M64BY64
     #endif
@@ -113,6 +113,9 @@ bool init_done = 0;
 #include <LEDMatrix.h>
 #endif
 
+uint32_t tft_spi_speed;
+
+//----------------------------------------------------------------------------
 #if defined(SMARTMATRIX)
 // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
 #define GPIOPINOUT 4 // if on ESP32, this selects which wiring is used. Teensy uses the define below
@@ -182,6 +185,7 @@ void show_callback() {
 
 //----------------------------------------------------------------------------
 #elif defined(M5STACK)
+#define HASTFT
 
 #include <M5Stack.h>
 #include <FastLED_SPITFT_GFX.h>
@@ -211,6 +215,7 @@ FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, 
 
 //----------------------------------------------------------------------------
 #elif defined(ILI9341)
+#define HASTFT
 
 #include "Adafruit_ILI9341.h"
 #include <FastLED_SPITFT_GFX.h>
@@ -267,6 +272,7 @@ FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, 
 
 //----------------------------------------------------------------------------
 #elif defined(ST7735_128b128) || defined(ST7735_128b160) 
+#define HASTFT
 
 #include <Adafruit_ST7735.h>
 #include <FastLED_SPITFT_GFX.h>
@@ -327,6 +333,7 @@ FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, 
 
 //----------------------------------------------------------------------------
 #elif defined(SSD1331)
+#define HASTFT
 
 #include <Adafruit_SSD1331.h>
 #include <FastLED_SPITFT_GFX.h>
@@ -378,6 +385,9 @@ SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
 // Option 1: use any pins but a little slower
 //#pragma message "Using SWSPI"
 Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
+// This hangs the moment it is run
+// https://github.com/adafruit/Adafruit-SSD1331-OLED-Driver-Library-for-Arduino/issues/27
+//Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(cs, dc, rst);
 #else
 // You can use any (4 or) 5 pins
 // hwspi hardcodes those pins, no need to redefine them
@@ -390,7 +400,6 @@ Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
 // (for UNO thats sclk = 13 and sid = 11) and pin 10 must be
 // an output. This is much faster - also required if you want
 // to use the microSD card (see the image drawing example)
-#pragma message "Using HWSPI"
 Adafruit_SSD1331 *tft = new Adafruit_SSD1331(&SPI, cs, dc, rst);
 #endif
 
@@ -748,40 +757,6 @@ void matrix_setup(int reservemem = 40000) {
 #endif
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
 
-#elif defined(M5STACK)
-    // Need to init the underlying TFT SPI engine
-    Serial.println("M5STACK begin");
-    M5.begin();
-    M5.Power.begin();
-    M5.Lcd.fillScreen(BLUE);
-
-#elif defined(ILI9341)
-    // Need to init the underlying TFT SPI engine
-    Serial.println("");
-    Serial.println("ILI9341 tft begin");
-    Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires <<<<");
-    Serial.println("");
-    // This is counter intuitive. On ESP32, higher is faster until it becomes slower again.
-    // 60: 3fps | 30: 3fps | 20: 5fps | 15: 4fps | 10: 4fps
-
-    // graphicstest screen fill speed
-    // - Adafruit::ILI9341 speed at 80Mhz is 8.1fps and 5fps at 40Mhz
-    // - WROVER at 24Mhz is 5fps, doesn't seem to work any faster
-    // - https://github.com/loboris/ESP32_TFT_lib (DMA) at 24Mhz is only 7fps
-    tft->begin(20000000);
-#if ILI_ROTATE == 0
-    tft->setRotation(1);
-    // This is very important, or FastLED_SPITFT_GFX::show will not work.
-    // Size is hardcoded by TFT size.
-    // Doesn't seem to work, but fillscreen below takes care of it
-    //tft->setAddrWindow(0, 0, 320, 240);
-#else
-    tft->setRotation(0);
-    //tft->setAddrWindow(0, 0, 240, 320);
-#endif
-    // Seems that filllscreen further initializes the tft so that it works
-    tft->fillScreen(ILI9341_DARKGREY);
-
 #elif defined(LINUX_RENDERER_X11)
     // Need to init the underlying TFT SPI engine
     Serial.println("ARDUINOONPC LINUX_RENDERER_X11 tft begin");
@@ -813,32 +788,73 @@ void matrix_setup(int reservemem = 40000) {
     matrix->setCanvas(canvas);
     Serial.println("RGBPanel Canvas initialized");
 
-#elif defined(ST7735_128b128)
-    Serial.println("ST7735_128b128: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
-    // 12fps by default, 34fps with non working 80Mhz
-    //tft->begin(40000000);
-    // fillScreen below does the job
-    //tft->setAddrWindow(0, 0, 128, 128);
-    tft->initR(INITR_144GREENTAB);
-    // This is reuqired for the screen to work
-    tft->fillScreen(ST77XX_GREEN);
+#elif defined(M5STACK)
+    // Need to init the underlying TFT SPI engine
+    Serial.println("M5STACK begin");
+    M5.begin();
+    M5.Power.begin();
+    M5.Lcd.fillScreen(BLUE);
+
+#elif defined(ILI9341)
+    // Adafruit ILI9341 1.5.4 or better is actually quite fast at 80Mhz: 40fps full frame refresh
+    // however it is not stable for the display to work every time. Anything over 24Mhz is not very 
+    // stable, so I'm accepting the slower resulting fps (unfortunately 14fps at 24Mhz).
+    // See 'ESP32 speed tests' lower down in the file for performance details.
+    tft_spi_speed = 24 * 1000 * 1000;
+    Serial.println("");
+    Serial.println("ILI9341 tft begin");
+    Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
+    Serial.println("");
+    // Need to init the underlying TFT SPI engine
+    tft->begin(tft_spi_speed);
+#if ILI_ROTATE == 0
+    tft->setRotation(1);
+    // This is very important, or FastLED_SPITFT_GFX::show will not work.
+    // Size is hardcoded by TFT size.
+    // Doesn't seem to work, but fillscreen below takes care of it
+    //tft->setAddrWindow(0, 0, 320, 240);
+#else
+    tft->setRotation(0);
+    //tft->setAddrWindow(0, 0, 240, 320);
+#endif
+    // Seems that filllscreen further initializes the tft so that it works
+    tft->fillScreen(ILI9341_DARKGREY);
 
 #elif defined(ST7735_128b160)
-    Serial.println("ST7735_128b160: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
-    // 10fps by default
-    // tft->setSPISpeed(80000000); // not working
-    //tft->begin(80000000); // protected
+    tft_spi_speed = 60 * 1000 * 1000;
+    Serial.println("");
+    Serial.println("ST7735_128b160 tft begin");
+    Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
+    Serial.println("");
+    // initR calls begin for us but does not allow setting SPI speed (hardcoded in the file)
+    tft->initR(INITR_BLACKTAB);
+    tft->setSPISpeed(tft_spi_speed);
     // fillScreen below does the job
     //tft->setAddrWindow(0, 0, 128, 160);
-    tft->initR(INITR_BLACKTAB);
-    // This is reuqired for the screen to work
+    // This is required for the screen to work
+    tft->fillScreen(ST77XX_GREEN);
+
+#elif defined(ST7735_128b128)
+    tft_spi_speed = 32 * 1000 * 1000;
+    Serial.println("");
+    Serial.println("ST7735_128b128 tft begin");
+    Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
+    Serial.println("");
+    // initR calls begin for us but does not allow setting SPI speed (hardcoded in the file)
+    tft->initR(INITR_144GREENTAB);
+    tft->setSPISpeed(tft_spi_speed);
+    // This is required for the screen to work
     tft->fillScreen(ST77XX_GREEN);
 
 #elif defined(SSD1331)
     // Need to init the underlying TFT SPI engine
-    tft->begin();
-    Serial.println("SSD1331: For extra SPI speed, try spi.begin 80Mhz, but it may be less stable");
-    //tft->begin(80000000);
+    tft_spi_speed = 40 * 1000 * 1000;
+    Serial.println("");
+    Serial.println("SSD1331 tft begin (HWSPI broken on ESP32)");
+    Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
+    Serial.println("");
+    tft->begin(tft_spi_speed);
+    tft->setSPISpeed(tft_spi_speed);
     // This is very important, or FastLED_SPITFT_GFX::show will not work.
     // Size is hardcoded by TFT size.
     tft->setAddrWindow(0, 0, 96, 64);
@@ -928,6 +944,58 @@ void matrix_setup(int reservemem = 40000) {
 #endif
 
     Serial.println("matrix_setup done");
+
+    // ESP32 speed tests
+    // - Adafruit::ILI9341 speed at 80Mhz is 
+    // - WROVER at 24Mhz is 25fps, doesn't seem to work any faster
+    // - https://github.com/loboris/ESP32_TFT_lib (DMA) at 24Mhz is only 7fps?
+    //
+    // ILI9314: 80Mhz: TFT 40fps, NO PSRAM: 32fps, PSRAM show: 12ps  => unstable, no display
+    // ILI9314: 40Mhz: TFT 25fps, NO PSRAM: 21fps, PSRAM show: 10fps => unstable, no display
+    // ILI9314: 39Mhz: TFT 18fps, NO PSRAM: 16fps, PSRAM show:  9fps => unstable, garbled
+    // ILI9314: 30Mhz: TFT 18fps, NO PSRAM: 16fps, PSRAM show:  9fps => still a bit unstabled, garbled
+    // ILI9314: 24Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps => stable
+    // ILI9314: 20Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps
+    //
+    // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps => unstable, no display
+    // ST7735_128b160: 60Mhz: TFT 93fps, NO PSRAM: 73fps, PSRAM show: 38fps
+    // ST7735_128b160: 60Mhz: TFT 96fps, NO PSRAM: 52fps
+    // ST7735_128b160: 40Mhz: TFT 68fps, NO PSRAM: 56fps, PSRAM show: 32fps
+    // ST7735_128b160: 20Mhz: TFT 53fps, NO PSRAM: 45fps, PSRAM show: 29fps
+    //
+    // ST7735_128b128: 60Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
+    // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
+    // ST7735_128b128: 32Mhz: TFT 84fps, NO PSRAM: 70fps, PSRAM show: 41fps => stable
+    // ST7735_128b128: 20Mhz: TFT 66fps, NO PSRAM: 56fps, PSRAM show: 36fps
+    //
+    // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps => stable
+    uint32_t before;
+#ifdef HASTFT
+    before = millis();
+    for (uint8_t i=0; i<3; i++) {
+	tft->fillScreen(0);
+	tft->fillScreen(0xFFFF);
+    }
+    Serial.print("TFT SPI Speed: ");
+    Serial.print(tft_spi_speed/1000000);
+    Serial.print("Mhz. Resulting fps: ");
+    Serial.println((6* 1000/(millis() - before)));
+#endif
+#ifdef BOARD_HAS_PSRAM
+    before = millis();
+    for (uint8_t i=0; i<5; i++) {
+      matrix->show(1);
+    }
+    Serial.print("Matrix->show() PSRAM BYPASS Speed Test fps: ");
+    Serial.println((5* 1000/(millis() - before)));
+#endif
+    before = millis();
+    for (uint8_t i=0; i<5; i++) {
+      matrix->show(0);
+    }
+    Serial.print("Matrix->show() Speed Test fps: ");
+    Serial.println((5* 1000/(millis() - before)));
+
     // At least on teensy, due to some framework bug it seems, early
     // serial output gets looped back into serial input
     // Hence, flush input.
