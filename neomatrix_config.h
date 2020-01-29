@@ -981,7 +981,7 @@ void matrix_setup(int reservemem = 40000) {
     Serial.print("Mhz. Resulting fps: ");
     Serial.println((6* 1000/(millis() - before)));
 #endif
-#ifdef BOARD_HAS_PSRAM
+#if defined(BOARD_HAS_PSRAM) && defined(HASTFT)
     before = millis();
     for (uint8_t i=0; i<5; i++) {
       matrix->show(1);
@@ -991,7 +991,7 @@ void matrix_setup(int reservemem = 40000) {
 #endif
     before = millis();
     for (uint8_t i=0; i<5; i++) {
-#ifdef BOARD_HAS_PSRAM
+#if defined(BOARD_HAS_PSRAM) && defined(HASTFT)
       matrix->show(0);
 #else
       matrix->show();
