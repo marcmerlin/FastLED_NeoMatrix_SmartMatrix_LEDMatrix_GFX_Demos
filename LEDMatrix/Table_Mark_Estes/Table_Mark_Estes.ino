@@ -35,8 +35,9 @@ int directn = 1, quash = 5;
 #define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
-10, 11, 25, 52, 61, 67, 70, 72, 73, 77, 80, 105, // good
-4, 22, 57, 60, 72, 104, };		     // ok
+// 52 and 61 are almost the same
+10, 11, 25, 52, 61, 67, 70, 72, 73, 77, 80, 105,  // good
+4, 22, 57, 60, 72, 104, 110 };	  // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
@@ -356,6 +357,13 @@ void newpattern()//generates all the randomness for each new pattern
     flip2 = true;
   if (random8() > 127)
     flip3 = true;
+
+  Serial.print("Flips: ");
+  Serial.print(flip);
+  Serial.print(" ");
+  Serial.print(flip2);
+  Serial.print(" ");
+  Serial.println(flip3);
 
   hue += random(64);//picks the next color basis
   h = hue;
@@ -1315,8 +1323,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 70:
-      if (flip2) boxer();
-      else if (flip3) bkringer();
+      if (flip2) boxer(); // outward going box
+      else if (flip3) bkringer(); // back collapsing circles
       spin2();
       if (!flip && flip2 && !flip3) adjuster();
       break;
@@ -3069,7 +3077,6 @@ void hypnoduck() {
 void hypnoduck2()
 // growing spirals
 {
-
   if (counter == 0)
     dot = random(2, 4);
   if (!flip2)
