@@ -32,12 +32,12 @@ int directn = 1, quash = 5;
 
 // This allows a selection of only my favourite patterns.
 // Comment this out to get all the patterns -- merlin
-#define BESTPATTERNS
+//#define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
 // 52 and 61 are almost the same
-10, 11, 25, 52, 61, 67, 70, 72, 73, 77, 80, 105,  // good
-4, 22, 57, 60, 72, 104, 110 };	  // ok
+10, 11, 25, 52, 60, 61, 62, 67, 70, 72, 73, 77, 80, 86, 105,  // good
+4, 59, 60, 72, 89, 104, 110 };	  // ok
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
 #else
@@ -357,13 +357,6 @@ void newpattern()//generates all the randomness for each new pattern
     flip2 = true;
   if (random8() > 127)
     flip3 = true;
-
-  Serial.print("Flips: ");
-  Serial.print(flip);
-  Serial.print(" ");
-  Serial.print(flip2);
-  Serial.print(" ");
-  Serial.println(flip3);
 
   hue += random(64);//picks the next color basis
   h = hue;
@@ -830,7 +823,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
   Serial.print(waiter[pattern]);
   Serial.print(" target FPS   " );
   Serial.print(targetfps);
-
+#ifdef ARDUINOONPC
+  Serial.println(""); // ArduinoOnPC doesn't output a line before newline, so output it early.
+#endif
 }
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
   switch (pattern) {
@@ -1244,7 +1239,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
         ringer();
       else
         starer();
-      adjuster();
+      //adjuster(); // this never does anything
       break;
 
 
@@ -3841,6 +3836,7 @@ void swirl4() {// outer
   }
 
   for ( uint16_t i = 0; i < xhowmany; i++) {
+    // SIGFPE, modulo 0?
     if (counter % int(4 * fpeed[i] + 35 - xslope[i]) == 0)
       xslope[i]++;
     if (xslope[i] > MATRIX_WIDTH - 6)

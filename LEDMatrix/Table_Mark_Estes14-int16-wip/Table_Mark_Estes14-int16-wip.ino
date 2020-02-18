@@ -127,11 +127,13 @@ long  ClockTimeSinceLastBounce[BallCount];
 
 // This allows a selection of only my favourite patterns.
 // Comment this out to get all the patterns -- merlin
-//#define BESTPATTERNS
+#define BESTPATTERNS
 #ifdef BESTPATTERNS
+// 82 and 89 are similar     55 and 102 are similar
 uint8_t bestpatterns[] = { 
-   4,  15,  16,  17,  19,  21,  26,  58,  59,  62,  66,  72,  73,  77,  80,  82,
-  84,  87,  89,  99, 102, 103, 105, 111, 114, 119, 120, 124, 133, 134, 135, 145,
+   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
+  4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
+   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
 };
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
@@ -268,6 +270,9 @@ void setup()
 {
   matrix_setup();
   Serial.println("Reset");
+#ifdef BESTPATTERNS
+  pattern = bestpatterns[0];
+#endif
   // WARNING: make sure that none of those pins are used by SmartMatrix, or the output will be broken
 #ifndef ARDUINOONPC
   randomSeed(analogRead(1) - analogRead(2) + analogRead(5));  //
@@ -1961,7 +1966,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
   if (slowme)
     Serial.print("  Slowmo!, ");
 
-  /* Serial.println("  ");
+   //Serial.println("  ");
     for (int16_t g = 0; g < 10; g++) {
 
      Serial.print ("Flop-");
@@ -1969,7 +1974,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
      Serial.print(":  ");
      Serial.print(flop[g]);
      Serial.print(", ");
-    }*/
+    }
+#ifdef ARDUINOONPC
+  Serial.println(""); // ArduinoOnPC doesn't output a line before newline, so output it early.
+#endif
 }
 
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
