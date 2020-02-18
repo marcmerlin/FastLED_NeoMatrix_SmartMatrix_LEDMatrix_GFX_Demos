@@ -416,8 +416,8 @@ FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, 
 #include <FastLED_TFTWrapper_GFX.h>
 
 uint8_t matrix_brightness = 255;
-const uint16_t MATRIX_TILE_WIDTH = 127;
-const uint16_t MATRIX_TILE_HEIGHT= 127;
+const uint16_t MATRIX_TILE_WIDTH = 64;
+const uint16_t MATRIX_TILE_HEIGHT= 96;
 //
 // Used by LEDMatrix
 const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
@@ -445,8 +445,8 @@ FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, 
 uint8_t matrix_brightness = 128;
 //
 // Used by LEDMatrix
-const uint16_t MATRIX_TILE_WIDTH = 127; // width of EACH NEOPIXEL MATRIX (not total display)
-const uint16_t MATRIX_TILE_HEIGHT= 127; // height of each matrix
+const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
 const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
 const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
@@ -458,7 +458,8 @@ const uint32_t NUMMATRIX = mw*mh;
 CRGB *matrixleds;
 #ifdef LEDMATRIX
 // cLEDMatrix defines
-cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_MATRIX> ledmatrix(false);
+cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
 #endif
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
     NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
