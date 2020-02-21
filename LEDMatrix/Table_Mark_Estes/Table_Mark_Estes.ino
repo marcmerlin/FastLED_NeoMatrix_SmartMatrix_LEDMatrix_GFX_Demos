@@ -3150,6 +3150,13 @@ void hypnoduck3()
 void hypnoduck4()
 // spiral inward with the hyponic light
 {
+  // MMFLAGS
+  uint16_t hd4size = 890;
+  uint16_t hd4center = 166; // 166 for 64x64, decrease to 120 for 96x96
+  uint8_t  hd4step = 5; // 5 is ok for 64x64, but need to decrease to 3 or 2 for 96x96
+
+  if      (max(MATRIX_HEIGHT, MATRIX_WIDTH) > 128) { hd4size = 2600; hd4center = 160; hd4step = 1; }
+  else if (max(MATRIX_HEIGHT, MATRIX_WIDTH) > 64)  { hd4size = 1200; hd4center = 166; hd4step = 3; };
 
   if (flip2) quash = 8; else quash = -8;
 
@@ -3161,10 +3168,7 @@ void hypnoduck4()
     //else
     //  zeds.DrawFilledRectangle(0, 0, MATRIX_WIDTH  - 1, MATRIX_HEIGHT  - 1, CRGB::White);
   }
-#define hd4size 1200 // 890 for 64x64, need 1200 for 96x96
-#define hdcenter 120 // 166 for 64x64, decrease to 120 for 96x96
-#define hd4step 3 // 5 is ok for 64x64, but need to decrease to 3 or 2 for 96x96
-  for (uint32_t jj = hd4size; jj > 166 - (counter % 160); jj -= hd4step)
+  for (uint32_t jj = hd4size; jj > hd4center - (counter % 160); jj -= hd4step)
   {
     xangle =  (sin8(jj + quash * h) - 128.0) / 128.0;
     yangle =  (cos8(jj + quash * h) - 128.0) / 128.0;
@@ -3548,6 +3552,10 @@ void circlearc()// arc of circles
     radius3 = random (MATRIX_WIDTH - (MATRIX_WIDTH >> 2), MATRIX_WIDTH + (MATRIX_WIDTH >> 2));
     poffset = random(1, 6);
     inner = random(5,  MIDLX / 2);
+    // MM FLAGS: I don't like pattern 3 (filled circle within bigger circle)
+    if (poffset == 3) poffset = 2;
+    Serial.print("poffset ");
+    Serial.println(poffset);
 
 
   }
