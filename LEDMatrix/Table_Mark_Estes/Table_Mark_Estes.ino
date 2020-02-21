@@ -326,6 +326,9 @@ void newpattern()//generates all the randomness for each new pattern
   targetfps = random(20, 30);
   bfade = random(1, 8);
   dot = random(2, 6);// controls the size of a circle in many animations
+  if (max(MATRIX_HEIGHT, MATRIX_WIDTH) >  64) dot += 4;
+  if (max(MATRIX_HEIGHT, MATRIX_WIDTH) > 128) dot += 4;
+  
   adjunct = (random(3, 11));//controls which screen wide effect is used if any
   dwell = 1000 * (random(20, 40));//set how long the pattern will play
 
@@ -3309,6 +3312,8 @@ void homer2() {// growing egg
   {
     howmany = random (MIDLX + 8, 2 * MATRIX_WIDTH - 12);
     dot = random(1, 5);
+    if (max(MATRIX_HEIGHT, MATRIX_WIDTH) >  64) dot += 4;
+    if (max(MATRIX_HEIGHT, MATRIX_WIDTH) > 128) dot += 4;
     for (int i = 0; i < howmany; i++) {
       fcount[i] = random8(); //angle
       fcolor[i] = random8();//color
@@ -3327,6 +3332,8 @@ void homer2() {// growing egg
 
   if (dot >= MIDLX) {
     dot = random(3, 7);
+    if (max(MATRIX_HEIGHT, MATRIX_WIDTH) >  64) dot += 4;
+    if (max(MATRIX_HEIGHT, MATRIX_WIDTH) > 128) dot += 4;
     ccoolloorr =  random8();
   }
   zeds.DrawCircle( MIDLX  , MIDLY, dot + 1, CRGB::White);
