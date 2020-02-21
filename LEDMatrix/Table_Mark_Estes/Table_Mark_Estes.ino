@@ -680,6 +680,11 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("sld bbox ");
       adjunct = 0;
       break;
+// Remove delay on pattern only based on ringer/bkringer
+    case 60:
+      ringdelay = 0;
+      bringdelay = 0;
+      break;
     case 62:
       targetfps = 30;
       break;
