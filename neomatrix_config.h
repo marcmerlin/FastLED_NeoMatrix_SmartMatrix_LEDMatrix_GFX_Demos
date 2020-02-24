@@ -702,7 +702,7 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
 	Serial.print("malloc failed for ");
 	Serial.println(varname);
 	show_free_mem();
-	while (1) delay(1);
+	while (1); // delay(1);  Adding this seems to cause an ESP32 bug
     }
     return NULL;
 }
@@ -763,7 +763,6 @@ void matrix_setup(int reservemem = 40000) {
     delay(1000);
 #endif
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
-
 
 #elif defined(LINUX_RENDERER_X11)
     // Need to init the underlying TFT SPI engine
