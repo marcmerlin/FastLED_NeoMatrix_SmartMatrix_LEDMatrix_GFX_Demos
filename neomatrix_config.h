@@ -58,10 +58,10 @@ to use, set the define before you include the file.
     file and the code below won't run
     */
     #ifdef ESP8266
-    #define SSD1331
-    #define SSD1331_ROTATE 1
+    //#define SSD1331
+    //#define SSD1331_ROTATE 1
     // ESP8266 shirt with neopixel strips
-    //#define M32B8X3
+    #define M32B8X3
     //#define M16BY16T4
     #endif
 
@@ -400,6 +400,7 @@ Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
 // (for UNO thats sclk = 13 and sid = 11) and pin 10 must be
 // an output. This is much faster - also required if you want
 // to use the microSD card (see the image drawing example)
+#pragma message "Using HWSPI"
 Adafruit_SSD1331 *tft = new Adafruit_SSD1331(&SPI, cs, dc, rst);
 #endif
 
@@ -668,6 +669,11 @@ void show_free_mem(const char *pre=NULL) {
     Framebuffer_GFX::show_free_mem(pre);
 }
 
+void die(const char *mesg) {
+    Serial.println(mesg);
+    while(1) delay(1); // while 1 loop only triggers watchdog on ESP chips
+}
+
 void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
 #ifndef BOARD_HAS_PSRAM
     psram = false;
@@ -696,7 +702,7 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
 	Serial.print("malloc failed for ");
 	Serial.println(varname);
 	show_free_mem();
-	while (1);
+	while (1) delay(1);
     }
     return NULL;
 }
@@ -757,6 +763,7 @@ void matrix_setup(int reservemem = 40000) {
     delay(1000);
 #endif
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
+
 
 #elif defined(LINUX_RENDERER_X11)
     // Need to init the underlying TFT SPI engine
