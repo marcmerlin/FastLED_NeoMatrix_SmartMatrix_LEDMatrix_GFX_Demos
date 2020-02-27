@@ -77,11 +77,11 @@ to use, set the define before you include the file.
 
     #ifdef ESP32
     //#define ILI9341
-    //#define ST7735_128b160
+    #define ST7735_128b160
     //#define ST7735_128b128
     //#define SSD1331
     //#define SSD1331_ROTATE 1
-    #define SMARTMATRIX
+    //#define SMARTMATRIX
     //#define M64BY64
     #endif
 
@@ -130,6 +130,7 @@ uint32_t tft_spi_speed;
 //
 #if defined(M24BY24)
     #include <FastLED_NeoMatrix.h>
+    #define FASTLED_NEOMATRIX
     
     const uint8_t MATRIXPIN = 13;
     
@@ -188,6 +189,7 @@ uint32_t tft_spi_speed;
 //----------------------------------------------------------------------------
 #elif defined(M32BY8X3)
     #include <FastLED_NeoMatrix.h>
+    #define FASTLED_NEOMATRIX
     
     uint8_t matrix_brightness = 64;
     // Used by LEDMatrix
@@ -244,6 +246,7 @@ uint32_t tft_spi_speed;
 //----------------------------------------------------------------------------
 #elif defined(M16BY16T4)
     #include <FastLED_NeoMatrix.h>
+    #define FASTLED_NEOMATRIX
     
     uint8_t matrix_brightness = 64;
     
@@ -274,6 +277,7 @@ uint32_t tft_spi_speed;
 //----------------------------------------------------------------------------
 #elif defined(M64BY64) // 64x64 straight connection (no matrices)
     #include <FastLED_NeoMatrix.h>
+    #define FASTLED_NEOMATRIX
     
     // http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
     uint8_t matrix_brightness = 128;
