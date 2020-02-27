@@ -8,13 +8,13 @@ the Adafruit::GFX and FastLED APIs as explained in its README).
 
 For the demos to run, you need to edit 
 https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/blob/master/neomatrix_config.h
-and #define the correct backend for your display.
+and #define the correct backend for your display.  
 Assuming you are running FastLED::NeoMatrix, you may want to try uncommmenting '#define M24BY24'
-and modifying the 2 code sections relevant to this define to put the correct data for your array.
+and modifying the 2 code sections relevant to this define to put the correct data for your array.  
 Obviously you can look at M32BY8X3, M16BY16T4, and M64BY64 for ways to configure more complex matrices.
 If you haven't gotten your FastLED matrix to work at all, please do make those examples work first:
-https://github.com/marcmerlin/FastLED_NeoMatrix/tree/master/examples/matrixtest
-https://github.com/marcmerlin/FastLED_NeoMatrix/tree/master/examples/MatrixGFXDemo
+- https://github.com/marcmerlin/FastLED_NeoMatrix/tree/master/examples/matrixtest
+- https://github.com/marcmerlin/FastLED_NeoMatrix/tree/master/examples/MatrixGFXDemo
 
 As of this writing, you can run on top of
 - https://github.com/marcmerlin/FastLED_NeoMatrix/
