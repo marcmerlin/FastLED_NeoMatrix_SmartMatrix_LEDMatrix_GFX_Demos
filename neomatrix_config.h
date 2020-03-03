@@ -77,11 +77,11 @@ to use, set the define before you include the file.
 
     #ifdef ESP32
     //#define ILI9341
-    #define ST7735_128b160
+    //#define ST7735_128b160
     //#define ST7735_128b128
     //#define SSD1331
     //#define SSD1331_ROTATE 1
-    //#define SMARTMATRIX
+    #define SMARTMATRIX
     //#define M64BY64
     #endif
 
@@ -95,6 +95,7 @@ to use, set the define before you include the file.
 
 #include <Adafruit_GFX.h>
 bool init_done = 0;
+uint32_t tft_spi_speed;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 // The ESP32 FastLED defines below must be defined before FastLED.h is loaded
@@ -117,9 +118,6 @@ bool init_done = 0;
 // zero copy/no malloc code to work.
 #include <LEDMatrix.h>
 #endif
-
-uint32_t tft_spi_speed;
-
 
 
 //============================================================================

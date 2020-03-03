@@ -68,7 +68,7 @@ class Boid {
     }
 
     void run(Boid boids [], uint8_t boidCount) {
-      flock(boids, boidCount);
+      Aflock(boids, boidCount);
       update();
       // wrapAroundBorders();
       // render();
@@ -113,7 +113,7 @@ class Boid {
     }
 
     // We accumulate a new acceleration each time based on three rules
-    void flock(Boid boids [], uint8_t boidCount) {
+    void Aflock(Boid boids [], uint8_t boidCount) {
       PVector sep = separate(boids, boidCount);   // Separation
       PVector ali = align(boids, boidCount);      // Alignment
       PVector coh = cohesion(boids, boidCount);   // Cohesion
