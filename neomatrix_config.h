@@ -305,7 +305,7 @@ uint32_t tft_spi_speed;
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
     // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
-    #define GPIOPINOUT 4 // if on ESP32, this selects which wiring is used. Teensy uses the define below
+    #define GPIOPINOUT 3 // if on ESP32, this selects which wiring is used. Teensy uses the define below
     #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware on teensy
     #include <SmartMatrix3.h>
     #include <SmartMatrix_GFX.h>
@@ -714,9 +714,6 @@ const uint16_t kMatrixHeight = mh;
 extern "C" {
 #include "user_interface.h"
 }
-// min/max are broken by the ESP8266 include
-#define min(a,b) (a<b)?(a):(b)
-#define max(a,b) (a>b)?(a):(b)
 #endif // ESP8266
 
 uint8_t gHue = 0; // rotating "base color" used by many of the patterns

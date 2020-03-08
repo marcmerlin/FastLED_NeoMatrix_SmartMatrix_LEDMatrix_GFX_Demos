@@ -206,7 +206,7 @@ void fireworks()
 {
 // Background sky color (brightness needs to be low, but not too low, backend dependent)
 #ifdef NEOMATRIX
-	#ifdef M32B8X3
+	#ifdef M32BY8X3
 	CRGB sky1(0,0,17);
 	#else
 	CRGB sky1(0,0,32);				
