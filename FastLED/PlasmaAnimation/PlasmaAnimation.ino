@@ -65,7 +65,7 @@ void loop()
         left2Right = -1;
         pixelIndex = (y + 1) * mw - 1;
       }
-      for (uint8_t x = 0; x < mw ; x++) {
+      for (uint16_t x = 0; x < mw ; x++) {
         //Calculate 3 seperate plasma waves, one for each color channel
         uint8_t r = fastCosineCalc(((x << 3) + (t >> 1) + fastCosineCalc((t2 + (y << 3)))));
         uint8_t g = fastCosineCalc(((y << 3) + t + fastCosineCalc(((t3 >> 2) + (x << 3)))));
