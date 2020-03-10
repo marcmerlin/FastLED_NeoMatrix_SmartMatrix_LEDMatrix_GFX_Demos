@@ -142,7 +142,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     CRGB *matrixleds;
     #ifdef LEDMATRIX
@@ -199,7 +198,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -256,7 +254,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -291,7 +288,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     CRGB *matrixleds;
     #ifdef LEDMATRIX
@@ -332,7 +328,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     /// SmartMatrix Defines
     #define COLOR_DEPTH 24         // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
@@ -388,7 +383,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -423,7 +417,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -479,7 +472,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -541,7 +533,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -614,7 +605,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -633,15 +623,21 @@ uint32_t tft_spi_speed;
     uint8_t matrix_brightness = 128;
     //
     // Used by LEDMatrix
-    const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
-    const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
+    // All running 1D neopixel code
+    #ifdef NEOPIXEL_STRIP
+	#pragma message "Neopixel 1D code"
+	const uint16_t MATRIX_TILE_WIDTH =  64; // width of EACH NEOPIXEL MATRIX (not total display)
+	const uint16_t MATRIX_TILE_HEIGHT=   1; // height of each matrix
+    #else
+	const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
+	const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
+    #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
     
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     CRGB *matrixleds;
     #ifdef LEDMATRIX
@@ -673,7 +669,6 @@ uint32_t tft_spi_speed;
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    const uint32_t NUMMATRIX = mw*mh;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -695,6 +690,7 @@ uint32_t tft_spi_speed;
 //============================================================================
 
 // Compat for some other demos
+const uint32_t NUMMATRIX = mw*mh;
 const uint32_t NUM_LEDS = NUMMATRIX;
 const uint16_t MATRIX_HEIGHT = mh;
 const uint16_t MATRIX_WIDTH = mw;
