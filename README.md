@@ -11,8 +11,8 @@ a look at it to understand the base layer/API everything is built on top of (and
 the Adafruit::GFX and FastLED APIs as explained in its README).
 
 
-Hardware backends and glue drivers tha can run this demo code
--------------------------------------------------------------
+Hardware backends and glue drivers that can run this demo code
+--------------------------------------------------------------
 I used all the low level drivers on the left, wrote all the glue drivers in the middle, and FrameBuffer::GFX
 ```
 Low Level Drv|Glue Driver for FrameBuffer::GFX
@@ -51,6 +51,8 @@ As of this writing, you can run on top of
 
 If you are using some of the other backends, I'll assume that you can set the correct define in neomatrix_config
 
+History
+-------
 This demo collection started after I wrote https://github.com/marcmerlin/FastLED_NeoMatrix which 
 was designed to add GFX compatiblity for FastLED supported backends.
 In that process, I picked up some demos in the FastLED directory that I 
@@ -75,8 +77,9 @@ For instance, look at https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatri
 
 What you end up with are demos that run with multiple APIs (GFX, FastLED, and LEDMAtrix) on top of multiple hardware backends (listed above).
 
-Demos examples:
-- Table Mark Estes + Sublime (LEDMatrix + FastLED/FastLEDonPc)
+Demos examples
+--------------
+- Table Mark Estes + Sublime (LEDMatrix + ArduinoOnPc-FastLED-GFX-LEDMatrix + FastLED_SDL on linux)
 ![102_demo_snaps](https://user-images.githubusercontent.com/1369412/71480161-a982c800-27ac-11ea-8f0e-fb149b6a9ae2.jpg)
 ![103_demo_snaps](https://user-images.githubusercontent.com/1369412/71480163-abe52200-27ac-11ea-9cb1-f4d23bdf96ac.jpg)
 
