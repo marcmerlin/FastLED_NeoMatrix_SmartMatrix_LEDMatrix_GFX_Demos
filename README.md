@@ -1,14 +1,41 @@
+Introduction
+------------
 This is a collection of demos I gathered after writing my first Adadfruit::GFX demo ( GFX/MatrixGFXDemo ) and later GFX/fontzoom.
+
+You'll find they are in 3 directories depending on which API they use (Adafruit::GFX, FastLED, or LEDMatrix)
 
 Those demos work on multiple hardware backends thanks to 
 https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/blob/master/neomatrix_config.h  
 All those backends ultimately run on top of https://github.com/marcmerlin/Framebuffer_GFX , so you should have
 a look at it to understand the base layer/API everything is built on top of (and that library itself offers
-the Adafruit::GFX and FastLED APIs as explained in its README).  
+the Adafruit::GFX and FastLED APIs as explained in its README).
 
+
+Hardware backends and glue drivers tha can run this demo code
+-------------------------------------------------------------
+I used all the low level drivers on the left, wrote all the glue drivers in the middle, and FrameBuffer::GFX
+```
+Low Level Drv|Glue Driver for FrameBuffer::GFX
+FastLED     - FastLED_NeoMatrix  -------------\     FastLED CRGB Array 
+SmartMatrix - SmartMatrix_GFX -----------------\    24bit FB storage        API Support
+ILI9341 \                                       \   CRGB methods like
+SSD1331  |--- FastLED_SPITFT_GFX ----------------\  scale8/fadeToBlackBy   ,FastLED API
+ST7735  /                                         |        |              / (XY 2D to 1D mapping)
+                                                  |        |             /
+ArduinoOnPc-FastLED-GFX-LEDMatrix arduino         - FrameBuffer::GFX------ Adafruit::NeoMatrix +
+emulation for linux / Raspberry Pi:               |        |             \ Adafruit::GFX APIs
+----------------------------------               /    Adafruit::GFX       \ 
+rpi-rgb-led-matrix - FastLED_RPIRGBPanel_GFX ---/   LEDMatrix (optional)   `LEDMatrix API
+ArduinoOnPC X11/linux - FastLED_TFTWrapper_GFX /
+FastLED_SDL (linux)   -  FastLED_NeoMatrix   -/                        
+```
+
+neomatrix_config.h controls which hardware backend to run all demos on
+-----------------------------------------------------------------------
 For the demos to run, you need to edit 
 https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/blob/master/neomatrix_config.h
-and #define the correct backend for your display.  
+and #define the correct backend for your display.
+
 Assuming you are running FastLED::NeoMatrix, you may want to try uncommmenting '#define M24BY24'
 and modifying the 2 code sections relevant to this define to put the correct data for your array.  
 Obviously you can look at M32BY8X3, M16BY16T4, and M64BY64 for ways to configure more complex matrices.
@@ -20,7 +47,7 @@ As of this writing, you can run on top of
 - https://github.com/marcmerlin/FastLED_NeoMatrix/
 - https://github.com/marcmerlin/SmartMatrix_GFX/
 - https://github.com/marcmerlin/FastLED_SPITFT_GFX (SSD1331, ILI9341, and ST7735 TFTs)
-- https://github.com/marcmerlin/FastLEDonPc
+- https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix (which itself supports 3 more drivers)
 
 If you are using some of the other backends, I'll assume that you can set the correct define in neomatrix_config
 
@@ -68,12 +95,14 @@ Demos examples:
 - TwinkleFox (FastLED/SmartMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/FastLED/TwinkleFOX
 ![201_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55816588-73c77300-5aa7-11e9-9503-82d8f55a52d0.jpg)
 
+- Table Mark Estes (LEDMatrix/FastLED_SPITFT_GFX)
+![104_20190526_FastLED_SPITFT_GFX_On_Top_Of_Framebuffer_GFX](https://user-images.githubusercontent.com/1369412/76477705-64d9f680-63c3-11ea-81b1-9a10471888fe.jpg)
 
 - Table Mark Estes (LEDMatrix/SmartMatrix) https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/tree/master/LEDMatrix/Table_Mark_Estes
 ![225_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55811839-b0db3780-5a9e-11e9-9b9e-42a38b99ca20.jpg)
 
-- Table Mark Estes (LEDMatrix/SmartMatrix) 
-![245_20190401_SmartMatrix_GFX_Patterns](https://user-images.githubusercontent.com/1369412/55811847-b5075500-5a9e-11e9-91da-5857d2fb1bcc.jpg)
+- Table Mark Estes (LEDMatrix/ArduinoOnPc-FastLED-GFX-LEDMatrix/FastLED_RPIRGBPanel_GFX) on a massive 384x192
+![dsc05134](https://user-images.githubusercontent.com/1369412/76477536-e2e9cd80-63c2-11ea-86f9-f925fe625a4d.jpg)
 
 Enjoy,  
 Marc <marc_soft@merlins.org>
