@@ -275,7 +275,7 @@ void setup()
 #endif
   // WARNING: make sure that none of those pins are used by SmartMatrix, or the output will be broken
 #ifndef ARDUINOONPC
-  randomSeed(analogRead(1) - analogRead(2) + analogRead(5));  //
+  randomSeed(analogRead(1) - analogRead(2) + analogRead(5));
 #endif
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center

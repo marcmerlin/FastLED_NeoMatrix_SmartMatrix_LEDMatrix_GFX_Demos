@@ -629,7 +629,7 @@ uint32_t tft_spi_speed;
 	const uint16_t MATRIX_TILE_WIDTH =  64; // width of EACH NEOPIXEL MATRIX (not total display)
 	const uint16_t MATRIX_TILE_HEIGHT=   1; // height of each matrix
     #else
-	const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
+	const uint16_t MATRIX_TILE_WIDTH = 384; // width of EACH NEOPIXEL MATRIX (not total display)
 	const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
@@ -656,10 +656,12 @@ uint32_t tft_spi_speed;
     // Arduino min/max conflict with g++ math min/max
     #undef min
     #undef max
+    #define min(a,b) ((a<b)?(a):(b))
+    #define max(a,b) ((a>b)?(a):(b))
     #include <led-matrix.h>
     
     uint8_t matrix_brightness = 255;
-    const uint16_t MATRIX_TILE_WIDTH = 128;
+    const uint16_t MATRIX_TILE_WIDTH = 384;
     const uint16_t MATRIX_TILE_HEIGHT= 192;
     
     // Used by LEDMatrix
@@ -918,7 +920,7 @@ void matrix_setup(int reservemem = 40000) {
         defaults.hardware_mapping = "regular"; // or e.g. "adafruit-hat"
         defaults.rows = 64;
         defaults.cols = 128;
-        defaults.chain_length = 1;
+        defaults.chain_length = 3;
         defaults.parallel = 3;
         defaults.pwm_lsb_nanoseconds = 50;
         defaults.pwm_bits = 7;
@@ -926,6 +928,8 @@ void matrix_setup(int reservemem = 40000) {
         defaults.panel_type = "FM6126A";
         
         rgb_matrix::RuntimeOptions ropt;
+	ropt.gpio_slowdown = 1;
+
         rgb_matrix::Canvas *canvas = rgb_matrix::CreateMatrixFromOptions(defaults, ropt);
         while (canvas == NULL) Serial.println("Canvas did not initialize");
         matrix->setCanvas(canvas);
