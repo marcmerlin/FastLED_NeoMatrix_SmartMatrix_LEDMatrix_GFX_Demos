@@ -396,6 +396,15 @@ uint32_t tft_spi_speed;
     
 //----------------------------------------------------------------------------
 #elif defined(ILI9341)
+    #ifdef ESP32
+	#ifdef BOARD_HAS_PSRAM
+	    #pragma message "Compiling for ILI9341 on ESP32 with PSRAM"
+	#else
+	    #error "Cannot compile for ILI9341 WITHOUT PSRAM on ESP32, not enough RAM"
+	#endif
+    #else
+	#pragma message "Compiling for ILI9341. Most chips except teensy 3.6 and better, won't have enough RAM"
+    #endif
     #define HASTFT
     
     #include "Adafruit_ILI9341.h"
@@ -785,7 +794,7 @@ void matrix_setup(int reservemem = 40000) {
     }
     init_done = 1;
     // Teensy takes a while to initialize serial port.
-// Teensy 3.0, 3.1/3.2, 3.5, 3.6
+    // Teensy 3.0, 3.1/3.2, 3.5, 3.6
     #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
         delay(3000);
     #endif
