@@ -10,6 +10,8 @@ All those backends ultimately run on top of https://github.com/marcmerlin/Frameb
 a look at it to understand the base layer/API everything is built on top of (and that library itself offers
 the Adafruit::GFX and FastLED APIs as explained in its README).
 
+Below is a summary of how things work, but you'll find more details on this post: http://marc.merlins.org/perso/arduino/post_2020-03-16_Framebuffer_GFX_-Choosing-between-its-3-2D-APIs_-FastLED-XY_-NeoMatrix_-and-LEDMatrix_-and-detail-of-its-many-supported-hardware-backends.html
+
 
 Hardware backends and glue drivers that can run this demo code
 --------------------------------------------------------------
