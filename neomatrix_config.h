@@ -79,9 +79,9 @@ in the defines below, but for your own use, you should just set
 #if defined(ARDUINOONPC)
     #if defined(RPI4)
 	#pragma message "Detected ARDUINOONPC on rPi4, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
-    #elif define (RPI3)
+    #elif defined(RPI3)
 	#pragma message "Detected ARDUINOONPC on rPi3, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
-    #elif define (RPILT3)
+    #elif defined(RPILT3)
 	#pragma message "Detected ARDUINOONPC on pre-rPi3, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
     #else
 	#ifndef LINUX_RENDERER_SDL
