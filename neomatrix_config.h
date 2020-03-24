@@ -46,27 +46,11 @@ to use, set the define before you include the file.
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //#define M24BY24
 
-#if defined(ARDUINOONPC)
-    #if defined(__ARMEL__)
-	#pragma message "Detected ARDUINOONPC on ARM (guessing rPi), will use FastLED_RPIRGBPanel_GFX"
-	#define RPIRGBPANEL
-    #else
-	#ifndef LINUX_RENDERER_SDL
-	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 FastLED_TFTWrapper_GFX Rendering"
-	    #define LINUX_RENDERER_X11
-	#else
-	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_SDL FastLED_NeoMatrix Rendering."
-	    #pragma message "Comment out LINUX_RENDERER_SDL for X11 rendering instead of SDL. Use + for brighter."
-	#endif
-    #endif
-#endif
+/* For my own benefit, I use some CPU architectures to default to some backends
+in the defines below, but for your own use, you should just set 
+#define M24B24 or SMARTMATRIX or somesuch just before this code block.  */
 
-#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341)
-    /*
-    For my own benefit, I use some CPU architectures to default to some backends
-    in the defines below, but for your own use, you should just set 
-    #define SMARTMATRIX or somesuch just before this code block.
-    */
+#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC)
     #ifdef ESP8266
     //#define SSD1331
     //#define SSD1331_ROTATE 1
@@ -91,6 +75,25 @@ to use, set the define before you include the file.
     #define ILI_ROTATE 1
     #endif
 #endif
+
+#if defined(ARDUINOONPC)
+    #if defined(RPI4)
+	#pragma message "Detected ARDUINOONPC on rPi4, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
+    #elif define (RPI3)
+	#pragma message "Detected ARDUINOONPC on rPi3, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
+    #elif define (RPILT3)
+	#pragma message "Detected ARDUINOONPC on pre-rPi3, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
+    #else
+	#ifndef LINUX_RENDERER_SDL
+	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 FastLED_TFTWrapper_GFX Rendering"
+	    #define LINUX_RENDERER_X11
+	#else
+	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_SDL FastLED_NeoMatrix Rendering."
+	    #pragma message "Comment out LINUX_RENDERER_SDL for X11 rendering instead of SDL. Use + for brighter."
+	#endif
+    #endif
+#endif
+
 
 
 #include <Adafruit_GFX.h>
@@ -670,8 +673,13 @@ uint32_t tft_spi_speed;
     #include <led-matrix.h>
     
     uint8_t matrix_brightness = 255;
-    const uint16_t MATRIX_TILE_WIDTH = 384;
-    const uint16_t MATRIX_TILE_HEIGHT= 192;
+    #ifdef RPI4
+        const uint16_t MATRIX_TILE_WIDTH = 384;
+        const uint16_t MATRIX_TILE_HEIGHT= 256;
+    #else
+	const uint16_t MATRIX_TILE_WIDTH = 192;
+	const uint16_t MATRIX_TILE_HEIGHT= 160;
+    #endif
     
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
@@ -927,17 +935,33 @@ void matrix_setup(int reservemem = 40000) {
     
         rgb_matrix::RGBMatrix::Options defaults;
         defaults.hardware_mapping = "regular"; // or e.g. "adafruit-hat"
-        defaults.rows = 64;
-        defaults.cols = 128;
-        defaults.chain_length = 3;
-        defaults.parallel = 3;
-        defaults.pwm_lsb_nanoseconds = 50;
-        defaults.pwm_bits = 7;
-        defaults.led_rgb_sequence = "RBG";
-        defaults.panel_type = "FM6126A";
+	#ifdef RPI4
+            defaults.rows = 64;
+            defaults.cols = 128;
+            defaults.chain_length = 4;
+            defaults.parallel = 3;
+            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_bits = 7;
+            defaults.led_rgb_sequence = "RBG";
+            defaults.panel_type = "FM6126A";
+    	    defaults.pixel_mapper_config = "V-mapper";
         
-        rgb_matrix::RuntimeOptions ropt;
-	ropt.gpio_slowdown = 1;
+            rgb_matrix::RuntimeOptions ropt;
+	    ropt.gpio_slowdown = 2;
+	#else
+            defaults.rows = 32;
+            defaults.cols = 64;
+            defaults.chain_length = 5;
+            defaults.parallel = 3;
+            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_bits = 7;
+            //defaults.led_rgb_sequence = "RBG";
+            defaults.panel_type = "FM6126A";
+            defaults.pixel_mapper_config = "V-mapper:Z";
+    
+            rgb_matrix::RuntimeOptions ropt;
+            ropt.gpio_slowdown = 1;
+	#endif
 
         rgb_matrix::Canvas *canvas = rgb_matrix::CreateMatrixFromOptions(defaults, ropt);
         while (canvas == NULL) Serial.println("Canvas did not initialize");
