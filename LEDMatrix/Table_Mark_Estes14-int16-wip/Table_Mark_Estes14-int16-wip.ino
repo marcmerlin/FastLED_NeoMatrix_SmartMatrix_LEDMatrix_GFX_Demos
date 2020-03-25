@@ -127,7 +127,7 @@ long  ClockTimeSinceLastBounce[BallCount];
 
 // This allows a selection of only my favourite patterns.
 // Comment this out to get all the patterns -- merlin
-#define BESTPATTERNS
+//#define BESTPATTERNS
 #ifdef BESTPATTERNS
 // 82 and 89 are similar     55 and 102 are similar
 uint8_t bestpatterns[] = { 
@@ -6398,10 +6398,10 @@ void VORTEX() {
       }
     }
   }
-  if (flop[2])
+  //if (flop[2])
     howmany = beatsin16(2, 1, how, 0);
-  else
-    howmany = beatsin16(2, 1, MATRIX_WIDTH, 0);
+  //else
+  //  howmany = beatsin16(2, 1, MATRIX_WIDTH, 0);
   for (int16_t i = 0 ; i < howmany; i++) {//draw all the drops
     //it is always your turn...
     if ( counter % fcount[i] == 0) {
