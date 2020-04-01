@@ -204,7 +204,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+    cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
@@ -389,7 +389,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
@@ -432,7 +432,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
@@ -487,7 +487,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
@@ -548,7 +548,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
@@ -620,7 +620,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
@@ -654,7 +654,7 @@ uint32_t tft_spi_speed;
     CRGB *matrixleds;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
@@ -691,7 +691,7 @@ uint32_t tft_spi_speed;
     
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
