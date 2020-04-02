@@ -21,8 +21,33 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Randomly slowdown animation. Nice in principle, but not great when debugging performance
+// --------------------------- Config Start --------------------------------
+// Randomly slowdown animation. Nice in principle, but not when debugging performance
 //#define RANDOMSLOWME
+
+// Control whether pattern order is random from the start or after one pass
+//#define MIXIT_AFTER_FIRST_PASS
+// mixit = true;
+
+#define SHOW_PATTERN_NUM
+
+// This allows a selection of only my favourite patterns.
+// Comment this out to get all the patterns -- merlin
+//#define BESTPATTERNS
+#ifdef BESTPATTERNS
+// 82 and 89 are similar     55 and 102 are similar
+uint8_t bestpatterns[] = { 
+   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
+  4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
+   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
+};
+#define numbest           sizeof(bestpatterns)
+#define lastpatindex numbest
+#else
+#define lastpatindex mpatterns
+#endif
+// --------------------------- Config End ----------------------------------
+
 
 #define LEDMATRIX
 #include "matrix.h"
@@ -124,23 +149,6 @@ float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle, eeksangle, why
 int StartHeighty = 1, Positiony[BallCount], Positionx[BallCount];
 float Heighty[BallCount], ImpactVelocityStart = sqrt( -2 * Gravity * StartHeighty ), ImpactVelocity[BallCount], TimeSinceLastBounce[BallCount], Dampening[BallCount];
 long  ClockTimeSinceLastBounce[BallCount];
-
-// This allows a selection of only my favourite patterns.
-// Comment this out to get all the patterns -- merlin
-//#define BESTPATTERNS
-#ifdef BESTPATTERNS
-// 82 and 89 are similar     55 and 102 are similar
-uint8_t bestpatterns[] = { 
-   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
-  4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
-   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
-};
-#define numbest           sizeof(bestpatterns)
-#define lastpatindex numbest
-#else
-#define lastpatindex mpatterns
-// mixit = true;
-#endif
 
 void newpattern();
 void whatami();
@@ -702,14 +710,15 @@ void newpattern()//generates all the randomness for each new pattern
   pattern = local_pattern;
 #endif
   if (new_pattern) pattern = new_pattern;
-  // Skip missing pattern
+  // Skip missing patterns
   if ( pattern > 26 && pattern < 54) pattern = 54;
   if ( pattern == 64) pattern = 65;
+  matrix->clear(); // without clear, some pattern transitions via blending look weird
 
   velo = 0; // random8()/2;
   nextsong = false;
 
-  matrix->clear(); // without clear, some pattern transitions via blending look weird
+
   targetfps = random(slowest, fastest);
   bfade = random(0, 9);
   wind = random(70) ;
@@ -1938,7 +1947,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
     default:
       Serial.print("D-fault");
       nextsong = true;
+#ifdef MIXIT_AFTER_FIRST_PASS
       mixit = true;//after  you get here the first time, it all gets random.
+#endif
       break;
   }
 
@@ -2885,6 +2896,14 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       matrix->clear();
       break;
   }
+#ifdef SHOW_PATTERN_NUM
+  uint8_t print_width = 1;
+  if (pattern > 9)  print_width = 2;
+  if (pattern > 99) print_width = 3;
+  zeds.DrawFilledRectangle(0, 0, 5 * print_width - 1, 6, 0);
+  matrix->setCursor(0, 0);
+  matrix->print(pattern);
+#endif
 }
 
 
