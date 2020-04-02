@@ -46,6 +46,20 @@ uint8_t bestpatterns[] = {
 #else
 #define lastpatindex mpatterns
 #endif
+
+// very nice rain going sideways
+// Case: 69  drops with effects , Adjunct 3 wind: 56 fancy: 14 afancy: 9 fader: 2Flop-0:  1, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  0, 
+// Case: 79  stars3,
+//  Case: 142  Crazy Snow, ?
+//  Case: 60  fireball with horizontal mirror
+// Case: 99  , Adjunct 8
+// Case: 104  circlearc
+// Case: 66  hypnoduck
+//  Case: 149  VORTEX but only with wide circles and faster speed
+//  Case: 60  fireball,
+//  Case: 114  drops with wind , Adjunct 5
+//  Case: 92  DRIP2 ,
+//  Case: 130 spin2 but consider removing the occasional fade
 // --------------------------- Config End ----------------------------------
 
 
@@ -150,6 +164,8 @@ int StartHeighty = 1, Positiony[BallCount], Positionx[BallCount];
 float Heighty[BallCount], ImpactVelocityStart = sqrt( -2 * Gravity * StartHeighty ), ImpactVelocity[BallCount], TimeSinceLastBounce[BallCount], Dampening[BallCount];
 long  ClockTimeSinceLastBounce[BallCount];
 
+// Arduino gcc may allow referencing functions before they are defined,
+// but gcc in ArduinoOnPC, does not, so copy all the signatures here.
 void newpattern();
 void whatami();
 void runpattern();
@@ -195,7 +211,7 @@ void starbubbles88();
 void tinybubbles2();
 void tinybubbles3();
 void sticks();
-void  Bargraph();
+void Bargraph();
 void adjustme();
 void spire2();
 void spire3();
@@ -1995,69 +2011,64 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
   switch (pattern) {
     case 0:
       Diamondhole();
-
       adjustme();// apply the screenwide effect
       break;
+
     case 1:
       Inca(blender);
-
       zeds.QuadrantBottomTriangleMirror();
       break;
+
     case 2:
       Ringo();
-
-      if (flop[0])
-        zeds.QuadrantBottomTriangleMirror();
+      if (flop[0]) zeds.QuadrantBottomTriangleMirror();
       break;
+
     case 3:
       diagonally();
       adjustme();
       break;
+
     case 4:
       Roundhole();
-
       adjustme();
       break;
+
     case 5:
       drifter();
-
       adjustme();
       break;
+
     case 6:
       drip();
       break;
+
     case 7:
-      if (flop[2] || flop[1])
-        solid5();
+      if (flop[2] || flop[1]) solid5();
       volcano(255);
-
       adjustme();
       break;
+
     case 8:
-      if (flop[2] || flop[1])
-        solid5();
-      else
-        solid5();
+      if (flop[2] || flop[1]) solid5(); else solid5();
       pyrimid();
-
       adjustme();
       break;
+
     case 9:
       solidpyrimid();
       adjustme();
       break;
+
     case 10:
       corner();
       // driftx = MIDLX;
       //  drifty = MIDLY;
-
       adjustme();
       break;
 
     case 11:
       whitewarp();
-
-
       break;
 
     case 12:
@@ -2065,12 +2076,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 13:
-
       confetti();
       break;
 
     case 14:
-
       spire2();
       if (flop[0] && flop[1]) adjustme();
       break;
@@ -2078,35 +2087,33 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 15:
       streaker();
       break;
+
     case 16:
       fireball();
       ringer();
       break;
+
     case 17:
-
-
       warp();
-
       break;
-    case 18:
 
+    case 18:
       siny();
       if (flop[0] && flop[2]) adjustme();
       break;
+
     case 19:
       sinx();
       if (flop[0] && !flop[2]) adjustme();
       break;
+
     case 20:
-
       triple();
-      if ((flop[3] && flop[1]) || (flop[4] && flop[8]) )
-        adjustme();
+      if ((flop[3] && flop[1]) || (flop[4] && flop[8]) ) adjustme();
       break;
+
     case 21:
-
       spire3();
-
       twister();
       break;
 
@@ -2115,40 +2122,29 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       Bargraph();
       adjustme();
       break;
+
     case 23:
       roger();
       if (flop[6] && (flop[1] || !flop[2])) adjustme();
       break;
 
     case 24:
-      if (flop[4])
-        solid5();
+      if (flop[4]) solid5();
       Bargraph();
       break;
 
     case 25:
       spire();
-      if (flop[2])
-        adjustme();
+      if (flop[2]) adjustme();
       break;
 
     case 26:
       sinx();
-      if (flop[7] || flop[5] || !flop[2])
-        adjustme();
+      if (flop[7] || flop[5] || !flop[2]) adjustme();
       break;
 
-
-
-
-
-
-
     case 54:
-
-
       splat();
-
       break;
 
     case 55:
@@ -2156,10 +2152,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 56:
-
       bouncez();
-      if (flop[6 || flop[5]])
-        adjustme();
+      if (flop[6 || flop[5]]) adjustme();
       break;
 
     case 57:
@@ -2170,24 +2164,18 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 58:
       whitewarp();
       adjustme();
-      if (flop[1] && wind < 9)
-        twister();
+      if (flop[1] && wind < 9) twister();
       break;
-
 
     case 59:
       fireball();
-
       break;
 
     case 60:
-
-      if (flop[0] || flop[1] )
-        confetti4();
+      if (flop[0] || flop[1] ) confetti4();
       fireball();
       adjustme();
       break;
-
 
     case 61:
       EVERY_N_SECONDS(3 + 3 * dot) {
@@ -2196,79 +2184,60 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       }
       warp();
       adjustme();
-
       break;
 
     case 62:
       warp();
-      if (flop[2])
-        confetti4();
+      if (flop[2]) confetti4();
       adjustme();
-
       break;
 
     case 63:
       confetti();
       confetti4();
-
-      if (wind < 9)
-        twister();
-      if (flop[3])
-        adjustme();
+      if (wind < 9) twister();
+      if (flop[3]) adjustme();
       break;
 
     case 64:
       triple();
-      if (flop[4])
-        adjustme();
+      if (flop[4]) adjustme();
       break;
 
     case 65:
-      if (flop[3] && flop[4] && flop[2])
-        smile();
-      else if (flop[6] && flop[7] && flop[5])
-        smile4();
-      else if (flop[1] && flop[8] && flop[3])
-        smile3();
-      else
-        smile2();
+      if (flop[3] && flop[4] && flop[2]) smile();
+      else if (flop[6] && flop[7] && flop[5]) smile4();
+      else if (flop[1] && flop[8] && flop[3]) smile3();
+      else smile2();
       break;
 
     case 66:
       hypnoduck();
-      if (flop[8])
-        adjustme();
+      if (flop[8]) adjustme();
       break;
 
     case 67:
       hypnoduck2();
-
-      if (flop[9] && flop[3])
-        adjustme();
+      if (flop[9] && flop[3]) adjustme();
       break;
 
     case 68:
       roger();
       adjustme();
-
       break;
 
-
     case 69:
-
       drops();
       adjustme();
       break;
 
     case 70:
-
       spin2();
       if (!flop[0] && flop[1] && !flop[2]) adjustme();
       break;
 
     case 71:
       xspin();
-
       break;
 
     case 72:
@@ -2277,12 +2246,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 73:
       homer2();
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       break;
 
     case 74:
-
       fireball();
       adjustme();
       break;
@@ -2327,15 +2294,13 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 83:
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       circlearc();
       adjustme();
       break;
 
     case 84:
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       fireball();
       break;
 
@@ -2346,7 +2311,6 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 86:
       starbounce();
-
       adjustme();
       break;
 
@@ -2355,13 +2319,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 88:
-      if (!flop[2])
-        warp();
-
+      if (!flop[2]) warp();
       triforce();
-      if (flop[2])
-        adjustme();
-
+      if (flop[2]) adjustme();
       break;
 
     case 89:
@@ -2377,12 +2337,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       EVERY_N_SECONDS(10 + 3 * dot) {
         fancy = random(1, 22);
       }
-      if (flop[2] || flop[5])
-        adjustme();
+      if (flop[2] || flop[5]) adjustme();
       break;
 
     case 92:
-
       drip();
       mirror();
       break;
@@ -2396,14 +2354,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 95:
-
       drip();
       mirror();
       break;
 
     case 96:
       triangler();
-
       break;
 
     case 97:
@@ -2425,12 +2381,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       confetti2();
       break;
 
-
     case 101:
       confetti4();
-      if (flop[0] || flop[1] || flop[2])
-        warp();
-
+      if (flop[0] || flop[1] || flop[2]) warp();
       break;
 
     case 102:
@@ -2457,8 +2410,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 107:
       for (int16_t j = 1; j < MATRIX_WIDTH - 8; j++)//0
         drawstar(driftx, drifty, j, j / 2, 7, 2 * h, h + j * 4);
-      if (flop[0])
-        rmagictime();
+      if (flop[0]) rmagictime();
       bkstarer();
       adjustme();// hey long time no see....
       break;
@@ -2467,45 +2419,33 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 108:
       whitewarp();
       rmagictime();
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       break;
 
     case 109:
       warp();
       xspin();
-
-      if (flop[0] && !flop[5])
-        adjustme();
+      if (flop[0] && !flop[5]) adjustme();
       break;
 
     case 110:
-
       bubbles();
-
       break;
 
     case 111:
-
-
       bubbles2();
-
       break;
 
     case 112:
       seasick5();
-
       break;
-
 
     case 113:
       homer3();
-
       break;
 
     case 114:
       drops();
-
       break;
 
     case 115:
@@ -2513,11 +2453,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       drifty = yyy;
       streaker();
       hypnoduck();
-
       break;
 
     case 116:
-
       fireball();
       triangler();
       if (flop[5]) adjustme();
@@ -2528,13 +2466,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
         driftx = MIDLX;
         drifty = MIDLY;
       }
-      if (flop[5]) {
-
-        solid5();
-      }
+      if (flop[5]) solid5();
       streaker();
       drawtriangle();
-
       break;
 
     case 118:
@@ -2546,19 +2480,16 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       spin2();
       break;
 
-
     case 120:
       drops();
       twister();
-      if (flop[5])
-        adjustme();
+      if (flop[5]) adjustme();
       break;
 
     case 121:
       drips();
       twister();
       adjustme();
-
       break;
 
     case 122:
@@ -2570,17 +2501,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 123:
       if (flop[5]) {
         driftx = MIDLX;
-
         drifty = MIDLY;
       }
       if (flop [3]) {
-        if (flop[4])
-          volcano(55);
-        else
-          Inca(55);
+        if (flop[4]) volcano(55); else Inca(55);
       }
       tinybubbles2();
-
       break;
 
     case 124:
@@ -2588,59 +2514,43 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 125:
-
       tinybubbles2();
       adjustme();
       break;
 
-
     case 126:
       whitewarp();
       fireworks();
-      if (flop[6] && flop[7])
-        adjustme();
+      if (flop[6] && flop[7]) adjustme();
       break;
-
 
     case 127:
       seasick3();
       break;
 
     case 128:
-
       magictime();
       adjustme();
-      if (flop[2])confetti2();
-      else
-        warp();
-
+      if (flop[2]) confetti2(); else warp();
       break;
 
     case 129:
-
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
-
 
     case 130:
       whitewarp();
       spin2();
       triforce();
-      if (flop[2])
-        adjustme();
-
+      if (flop[2]) adjustme();
       break;
-
-
 
     case 131:
       seasickness();
       break;
 
     case 132:
-
       spiralz();
       adjustme();
       break;
@@ -2661,27 +2571,22 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 135:
 
       spiral2();// add a spiral
-      if (flop[7])
-        adjustme();
+      if (flop[7]) adjustme();
       break;
 
     case 136://i love this
       drifty = MIDLY;
       driftx = MIDLX;
-      if (flop[6])
-        solid5();
+      if (flop[6]) solid5();
       spire3();
       confetti2();
       twister();
       adjustme();
       break;
 
-
-
     case 139:
       spiral3();
-      if (flop[7])
-        adjustme();
+      if (flop[7]) adjustme();
       break;
 
     case 140:
@@ -2694,26 +2599,18 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       adjustme();
       break;
 
-
     case 141:
-      if (flop[2])
-        snow(138);
-      else
-        snow(random8());
+      if (flop[2]) snow(138); else snow(random8());
       break;
 
     case 142:
-      if (flop[2])
-        snow(blender);
-      else
-        snow(random8());
+      if (flop[2]) snow(blender); else snow(random8());
       adjustme();
       break;
 
     case 143:
       BouncingBalls(dot);
-      if (flop[6])
-        adjustme();
+      if (flop[6]) adjustme();
       break;
 
     case 144:
@@ -2721,14 +2618,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       BouncingBalls(12);
       break;
 
-
     case 145:
-      if (flop[5] && flop[7]) {
-
-        solid5();
-      }
-      else
-        Inca(64);
+      if (flop[5] && flop[7]) solid5(); else Inca(64);
       Bouncingtri(dot);
       break;
 
@@ -2763,16 +2654,11 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 152://i love this 136
-
       spire3();
       confetti2();
       twister();
       adjustme();
       break;
-
-
-
-
 
     case 155://123
       if (flop[5] && flop[7]) {
@@ -2780,27 +2666,19 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
         driftx = MIDLX;
         drifty = MIDLY;
       }
-
-      else
-        solid4();//black
+      else solid4();//black
       starbubbles88();
       break;
 
     case 156://123
       driftx = MIDLX;
       drifty = MIDLY;
-      if (flop[5] || flop[3]) {
-        solid5();
-      }
-      else
-        solid4();//black
+      if (flop[5] || flop[3]) solid5(); else solid4();//black
       squarebubbles();
       break;
 
-
     case 158:
-      if (flop[5])
-        solid5();
+      if (flop[5]) solid5();
       tuber();
       adjustme();
       break;
@@ -2811,75 +2689,75 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       adjustme();
       break;
 
-
     case 160:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 161:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 162:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 163:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 164:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 165:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 166:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 167:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 168:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 169:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 170:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 171:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 172:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     /*case 173:
       koi();
       break;*/
+
     case 174:
       if (flop[0] && flop[1] ) {
         confetti2();
@@ -2888,9 +2766,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       else {
         spiral2();
       }
-      if (flop[3] && flop[7])
-        adjustme();
+      if (flop[3] && flop[7]) adjustme();
       break;
+
     default:
       nextsong = true;
       matrix->clear();
@@ -6417,6 +6295,10 @@ void VORTEX() {
       }
     }
   }
+// Fix division by 0 in counter % below
+// #0  raise (sig=<optimized out>) at ../sysdeps/unix/sysv/linux/raise.c:51
+// #1  0x76c991fc in __aeabi_ldiv0 () from /lib/arm-linux-gnueabihf/libgcc_s.so.1
+// #2  0x0004e35c in VORTEX () at /root/ArduinoOnPc-FastLED-GFX-LEDMatrix/examples/GFX_Table_Mark_Estes14-int16-wip/Table_Mark_Estes14-int16-wip.ino:6407
   //if (flop[2])
     howmany = beatsin16(2, 1, how, 0);
   //else
