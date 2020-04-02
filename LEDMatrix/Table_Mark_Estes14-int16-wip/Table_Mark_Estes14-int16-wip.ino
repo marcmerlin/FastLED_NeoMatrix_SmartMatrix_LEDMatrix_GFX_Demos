@@ -164,6 +164,10 @@ int StartHeighty = 1, Positiony[BallCount], Positionx[BallCount];
 float Heighty[BallCount], ImpactVelocityStart = sqrt( -2 * Gravity * StartHeighty ), ImpactVelocity[BallCount], TimeSinceLastBounce[BallCount], Dampening[BallCount];
 long  ClockTimeSinceLastBounce[BallCount];
 
+#ifdef SHOW_PATTERN_NUM
+uint8_t print_width = 1;
+#endif
+
 // Arduino gcc may allow referencing functions before they are defined,
 // but gcc in ArduinoOnPC, does not, so copy all the signatures here.
 void newpattern();
@@ -729,7 +733,12 @@ void newpattern()//generates all the randomness for each new pattern
   // Skip missing patterns
   if ( pattern > 26 && pattern < 54) pattern = 54;
   if ( pattern == 64) pattern = 65;
+
   matrix->clear(); // without clear, some pattern transitions via blending look weird
+#ifdef SHOW_PATTERN_NUM
+  if (pattern > 9)  print_width = 2;
+  if (pattern > 99) print_width = 3;
+#endif
 
   velo = 0; // random8()/2;
   nextsong = false;
@@ -1988,6 +1997,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
 }
 
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
+#ifdef SHOW_PATTERN_NUM
+  zeds.DrawFilledRectangle(0, 0, 6 * print_width - 1, 7, 0);
+#endif
   switch (pattern) {
     case 0:
       Diamondhole();
@@ -2755,10 +2767,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
   }
 #ifdef SHOW_PATTERN_NUM
-  uint8_t print_width = 1;
-  if (pattern > 9)  print_width = 2;
-  if (pattern > 99) print_width = 3;
-  zeds.DrawFilledRectangle(0, 0, 5 * print_width - 1, 6, 0);
+  zeds.DrawFilledRectangle(0, 0, 6 * print_width - 1, 7, 0);
   matrix->setCursor(0, 0);
   matrix->print(pattern);
 #endif
