@@ -305,7 +305,7 @@ uint32_t tft_spi_speed;
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
     // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
-    #define GPIOPINOUT 3 // if on ESP32, this selects which wiring is used. Teensy uses the define below
+    #define GPIOPINOUT 8 // if on ESP32, this selects which wiring is used. Teensy uses the define below
     #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware on teensy
     #include <SmartMatrix3.h>
     #include <SmartMatrix_GFX.h>
@@ -791,7 +791,9 @@ void matrix_setup(int reservemem = 40000) {
     #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
         delay(3000);
     #endif
-    Serial.begin(115200);
+    // It's bad to call Serial.begin twice, so it's disabled here now, make sure you have it enabled
+    // in your calling script.
+    //Serial.begin(115200);
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
     show_free_mem("Memory after setup() starts");
     
