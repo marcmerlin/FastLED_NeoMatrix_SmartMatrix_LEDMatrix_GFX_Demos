@@ -31,7 +31,7 @@ The TL;DR is you shouldn't bother with it if you already have the GFX
 and FastLED APIs, unless you can use fancy wavy scrolling colored fonts or the
 sprite support in LEDMatrix.
 
-You should need to modify this file at all unless you are adding new matrix
+You should not need to modify this file at all unless you are adding new matrix
 definitions and/or changing pin mappings for TFT screens. To choose which backend
 to use, set the define before you include the file.
 */
@@ -340,7 +340,8 @@ uint32_t tft_spi_speed;
     const uint8_t kMatrixHeight = mh;
     const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
     const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
-    const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_NONE);      // see http://docs.pixelmatix.com/SmartMatrix for options
+    const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_FM6126A_RESET_AT_START);      // see http://docs.pixelmatix.com/SmartMatrix for options
+    //const uint8_t kMatrixOptions = 0;
     const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
     
     SMARTMATRIX_ALLOCATE_BUFFERS(matrixLayer, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
