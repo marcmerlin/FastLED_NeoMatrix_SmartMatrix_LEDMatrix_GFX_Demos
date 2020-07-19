@@ -21,8 +21,47 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-// Randomly slowdown animation. Nice in principle, but not great when debugging performance
+// --------------------------- Config Start --------------------------------
+// Randomly slowdown animation. Nice in principle, but not when debugging performance
 //#define RANDOMSLOWME
+
+// Control whether pattern order is random from the start or after one pass
+//#define MIXIT_AFTER_FIRST_PASS
+// mixit = true;
+
+#define SHOW_PATTERN_NUM
+
+// This allows a selection of only my favourite patterns.
+// Comment this out to get all the patterns -- merlin
+//#define BESTPATTERNS
+#ifdef BESTPATTERNS
+// 82 and 89 are similar     55 and 102 are similar
+uint8_t bestpatterns[] = {
+   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
+   4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
+   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
+};
+#define numbest           sizeof(bestpatterns)
+#define lastpatindex numbest
+#else
+#define lastpatindex mpatterns
+#endif
+
+// very nice rain going sideways
+// Case: 69  drops with effects , Adjunct 3 wind: 56 fancy: 14 afancy: 9 fader: 2Flop-0:  1, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  0,
+// Case: 79  stars3,
+//  Case: 142  Crazy Snow, ?
+//  Case: 60  fireball with horizontal mirror
+// Case: 99  , Adjunct 8
+// Case: 104  circlearc
+// Case: 66  hypnoduck
+//  Case: 149  VORTEX but only with wide circles and faster speed
+//  Case: 60  fireball,
+//  Case: 114  drops with wind , Adjunct 5
+//  Case: 92  DRIP2 ,
+//  Case: 130 spin2 but consider removing the occasional fade
+// --------------------------- Config End ----------------------------------
+
 
 #define LEDMATRIX
 #include "matrix.h"
@@ -125,23 +164,12 @@ int StartHeighty = 1, Positiony[BallCount], Positionx[BallCount];
 float Heighty[BallCount], ImpactVelocityStart = sqrt( -2 * Gravity * StartHeighty ), ImpactVelocity[BallCount], TimeSinceLastBounce[BallCount], Dampening[BallCount];
 long  ClockTimeSinceLastBounce[BallCount];
 
-// This allows a selection of only my favourite patterns.
-// Comment this out to get all the patterns -- merlin
-#define BESTPATTERNS
-#ifdef BESTPATTERNS
-// 82 and 89 are similar     55 and 102 are similar
-uint8_t bestpatterns[] = { 
-   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
-  4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
-   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
-};
-#define numbest           sizeof(bestpatterns)
-#define lastpatindex numbest
-#else
-#define lastpatindex mpatterns
-// mixit = true;
+#ifdef SHOW_PATTERN_NUM
+uint8_t print_width = 1;
 #endif
 
+// Arduino gcc may allow referencing functions before they are defined,
+// but gcc in ArduinoOnPC, does not, so copy all the signatures here.
 void newpattern();
 void whatami();
 void runpattern();
@@ -187,7 +215,7 @@ void starbubbles88();
 void tinybubbles2();
 void tinybubbles3();
 void sticks();
-void  Bargraph();
+void Bargraph();
 void adjustme();
 void spire2();
 void spire3();
@@ -275,7 +303,7 @@ void setup()
 #endif
   // WARNING: make sure that none of those pins are used by SmartMatrix, or the output will be broken
 #ifndef ARDUINOONPC
-  randomSeed(analogRead(1) - analogRead(2) + analogRead(5));  //
+  randomSeed(analogRead(1) - analogRead(2) + analogRead(5));
 #endif
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
@@ -702,14 +730,20 @@ void newpattern()//generates all the randomness for each new pattern
   pattern = local_pattern;
 #endif
   if (new_pattern) pattern = new_pattern;
-  // Skip missing pattern
+  // Skip missing patterns
   if ( pattern > 26 && pattern < 54) pattern = 54;
   if ( pattern == 64) pattern = 65;
+
+  matrix->clear(); // without clear, some pattern transitions via blending look weird
+#ifdef SHOW_PATTERN_NUM
+  if (pattern > 9)  print_width = 2;
+  if (pattern > 99) print_width = 3;
+#endif
 
   velo = 0; // random8()/2;
   nextsong = false;
 
-  matrix->clear(); // without clear, some pattern transitions via blending look weird
+
   targetfps = random(slowest, fastest);
   bfade = random(0, 9);
   wind = random(70) ;
@@ -761,43 +795,52 @@ void whatami()// set some parameters specific to the pattern and send some data 
   switch (pattern)
   {
     case 0:
-      Serial.print("Dhole ");//label
-      adjunct = random(2, 5); //specify the screen effect as 2 which in this case means HorizontalMirror()  followed by VerticalMirror()  if not specified, it will be what ever was assigned randomly for this pattern
+      Serial.print("Dhole "); //label
+      //specify the screen effect as 2 which in this case means
+      // HorizontalMirror() followed by VerticalMirror() if not specified,
+      // it will be what ever was assigned randomly for this pattern
+      adjunct = random(2, 5);
       break;
+
     case 1:
       Serial.print("Inca ");
       adjunct = random(2, 5);
-      if (!flop[3] && !flop[4])
-        fancy = 0;
+      if (!flop[3] && !flop[4]) fancy = 0;
       break;
+
     case 2:
       Serial.print("Ringo ");
       fancy = random(10);
       break;
+
     case 3:
       Serial.print("Diag ");
       targetfps = 40;
       break;
+
     case 4:
       Serial.print("Rhole ");
       targetfps = 40;
       break;
+
     case 5:
       Serial.print("Drft ");
       targetfps = 40;
       break;
+
     case 6:
       adjunct = 0;
       bfade = 99;
       Serial.print("DRIP ");
       wind = 0;
-
       fancy = 0;
       break;
+
     case 7:
       Serial.print("Volc ");
       targetfps = 40;
       break;
+
     case 8:
       Serial.print("Pym ");
       targetfps = 80;
@@ -806,6 +849,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       slowme = false;
       adjunct = random (2, 6);
       break;
+
     case 9:
       Serial.print("Pyms ");
       if (flop[1]) steper = steper * 2;
@@ -815,6 +859,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       adjunct = random (2, 5);
       if (flop[4] || flop[5]) adjunct = 4;
       break;
+
     case 10:
       //  driftx = MIDLX;//pin the animation to the center
       //  drifty = MIDLY;
@@ -823,11 +868,13 @@ void whatami()// set some parameters specific to the pattern and send some data 
       shifty = 1;
       adjunct = random (1, 8);
       break;
+
     case 11:
       adjunct = 0;
       targetfps = random(10, 40);
       Serial.print("Wt warp ");
       break;
+
     case 12:
       Serial.print("Fzy ");
       bfade = 0;
@@ -835,6 +882,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       fancy = 0;
       slowme = false;
       break;
+
     case 13:
       bfade = 1;
       //adjunct = 0;
@@ -843,36 +891,43 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = random(11);
       targetfps = random (5, 15);
       break;
+
     case 14:
       adjunct = 0;
       fancy = 0;
       targetfps = random (25, 55);
       Serial.print("spire2 ");
       break;
+
     case 15:
       Serial.print("streaker ");
       adjunct = 0;
       break;
+
     case 16:
       Serial.print("fireball ringer ");
       adjunct = 0;
       bfade = constrain(bfade, 1, 3);
       targetfps = 15;
       break;
+
     case 17:
       Serial.print("Warp ");
       adjunct = 0;
       targetfps = 15;
       break;
+
     case 18:
       adjunct = 0;
       Serial.print("Siny ");
       break;
+
     case 19:
       //adjunct = 0;
       Serial.print("Sinx ");
       targetfps = 20;
       break;
+
     case 20:
       adjunct = 0;
       Serial.print("triple ");
@@ -880,6 +935,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       bfade = random(3, 6);
       //  dot = 1;
       break;
+
     case 21:
       bfade = 2;
       if (flop[4]) bfade = 100;
@@ -887,11 +943,13 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("spire3 ");
       targetfps = 20;
       break;
+
     case 22:
       adjunct = 5;
       steper = mstep;
       Serial.print("BarG mirror");
       break;
+
     case 23:
       if (flop[5])
         afancy = 25;
@@ -899,6 +957,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = 5;
       bfade = 1;
       break;
+
     case 24:
       if  (flop[0])
       {
@@ -915,12 +974,15 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("barg V mirror ");
       steper = mstep;
       break;
+
       break;
+
     case 25:
       Serial.print("spire ");
       adjunct = 0;
       targetfps = 40;
       break;
+
     case 26:
       //adjunct = 0;
       //fancy = 0;
@@ -937,7 +999,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
 
-
     //======================================
 
     case 54:
@@ -946,6 +1007,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random (15, 20);
       bfade = random(3);
       break;
+
     case 55:
       Serial.print("seasick 2");
       bfade = 1;
@@ -953,27 +1015,32 @@ void whatami()// set some parameters specific to the pattern and send some data 
       fancy = 0;
       wind = 0;
       break;
+
     case 56:
       Serial.print("bounce ");
       fancy = random(1, 28);//more likely
       if (flop[4])afancy = 25;
       break;
+
     case 57:
       Serial.print("bounce adj ");
       adjunct = random(3, 12);
       fancy = random(1, 28);//more likely than not
       break;
+
     case 58:
       Serial.print("whitewarp ");
       //  adjunct = 0;
       fancy = random(1, 17);
       targetfps = random (15, 40) ;
       break;
+
     case 59:
       Serial.print("fireball ");
       adjunct = 0;
       fancy = random(1, 17);
       break;
+
     case 60:
       targetfps = random (25, 38);
       adjunct = random(3, 11);
@@ -986,17 +1053,19 @@ void whatami()// set some parameters specific to the pattern and send some data 
         bfade = random(3, 8);
       }
       break;
+
     case 61:
       targetfps = random (16, 25);
       Serial.print("warp, effects and wind");
-
       fancy = random(1, 23);
       wind = random(1, 11);
       break;
+
     case 62:
       targetfps = random(15, 25);
       fancy = random(1, 17);
       break;
+
     case 63:
       bfade = 100;
       wind = random(1, 11);
@@ -1024,6 +1093,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       //  fancy = 0;
       Serial.print("hypnoduck 2");
       break;
+
     case 68:
       targetfps = random (15, 35);
       // adjunct = 0;
@@ -1034,38 +1104,45 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 69:
       targetfps = random (13, 25);
       Serial.print("drops with effects ");
-
       fancy = random(1, 17);
       break;
+
     case 70:
       Serial.print("spin2 ");
       //targetfps = random (5, 15);
-    break; case 71:
+    break;
+ case 71:
       Serial.print("xspin ");
       //targetfps = random (5, 15);
       break;
+
     case 72:
       Serial.print("homer ");
       targetfps = random (15, 25);
       break;
+
     case 73:
       Serial.print("homer egg ");
       targetfps = random (15, 25);
       wind = 0;
       break;
+
     case 74:
       Serial.print("fireball w/ eff ");
       // targetfps = random (5, 15);
       break;
+
     case 75:
       Serial.print("seasick");
       bfade = random(3);
       targetfps = 60;
       break;
+
     case 76:
       targetfps = random(5, 12);
       bfade = random(6, 9);
       break;
+
     case 77:
       Serial.print("whtwarp ");
       targetfps = random(8, 25);
@@ -1084,10 +1161,12 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(30, 30);
       wind = 0;
       break;
+
     case 80:
       Serial.print("starz ");
       targetfps = random(15, 30);
       break;
+
     case 81:
       Serial.print("starz2 ");
       targetfps = random(15, 30);
@@ -1100,11 +1179,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = 0;
       fancy = 0;
       bfade = random (6, 9); //color fade
-
       break;
+
     case 83:
-      if (flop[4] || flop[5])
-        adjunct = 9;
+      if (flop[4] || flop[5]) adjunct = 9;
       Serial.print("circlearc ");
       fancy = fancy / 2;
       targetfps = random(15, 35);
@@ -1115,13 +1193,14 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(10, 20);
       if (flop[6]) afancy = random(20, 30);
       break;
+
     case 85:
       Serial.print("wheelz ");
       targetfps = random(15, 25);
       break;
+
     case 86:
       Serial.print("starbounce ");
-
       bfade = random(2, 6);
       if (flop[4]) afancy = random (25, 28);
       break;
@@ -1145,18 +1224,16 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(9, 20);
       bfade = random(2, 6);
       Serial.print("swirl4a ");
-      if (flop[4] || flop[5] || flop[6])
-        wind = 0;
+      if (flop[4] || flop[5] || flop[6]) wind = 0;
       fancy = 0;
-      if (flop[7] || flop[8])
-        slowme = false;
+      if (flop[7] || flop[8]) slowme = false;
       break;
+
     case 91:
       Serial.print("just fancy");
       fancy = random(1, 17);
       targetfps = random(15, 25);
       break;
-
 
     case 92:
       targetfps = 10;
@@ -1165,9 +1242,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
       adjunct = 0;
       Serial.print("DRIP2 ");
       fancy = 0;
-
-
       break;
+
     case 93:
       bfade = random (1, 6);
       adjunct = 0;
@@ -1176,6 +1252,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = 0;
       targetfps = random (5, 15);
       break;
+
     case 94:
       Serial.print("swirl3");
       bfade = random (2, 6);
@@ -1200,8 +1277,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
     case 97:
       wind = 0;
-      if (flop[7])
-        bfade = 1;
+      if (flop[7]) bfade = 1;
       targetfps = random(15, 25);
       Serial.print("xspin");
       break;
@@ -1230,32 +1306,33 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("conf4 warp");
       targetfps = random(10, 25);
       break;
+
     case 102:
       Serial.print("seasick4");
-
       break;
+
     case 103:
       Serial.print("hypnoduck3");
       break;
 
-
     case 104:
       Serial.print("circlearc");
-
       break;
+
     case 105:
       wind = 0;
       Serial.print("hypnoduck4");
       targetfps = random(20, 42);
       break;
+
     case 106:
       Serial.print("circlearc");
       targetfps = random (20, 40);
       adjunct = 3;
       fancy = 0;
       wind = 3;
-
       break;
+
     case 107:
       Serial.print("floaty star, Rmag, bkstar");
       fancy = random(6, 9);//avoid bk-starer
@@ -1272,31 +1349,35 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("xspin, warp");
       //targetfps = random(15, 30);
       break;
+
     case 110:
       Serial.print("bubbles ");
       targetfps = random(15, 35);
       bfade = 10;//lots
       fancy = 0;
       break;
+
     case 111:
       Serial.print("bubbles2 ");
       targetfps = random(15, 44);
       bfade = 10;//lots
       fancy = 0;
       break;
+
     case 112:
       Serial.print("seasick5 ");
       targetfps = random(14, 30);
       bfade = random(3);
       fancy = 0;
-      if (wind < 9)
-        wind = 3;
+      if (wind < 9) wind = 3;
       break;
+
     case 113:
       Serial.print("homer3 ");
       targetfps = random(25, 40);
       bfade = random(2, 4);
       break;
+
     case 114:
       Serial.print("drops with wind ");
       targetfps = random(20, 30);
@@ -1312,23 +1393,25 @@ void whatami()// set some parameters specific to the pattern and send some data 
       fancy = 0;
       wind = 0;
       break;
+
     case 116:
       Serial.print("fireball - tri ");
       targetfps = random(40, 60);
       bfade = 4;
       break;
+
     case 117:
       Serial.print("streaker triangle  ");
       wind = 0;
       targetfps = random(10, 50);
       //bfade = 4;
       break;
+
     case 118:
       Serial.print("drops ");
       targetfps = random(9, 30);
       bfade = random (1, 3);
-      if (flop[0] || flop[1])
-        wind = 0;
+      if (flop[0] || flop[1]) wind = 0;
       fancy = 0;
       break;
 
@@ -1336,9 +1419,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("spin2 ");
       targetfps = random(9, 30);
       bfade = random (1, 3);
-      if ( flop[0])wind = 8;
-      else
-        wind = 9;
+      if ( flop[0]) wind = 8; else wind = 9;
       break;
 
     case 120:
@@ -1347,7 +1428,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       bfade = random (0, 4);
       wind = random(2, 5);
       adjunct = 11 ;
-
       fancy = 0;
       break;
 
@@ -1357,7 +1437,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       bfade = random (3, 6);
       wind = random(2, 5);
       adjunct = 11 ;
-
       fancy = 0;
       break;
 
@@ -1365,13 +1444,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("round dr0ps ");
       targetfps = random(25, 38);
       bfade = random (2, 5);
-      if (flop[0] && flop[1])
-        wind = 6;
-      else if (flop[2])
-        wind = 3;
-      else wind = 0;
+      if (flop[0] && flop[1]) wind = 6; else if (flop[2]) wind = 3; else wind = 0;
       adjunct = 0;
-
       fancy = 0;
       break;
 
@@ -1400,19 +1474,21 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = 0;
       Serial.print("whitewarp fireworks");
       break;
+
     case 127:
       Serial.print("seasick 3");
       targetfps = 60;
       bfade = 1;
       break;
+
     case 128:
       Serial.print("magictime");
       targetfps = 15;
       bfade = 2;
       fancy = random(1, 17);
       break;
-    case 129:
 
+    case 129:
       Serial.print("a pat: cube");
       item = 2;
       Serial.print(item);
@@ -1421,18 +1497,14 @@ void whatami()// set some parameters specific to the pattern and send some data 
       afancy = 28;
       wind = 0;
       adjunct = 0;
-
       break;
 
     case 130:
       Serial.print("spin2 ");
       Serial.print("triforce ");
-
       targetfps = random(9, 30);
       afancy = 28;
-      if ( flop[0])wind = 8;
-      else
-        wind = 9;
+      if ( flop[0]) wind = 8; else wind = 9;
       break;
 
     case 131:
@@ -1440,41 +1512,35 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(20, 60);
       bfade = 101;
       break;
+
     case 132:
       Serial.print("spiral moving");
       targetfps = random(20, 60);
       adjunct = random8();
       wind = 0;
       fancy = random8()/2;
-
       break;
-
 
     case 133:
       Serial.print("spiral2 fixed");
       targetfps = random(10 - 24);
-      if (flop[3])
-        adjunct = random8() / 2;
+      if (flop[3]) adjunct = random8() / 2;
       wind = wind * 2 + 1;
       fancy = random8()/2;
-
-
       break;
+
     case 134:
       Serial.print("spiral fixed");
       targetfps = random(10 - 34);
-      if (flop[3])
-        adjunct = random8() / 2;
+      if (flop[3]) adjunct = random8() / 2;
       wind = wind * 2 + 1;
-      if (flop[6])
-        fancy = 0;
+      if (flop[6]) fancy = 0;
       bfade = 2;
-
       break;
+
     case 135:
       Serial.print("spiral2 moving");
       targetfps = random(10 - 34);
-
       wind = wind * 2 + 1;
       fancy = random8()/2;
       break;
@@ -1490,7 +1556,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       flop[2] = true;
       break;
 
-
     case 139:
       Serial.print("spiral3 fixed");
       targetfps = random(8 - 24);
@@ -1498,8 +1563,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = wind * 2 + 1;
       fancy = random8()/2;
       afancy = random8();
-
-
       break;
 
     case 140:
@@ -1513,7 +1576,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       flop[2] = true;
       break;
 
-
     case 141:
       Serial.print("snow 128");
       dwell = 1 * dwell;
@@ -1525,27 +1587,21 @@ void whatami()// set some parameters specific to the pattern and send some data 
       slowme = false;//no slowmo.
       break;
 
-
     case 142:
       Serial.print("Crazy Snow");
       dwell = 1 * dwell;
-
       bfade = 0;
-
       // adjunct = 0;
       fancy = 0;
       wind = 0;
       targetfps = random(fastest, 3 * fastest);
       slowme = false;//no slowmo.
-
       break;
 
     case 143:
       Serial.print("bouncer");
       // dwell = 1.5 * dwell;
-
       bfade = random(2, 5);
-
       //adjunct = 0;
       fancy = 0;
       wind = 0;
@@ -1558,19 +1614,13 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("bouncer delux");
       dwell = 1.5 * dwell;
       bfade = 2;
-
-      if (flop[2])
-        directn = 0;
-      else
-        directn = 1;
+      if (flop[2]) directn = 0; else directn = 1;
       adjunct = 0;
       fancy = 0;
       wind = 0;
       targetfps = 60;
       slowme = false;//no slowmo.
       break;
-
-
 
     case 145:
       Serial.print("bouncer tri");
@@ -1581,10 +1631,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = 0;
       targetfps = 60;
       slowme = false;//no slowmo.
-      if ( flop[0])
-        directn = 0;
-      else
-        directn = 1;
+      if ( flop[0]) directn = 0; else directn = 1;
       break;
 
     case 146:
@@ -1609,52 +1656,35 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(6, 20);
       bfade = random(2, 6);
       Serial.print("swirl4 ");
-      if (flop[4] || flop[5] || flop[6])
-        wind = 0;
+      if (flop[4] || flop[5] || flop[6]) wind = 0;
       fancy = 0;
       slowme = false;
       break;
+
     case 149:
       targetfps = random(6, 30);
       bfade = 100;
-      if (flop[7] && flop[8])
-        bfade = 101;
+      if (flop[7] && flop[8]) bfade = 101;
       Serial.print("VORTEX ");
-      if (flop[7] || !flop[6]) {
-
-        wind = 0;
-      }
-
-      if (flop[1] || !flop[8]) {
-        adjunct = 0;
-
-      }
+      if (flop[7] || !flop[6]) wind = 0;
+      if (flop[1] || !flop[8]) adjunct = 0;
       fancy = 0;
       slowme = false;
-      if (flop[2] && flop[3] && flop[4])
-        slowme = true;
+      if (flop[2] && flop[3] && flop[4]) slowme = true;
       break;
 
     case 150:
       targetfps = random(20, 60);
       /*bfade = 0;
-        if (flop[7] && flop[8])
-        bfade = 101;*/
+        if (flop[7] && flop[8]) bfade = 101;*/
       Serial.print("Fire  ");
-      if (!flop[7] || flop[6]) {
-
-        wind = 0;
-      }
-
-      if (flop[1] || !flop[8]) {
-        adjunct = 0;
-
-      }
+      if (!flop[7] || flop[6]) wind = 0;
+      if (flop[1] || !flop[8]) adjunct = 0;
       fancy = 0;
       slowme = false;
-      if (flop[2] && flop[3] && flop[4])
-        slowme = true;
+      if (flop[2] && flop[3] && flop[4]) slowme = true;
       break;
+
     case 151:
       Serial.print("tinybubbles3");
       //slowme = false;
@@ -1671,8 +1701,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       flop[2] = true;
       break;
 
-
-
     case 155:
       bfade = 99;
       fancy = 0;
@@ -1680,6 +1708,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(10, 40);
       Serial.print("star bubbles");
       break;
+
     case 156:
       bfade = 99;
       fancy = 0;
@@ -1694,38 +1723,26 @@ void whatami()// set some parameters specific to the pattern and send some data 
       slowme = false;//no slowmo.
       Serial.print("tuber ");
       fancy = random(15);
-      if (random8() > 128)
-        adjunct = 5;
+      if (random8() > 128) adjunct = 5;
       bfade = random(108, 111);
       break;
 
     case 159:
       targetfps = random(6, 30);
       bfade = 100;
-      if (flop[7] && flop[8])
-        bfade = 101;
+      if (flop[7] && flop[8]) bfade = 101;
       Serial.print("VORTEX ");
-      if (flop[7] || !flop[6]) {
-
-        wind = 0;
-      }
+      if (flop[7] || !flop[6]) wind = 0;
       afancy = 1;
-      if (flop[1] || !flop[8]) {
-        afancy = 2;
-
-      }
+      if (flop[1] || !flop[8]) afancy = 2;
       fancy = 0;
       slowme = false;
-      if (flop[2] && flop[3] && flop[4])
-        slowme = true;
+      if (flop[2] && flop[3] && flop[4]) slowme = true;
       break;
-
-
 
     case 160:
       Serial.print("a pat: ");
       item = 1;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1737,6 +1754,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       afancy = 25;
       break;
+
     case 161:
       Serial.print("a pat: cube");
       item = 2;
@@ -1751,8 +1769,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
         bfade = 0;
         fancy = 0;
       }
-
       break;
+
     case 162:
       Serial.print("a pat: ");
       item = 4;
@@ -1768,8 +1786,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
         bfade = 1;
         fancy = 0;
       }
-
       break;
+
     case 163:
       Serial.print("a pat: ");
       item = 5;
@@ -1785,6 +1803,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
         fancy = 0;
       }
       break;
+
     case 164:
       Serial.print("a pat: ");
       item = 12;
@@ -1792,18 +1811,16 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print(item);
       patternz = items[item];
       patternz->start();
-
-
       if ( flop[3] || flop[4]) {
         wind = 0;
         bfade = 1;
         afancy = 26;
       }
       break;
+
     case 165:
       Serial.print("a pat: ");
       item = 3;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1818,7 +1835,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 166:
       Serial.print("a pat: ");
       item = 6;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1834,7 +1850,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 167:
       Serial.print("a pat: ");
       item = 7;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1849,7 +1864,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 168:
       Serial.print("a pat: ");
       item = 8;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1864,7 +1878,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 169:
       Serial.print("a pat: ");
       item = 9;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1879,7 +1892,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 170:
       Serial.print("a pat: ");
       item = 10;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1890,10 +1902,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
         afancy = 26;
       }
       break;
+
     case 171:
       Serial.print("a pat: cube");
       item = 2;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1904,10 +1916,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
         fancy = 0;
       };
       break;
+
     case 172:
       Serial.print("a pat: ");
       item = 0;
-
       Serial.print(item);
       patternz = items[item];
       patternz->start();
@@ -1918,13 +1930,15 @@ void whatami()// set some parameters specific to the pattern and send some data 
         fancy = 0;
       };
       break;
+
     /*case 173:
       Serial.print("Koi");
       fancy = 0;
       bfade = 101;
       slowme = false;
       targetfps = 2;
-      break;*/
+      break;
+*/
     case 174:
       Serial.print("174");
       if (flop[9] || flop[2]) {
@@ -1933,12 +1947,14 @@ void whatami()// set some parameters specific to the pattern and send some data 
         bfade = 3;
         slowme = true;//no slowmo.
       }
-
       break;
+
     default:
       Serial.print("D-fault");
       nextsong = true;
+#ifdef MIXIT_AFTER_FIRST_PASS
       mixit = true;//after  you get here the first time, it all gets random.
+#endif
       break;
   }
 
@@ -1981,72 +1997,70 @@ void whatami()// set some parameters specific to the pattern and send some data 
 }
 
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
+#ifdef SHOW_PATTERN_NUM
+  zeds.DrawFilledRectangle(0, 0, 6 * print_width - 1, 7, 0);
+#endif
   switch (pattern) {
     case 0:
       Diamondhole();
-
       adjustme();// apply the screenwide effect
       break;
+
     case 1:
       Inca(blender);
-
       zeds.QuadrantBottomTriangleMirror();
       break;
+
     case 2:
       Ringo();
-
-      if (flop[0])
-        zeds.QuadrantBottomTriangleMirror();
+      if (flop[0]) zeds.QuadrantBottomTriangleMirror();
       break;
+
     case 3:
       diagonally();
       adjustme();
       break;
+
     case 4:
       Roundhole();
-
       adjustme();
       break;
+
     case 5:
       drifter();
-
       adjustme();
       break;
+
     case 6:
       drip();
       break;
+
     case 7:
-      if (flop[2] || flop[1])
-        solid5();
+      if (flop[2] || flop[1]) solid5();
       volcano(255);
-
       adjustme();
       break;
+
     case 8:
-      if (flop[2] || flop[1])
-        solid5();
-      else
-        solid5();
+      if (flop[2] || flop[1]) solid5(); else solid5();
       pyrimid();
-
       adjustme();
       break;
+
     case 9:
       solidpyrimid();
       adjustme();
       break;
+
     case 10:
       corner();
       // driftx = MIDLX;
       //  drifty = MIDLY;
-
       adjustme();
       break;
 
     case 11:
       whitewarp();
-
-
       break;
 
     case 12:
@@ -2054,12 +2068,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 13:
-
       confetti();
       break;
 
     case 14:
-
       spire2();
       if (flop[0] && flop[1]) adjustme();
       break;
@@ -2067,35 +2079,33 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 15:
       streaker();
       break;
+
     case 16:
       fireball();
       ringer();
       break;
+
     case 17:
-
-
       warp();
-
       break;
-    case 18:
 
+    case 18:
       siny();
       if (flop[0] && flop[2]) adjustme();
       break;
+
     case 19:
       sinx();
       if (flop[0] && !flop[2]) adjustme();
       break;
+
     case 20:
-
       triple();
-      if ((flop[3] && flop[1]) || (flop[4] && flop[8]) )
-        adjustme();
+      if ((flop[3] && flop[1]) || (flop[4] && flop[8]) ) adjustme();
       break;
+
     case 21:
-
       spire3();
-
       twister();
       break;
 
@@ -2104,40 +2114,29 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       Bargraph();
       adjustme();
       break;
+
     case 23:
       roger();
       if (flop[6] && (flop[1] || !flop[2])) adjustme();
       break;
 
     case 24:
-      if (flop[4])
-        solid5();
+      if (flop[4]) solid5();
       Bargraph();
       break;
 
     case 25:
       spire();
-      if (flop[2])
-        adjustme();
+      if (flop[2]) adjustme();
       break;
 
     case 26:
       sinx();
-      if (flop[7] || flop[5] || !flop[2])
-        adjustme();
+      if (flop[7] || flop[5] || !flop[2]) adjustme();
       break;
 
-
-
-
-
-
-
     case 54:
-
-
       splat();
-
       break;
 
     case 55:
@@ -2145,10 +2144,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 56:
-
       bouncez();
-      if (flop[6 || flop[5]])
-        adjustme();
+      if (flop[6 || flop[5]]) adjustme();
       break;
 
     case 57:
@@ -2159,24 +2156,18 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 58:
       whitewarp();
       adjustme();
-      if (flop[1] && wind < 9)
-        twister();
+      if (flop[1] && wind < 9) twister();
       break;
-
 
     case 59:
       fireball();
-
       break;
 
     case 60:
-
-      if (flop[0] || flop[1] )
-        confetti4();
+      if (flop[0] || flop[1] ) confetti4();
       fireball();
       adjustme();
       break;
-
 
     case 61:
       EVERY_N_SECONDS(3 + 3 * dot) {
@@ -2185,79 +2176,60 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       }
       warp();
       adjustme();
-
       break;
 
     case 62:
       warp();
-      if (flop[2])
-        confetti4();
+      if (flop[2]) confetti4();
       adjustme();
-
       break;
 
     case 63:
       confetti();
       confetti4();
-
-      if (wind < 9)
-        twister();
-      if (flop[3])
-        adjustme();
+      if (wind < 9) twister();
+      if (flop[3]) adjustme();
       break;
 
     case 64:
       triple();
-      if (flop[4])
-        adjustme();
+      if (flop[4]) adjustme();
       break;
 
     case 65:
-      if (flop[3] && flop[4] && flop[2])
-        smile();
-      else if (flop[6] && flop[7] && flop[5])
-        smile4();
-      else if (flop[1] && flop[8] && flop[3])
-        smile3();
-      else
-        smile2();
+      if (flop[3] && flop[4] && flop[2]) smile();
+      else if (flop[6] && flop[7] && flop[5]) smile4();
+      else if (flop[1] && flop[8] && flop[3]) smile3();
+      else smile2();
       break;
 
     case 66:
       hypnoduck();
-      if (flop[8])
-        adjustme();
+      if (flop[8]) adjustme();
       break;
 
     case 67:
       hypnoduck2();
-
-      if (flop[9] && flop[3])
-        adjustme();
+      if (flop[9] && flop[3]) adjustme();
       break;
 
     case 68:
       roger();
       adjustme();
-
       break;
 
-
     case 69:
-
       drops();
       adjustme();
       break;
 
     case 70:
-
       spin2();
       if (!flop[0] && flop[1] && !flop[2]) adjustme();
       break;
 
     case 71:
       xspin();
-
       break;
 
     case 72:
@@ -2266,12 +2238,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 73:
       homer2();
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       break;
 
     case 74:
-
       fireball();
       adjustme();
       break;
@@ -2316,15 +2286,13 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 83:
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       circlearc();
       adjustme();
       break;
 
     case 84:
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       fireball();
       break;
 
@@ -2335,7 +2303,6 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 86:
       starbounce();
-
       adjustme();
       break;
 
@@ -2344,13 +2311,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 88:
-      if (!flop[2])
-        warp();
-
+      if (!flop[2]) warp();
       triforce();
-      if (flop[2])
-        adjustme();
-
+      if (flop[2]) adjustme();
       break;
 
     case 89:
@@ -2366,12 +2329,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       EVERY_N_SECONDS(10 + 3 * dot) {
         fancy = random(1, 22);
       }
-      if (flop[2] || flop[5])
-        adjustme();
+      if (flop[2] || flop[5]) adjustme();
       break;
 
     case 92:
-
       drip();
       mirror();
       break;
@@ -2385,14 +2346,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 95:
-
       drip();
       mirror();
       break;
 
     case 96:
       triangler();
-
       break;
 
     case 97:
@@ -2414,12 +2373,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       confetti2();
       break;
 
-
     case 101:
       confetti4();
-      if (flop[0] || flop[1] || flop[2])
-        warp();
-
+      if (flop[0] || flop[1] || flop[2]) warp();
       break;
 
     case 102:
@@ -2446,8 +2402,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 107:
       for (int16_t j = 1; j < MATRIX_WIDTH - 8; j++)//0
         drawstar(driftx, drifty, j, j / 2, 7, 2 * h, h + j * 4);
-      if (flop[0])
-        rmagictime();
+      if (flop[0]) rmagictime();
       bkstarer();
       adjustme();// hey long time no see....
       break;
@@ -2456,45 +2411,33 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 108:
       whitewarp();
       rmagictime();
-      if (flop[1] && flop[2] && wind < 9)
-        twister();
+      if (flop[1] && flop[2] && wind < 9) twister();
       break;
 
     case 109:
       warp();
       xspin();
-
-      if (flop[0] && !flop[5])
-        adjustme();
+      if (flop[0] && !flop[5]) adjustme();
       break;
 
     case 110:
-
       bubbles();
-
       break;
 
     case 111:
-
-
       bubbles2();
-
       break;
 
     case 112:
       seasick5();
-
       break;
-
 
     case 113:
       homer3();
-
       break;
 
     case 114:
       drops();
-
       break;
 
     case 115:
@@ -2502,11 +2445,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       drifty = yyy;
       streaker();
       hypnoduck();
-
       break;
 
     case 116:
-
       fireball();
       triangler();
       if (flop[5]) adjustme();
@@ -2517,13 +2458,9 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
         driftx = MIDLX;
         drifty = MIDLY;
       }
-      if (flop[5]) {
-
-        solid5();
-      }
+      if (flop[5]) solid5();
       streaker();
       drawtriangle();
-
       break;
 
     case 118:
@@ -2535,19 +2472,16 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       spin2();
       break;
 
-
     case 120:
       drops();
       twister();
-      if (flop[5])
-        adjustme();
+      if (flop[5]) adjustme();
       break;
 
     case 121:
       drips();
       twister();
       adjustme();
-
       break;
 
     case 122:
@@ -2559,17 +2493,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 123:
       if (flop[5]) {
         driftx = MIDLX;
-
         drifty = MIDLY;
       }
       if (flop [3]) {
-        if (flop[4])
-          volcano(55);
-        else
-          Inca(55);
+        if (flop[4]) volcano(55); else Inca(55);
       }
       tinybubbles2();
-
       break;
 
     case 124:
@@ -2577,59 +2506,43 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 125:
-
       tinybubbles2();
       adjustme();
       break;
 
-
     case 126:
       whitewarp();
       fireworks();
-      if (flop[6] && flop[7])
-        adjustme();
+      if (flop[6] && flop[7]) adjustme();
       break;
-
 
     case 127:
       seasick3();
       break;
 
     case 128:
-
       magictime();
       adjustme();
-      if (flop[2])confetti2();
-      else
-        warp();
-
+      if (flop[2]) confetti2(); else warp();
       break;
 
     case 129:
-
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
-
 
     case 130:
       whitewarp();
       spin2();
       triforce();
-      if (flop[2])
-        adjustme();
-
+      if (flop[2]) adjustme();
       break;
-
-
 
     case 131:
       seasickness();
       break;
 
     case 132:
-
       spiralz();
       adjustme();
       break;
@@ -2650,27 +2563,22 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 135:
 
       spiral2();// add a spiral
-      if (flop[7])
-        adjustme();
+      if (flop[7]) adjustme();
       break;
 
     case 136://i love this
       drifty = MIDLY;
       driftx = MIDLX;
-      if (flop[6])
-        solid5();
+      if (flop[6]) solid5();
       spire3();
       confetti2();
       twister();
       adjustme();
       break;
 
-
-
     case 139:
       spiral3();
-      if (flop[7])
-        adjustme();
+      if (flop[7]) adjustme();
       break;
 
     case 140:
@@ -2683,26 +2591,18 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       adjustme();
       break;
 
-
     case 141:
-      if (flop[2])
-        snow(138);
-      else
-        snow(random8());
+      if (flop[2]) snow(138); else snow(random8());
       break;
 
     case 142:
-      if (flop[2])
-        snow(blender);
-      else
-        snow(random8());
+      if (flop[2]) snow(blender); else snow(random8());
       adjustme();
       break;
 
     case 143:
       BouncingBalls(dot);
-      if (flop[6])
-        adjustme();
+      if (flop[6]) adjustme();
       break;
 
     case 144:
@@ -2710,14 +2610,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       BouncingBalls(12);
       break;
 
-
     case 145:
-      if (flop[5] && flop[7]) {
-
-        solid5();
-      }
-      else
-        Inca(64);
+      if (flop[5] && flop[7]) solid5(); else Inca(64);
       Bouncingtri(dot);
       break;
 
@@ -2752,16 +2646,11 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 152://i love this 136
-
       spire3();
       confetti2();
       twister();
       adjustme();
       break;
-
-
-
-
 
     case 155://123
       if (flop[5] && flop[7]) {
@@ -2769,27 +2658,19 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
         driftx = MIDLX;
         drifty = MIDLY;
       }
-
-      else
-        solid4();//black
+      else solid4();//black
       starbubbles88();
       break;
 
     case 156://123
       driftx = MIDLX;
       drifty = MIDLY;
-      if (flop[5] || flop[3]) {
-        solid5();
-      }
-      else
-        solid4();//black
+      if (flop[5] || flop[3]) solid5(); else solid4();//black
       squarebubbles();
       break;
 
-
     case 158:
-      if (flop[5])
-        solid5();
+      if (flop[5]) solid5();
       tuber();
       adjustme();
       break;
@@ -2800,75 +2681,75 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       adjustme();
       break;
 
-
     case 160:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 161:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 162:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 163:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 164:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 165:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 166:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 167:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 168:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 169:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 170:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 171:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     case 172:
       patternz->drawFrame();
-      if (flop[5] && flop[9])
-        adjustme();
+      if (flop[5] && flop[9]) adjustme();
       break;
+
     /*case 173:
       koi();
       break;*/
+
     case 174:
       if (flop[0] && flop[1] ) {
         confetti2();
@@ -2877,14 +2758,19 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       else {
         spiral2();
       }
-      if (flop[3] && flop[7])
-        adjustme();
+      if (flop[3] && flop[7]) adjustme();
       break;
+
     default:
       nextsong = true;
       matrix->clear();
       break;
   }
+#ifdef SHOW_PATTERN_NUM
+  zeds.DrawFilledRectangle(0, 0, 6 * print_width - 1, 7, 0);
+  matrix->setCursor(0, 0);
+  matrix->print(pattern);
+#endif
 }
 
 
@@ -6398,10 +6284,11 @@ void VORTEX() {
       }
     }
   }
-  if (flop[2])
+  // Fix division by 0 in counter % below
+  //if (flop[2])
     howmany = beatsin16(2, 1, how, 0);
-  else
-    howmany = beatsin16(2, 1, MATRIX_WIDTH, 0);
+  //else
+  //  howmany = beatsin16(2, 1, MATRIX_WIDTH, 0);
   for (int16_t i = 0 ; i < howmany; i++) {//draw all the drops
     //it is always your turn...
     if ( counter % fcount[i] == 0) {

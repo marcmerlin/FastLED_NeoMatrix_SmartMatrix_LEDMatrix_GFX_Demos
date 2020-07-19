@@ -8,7 +8,6 @@
 #define MIDLX               (MATRIX_WIDTH/2)
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           113// max number of patterns
-#define min(a,b) ((a)<(b)?(a):(b))
 
 
 // yes, I use a lot of global variables, likey some of these are redundant or not even used...
@@ -27,12 +26,12 @@ unsigned long lasttest, lastmillis, dwell = 5000,  longhammer;
 float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle;
 int16_t raad, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1;
 int16_t shifty = 6, pattern = 0, poffset;
-int16_t sinewidth, mstep, faudio[MATRIX_HEIGHT], inner, bfade = 6;
+int16_t sinewidth, mstep, faudio[MATRIX_WIDTH], inner, bfade = 6;
 int directn = 1, quash = 5;
 
 // This allows a selection of only my favourite patterns.
 // Comment this out to get all the patterns -- merlin
-//#define BESTPATTERNS
+#define BESTPATTERNS
 #ifdef BESTPATTERNS
 uint8_t bestpatterns[] = { 
 // 52 and 61 are almost the same
@@ -160,7 +159,6 @@ void setup()
   driftx = random8(4, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random8(4, MATRIX_HEIGHT - 4);// set an initial location for the animation center
   mstep = byte( 256 / min((MATRIX_WIDTH - 1), 255)); //mstep is the step size to distribute 256 over an array the width of the matrix
-
   steper = random8(2, 8);// steper is used to modify h to generate a color step on each move
   lastmillis = millis();
   lasttest = millis();
