@@ -120,6 +120,96 @@ uint32_t tft_spi_speed;
 
 
 //============================================================================
+// Ok, if you're doing matrices of displays, there is also a reasonable chance
+// you'll be using SPIFFS or FATFS on flash, or an sdcard, so let's define it
+// here (NeoMatrix-FastLED-IR actually also uses this to read a config file)
+//============================================================================
+
+// control if we decode in 32x32 or 64x64, or something else
+#ifdef ESP8266
+#define gif_size 32
+#else
+#define gif_size 64
+#endif
+
+// Note, you can use an sdcard on ESP32 or ESP8266 if you really want,
+// but if your data fits in built in flash, why not use it?
+// Use built in flash via SPIFFS/FATFS
+// esp8266com/esp8266/libraries/SD/src/File.cpp
+// ESP8266: http://esp8266.github.io/Arduino/versions/2.3.0/doc/filesystem.html#uploading-files-to-file-system
+// ESP32: https://github.com/me-no-dev/arduino-esp32fs-plugin
+// https://github.com/marcmerlin/esp32_fatfsimage/blob/master/README.md
+#if defined(ESP8266)
+    #include <FS.h>
+    #define FSO SPIFFS
+    #if gif_size == 64
+        #define GIF_DIRECTORY "/gifs64/"
+    #else
+        #define GIF_DIRECTORY "/gifs/"
+    #endif
+    extern "C" {
+        #include "user_interface.h"
+    }
+#elif defined(ESP32)
+    //#include <SPIFFS.h>
+    //#define FSO SPIFFS
+    #include "FFat.h"
+    #define FSO FFat
+    #define FSOFAT
+    // Do NOT add a trailing slash, or things will fail
+    #if gif_size == 64
+        #define GIF_DIRECTORY "/gifs64"
+    #else
+        #define GIF_DIRECTORY "/gifs"
+    #endif
+#elif defined(ARDUINOONPC)
+    #include <SPIFFS.h>
+    #define FSO SPIFFS
+    // Do NOT add a trailing slash, or things will fail
+    #if gif_size == 64
+        #define GIF_DIRECTORY "/gifs64"
+    #else
+        #define GIF_DIRECTORY "/gifs"
+    #endif
+#else
+    #define FSO SD
+    #define FSOSD
+    #if defined (ARDUINO)
+    #include <SD.h>
+    #elif defined (SPARK)
+    #include "sd-card-library-photon-compat/sd-card-library-photon-compat.h"
+    #endif
+    // Chip select for SD card on the SmartMatrix Shield or Photon
+    // Teensy 3.5/3.6
+    #if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+        #define SD_CS BUILTIN_SDCARD
+    #elif defined(ESP32)
+        #define SD_CS 5
+    #elif defined (ARDUINO)
+        #define SD_CS 15
+        //#define SD_CS BUILTIN_SDCARD
+    #elif defined (SPARK)
+        #define SD_CS SS
+    #endif
+    
+    #if defined(ESP32)
+        // ESP32 SD Library can't handle a trailing slash in the directory name
+        #if gif_size == 64
+            #define GIF_DIRECTORY "/gifs64"
+        #else
+            #define GIF_DIRECTORY "/gifs"
+        #endif
+    #else
+        // Teensy SD Library requires a trailing slash in the directory name
+        #if gif_size == 64
+            #define GIF_DIRECTORY "/gifs64/"
+        #else
+            #define GIF_DIRECTORY "/gifs/"
+        #endif
+    #endif
+#endif
+
+//============================================================================
 // Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
 // You should #define one and only one of them and if you need to edit it,
 // edit both the block below and the 2nd block in setup() at the bottom of this file
