@@ -33,13 +33,16 @@
 
 // This allows a selection of only my favourite patterns.
 // Comment this out to get all the patterns -- merlin
-//#define BESTPATTERNS
+#define BESTPATTERNS
 #ifdef BESTPATTERNS
 // 82 and 89 are similar     55 and 102 are similar
 uint8_t bestpatterns[] = {
-   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
-   4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
-   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
+//   3, 8, 14, 17, 26, 55, 58, 59, 61, 69, 72, 82, 102, 109, 111, 132,
+//   4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
+//   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
+
+2, 3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 69, 79, 81, 82, 84, 86, 87, 89, 90, 91, 94, 96, 98, 99, 100, 102, 103, 104, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 123, 124, 126, 130, 131, 132, 134, 139, 141, 144, 147, 148, 149, 151, 158, 159, 163, 164, 166, 174
+//3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 79, 81, 82, 84, 86, 87, 89, 90, 91, 94, 96, 98, 99, 100, 102, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 123, 124, 126, 130, 131, 139, 141, 144, 147, 148, 149, 151, 158, 159, 163, 164, 166, 174
 };
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
@@ -165,7 +168,7 @@ float Heighty[BallCount], ImpactVelocityStart = sqrt( -2 * Gravity * StartHeight
 long  ClockTimeSinceLastBounce[BallCount];
 
 #ifdef SHOW_PATTERN_NUM
-uint8_t print_width = 1;
+uint8_t print_width;
 #endif
 
 // Arduino gcc may allow referencing functions before they are defined,
@@ -736,6 +739,7 @@ void newpattern()//generates all the randomness for each new pattern
 
   matrix->clear(); // without clear, some pattern transitions via blending look weird
 #ifdef SHOW_PATTERN_NUM
+  print_width = 1;
   if (pattern > 9)  print_width = 2;
   if (pattern > 99) print_width = 3;
 #endif
