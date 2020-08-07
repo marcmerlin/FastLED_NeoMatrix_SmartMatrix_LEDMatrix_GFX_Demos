@@ -164,7 +164,7 @@ uint32_t tft_spi_speed;
         #define GIF_DIRECTORY "/gifs"
     #endif
 #elif defined(ARDUINOONPC)
-    #include <SPIFFS.h>
+    //#include <SPIFFS.h>
     #define FSO SPIFFS
     // Do NOT add a trailing slash, or things will fail
     #if gif_size == 64
