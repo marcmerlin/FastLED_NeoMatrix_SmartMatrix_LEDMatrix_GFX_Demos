@@ -41,8 +41,10 @@ uint8_t bestpatterns[] = {
 //   4, 10, 11, 25, 67, 70, 73, 77, 80, 86, 104, 105, 110,    // good in original tmed
 //   20, 89, 94, 101, 124, 128, 134, 143, 145, 155,// good but not picked for Neomatrix
 
-2, 3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 69, 79, 81, 82, 84, 86, 87, 89, 90, 91, 94, 96, 98, 99, 100, 102, 103, 104, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 123, 124, 126, 130, 131, 132, 134, 139, 141, 144, 147, 148, 149, 151, 158, 159, 163, 164, 166, 174
-//3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 79, 81, 82, 84, 86, 87, 89, 90, 91, 94, 96, 98, 99, 100, 102, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 123, 124, 126, 130, 131, 139, 141, 144, 147, 148, 149, 151, 158, 159, 163, 164, 166, 174
+//, 3, 8, 10, 11, 14, 17, 20, 25, 26, 55, 58, 59, 61, 67, 69, 70, 72, 73, 77, 80, 82, 86, 89, 94, 101, 102, 104, 105, 109, 110, 111, 124, 128, 132, 134, 143, 145, 155, 
+
+// Selection for picture frame:
+3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 26, 55, 58, 59, 61, 67, 69, 70, 72, 73, 77, 79, 80, 81, 82, 84, 86, 87, 89, 90, 94, 96, 98, 99, 101, 102, 103, 104, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 123, 124, 126, 128, 130, 131, 132, 134, 139, 141, 144, 147, 148, 149, 151, 155, 158, 159, 163, 166, 174
 };
 #define numbest           sizeof(bestpatterns)
 #define lastpatindex numbest
@@ -51,18 +53,18 @@ uint8_t bestpatterns[] = {
 #endif
 
 // very nice rain going sideways
+// Case: 60  fireball with horizontal mirror
+// Case: 66  hypnoduck
 // Case: 69  drops with effects , Adjunct 3 wind: 56 fancy: 14 afancy: 9 fader: 2Flop-0:  1, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  0,
 // Case: 79  stars3,
-//  Case: 142  Crazy Snow, ?
-//  Case: 60  fireball with horizontal mirror
+// Case: 92  DRIP2 ,
 // Case: 99  , Adjunct 8
 // Case: 104  circlearc
-// Case: 66  hypnoduck
-//  Case: 149  VORTEX but only with wide circles and faster speed
-//  Case: 60  fireball,
-//  Case: 114  drops with wind , Adjunct 5
-//  Case: 92  DRIP2 ,
-//  Case: 130 spin2 but consider removing the occasional fade
+// 105: make bigger spiral?
+// Case: 114  drops with wind , Adjunct 5
+// Case: 142  Crazy Snow, ?
+// Case: 149  VORTEX but only with wide circles and faster speed
+// Case: 130 spin2 but consider removing the occasional fade
 // --------------------------- Config End ----------------------------------
 
 
