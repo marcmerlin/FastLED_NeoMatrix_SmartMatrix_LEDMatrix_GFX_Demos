@@ -1031,7 +1031,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 128;
             defaults.chain_length = 4;
             defaults.parallel = 3;
-            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
