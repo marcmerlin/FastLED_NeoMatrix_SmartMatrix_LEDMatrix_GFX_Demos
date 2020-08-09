@@ -883,8 +883,13 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
     return NULL;
 }
 
-void matrix_setup(int reservemem = 40000) {
+void matrix_setup(bool initserial=true, int reservemem = 40000) {
     reservemem = reservemem; // squelch compiler warning if var is unused.
+    // It's bad to call Serial.begin twice, so it's disabled here now, make sure you have it enabled
+    // in your calling script.
+    Serial.begin(115200);
+    Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
+
     if (init_done) {
         Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
         return;
@@ -895,10 +900,6 @@ void matrix_setup(int reservemem = 40000) {
     #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
         delay(3000);
     #endif
-    // It's bad to call Serial.begin twice, so it's disabled here now, make sure you have it enabled
-    // in your calling script.
-    //Serial.begin(115200);
-    Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
     show_free_mem("Memory after setup() starts");
     
     // Smartmatrix defines the framebuffers itself. Other methods make their own allocation here  
