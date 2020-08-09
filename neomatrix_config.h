@@ -846,8 +846,7 @@ void show_free_mem(const char *pre=NULL) {
 
 void die(const char *mesg) {
     Serial.println(mesg);
-    while(1) delay((int32_t)1); // while 1 loop only triggers watchdog on ESP chips
-    
+    while(1) delay((uint32_t)1); // while 1 loop only triggers watchdog on ESP chips
 }
 
 void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
