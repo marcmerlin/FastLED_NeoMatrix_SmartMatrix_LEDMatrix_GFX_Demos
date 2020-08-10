@@ -140,18 +140,20 @@ uint32_t tft_spi_speed;
 // ESP32: https://github.com/me-no-dev/arduino-esp32fs-plugin
 // https://github.com/marcmerlin/esp32_fatfsimage/blob/master/README.md
 #if defined(ESP8266)
+    #define FS_PREFIX ""
     #include <FS.h>
     #define FSO SPIFFS
     #define FSOSPIFFS
     #if gif_size == 64
-        #define GIF_DIRECTORY "/gifs64/"
+        #define GIF_DIRECTORY FS_PREFIX "/gifs64/"
     #else
-        #define GIF_DIRECTORY "/gifs/"
+        #define GIF_DIRECTORY FS_PREFIX "/gifs/"
     #endif
     extern "C" {
         #include "user_interface.h"
     }
 #elif defined(ESP32)
+    #define FS_PREFIX ""
     //#include <SPIFFS.h>
     //#define FSO SPIFFS
     #include "FFat.h"
@@ -159,26 +161,18 @@ uint32_t tft_spi_speed;
     #define FSOFAT
     // Do NOT add a trailing slash, or things will fail
     #if gif_size == 64
-        #define GIF_DIRECTORY "/gifs64"
+        #define GIF_DIRECTORY FS_PREFIX "/gifs64"
     #else
-        #define GIF_DIRECTORY "/gifs"
+        #define GIF_DIRECTORY FS_PREFIX "/gifs"
     #endif
 #elif defined(ARDUINOONPC)
-    //#include <SPIFFS.h>
-    #define FSO SPIFFS
-    // Do NOT add a trailing slash, or things will fail
-    #if gif_size == 64
-        #define GIF_DIRECTORY "/gifs64"
-    #else
-        #define GIF_DIRECTORY "/gifs"
-    #endif
+    #define FS_PREFIX "/root/NM/"
 #else
+    #define FS_PREFIX ""
     #define FSO SD
     #define FSOSD
     #if defined (ARDUINO)
     #include <SD.h>
-    #elif defined (SPARK)
-    #include "sd-card-library-photon-compat/sd-card-library-photon-compat.h"
     #endif
     // Chip select for SD card on the SmartMatrix Shield or Photon
     // Teensy 3.5/3.6
@@ -193,20 +187,11 @@ uint32_t tft_spi_speed;
         #define SD_CS SS
     #endif
     
-    #if defined(ESP32)
-        // ESP32 SD Library can't handle a trailing slash in the directory name
-        #if gif_size == 64
-            #define GIF_DIRECTORY "/gifs64"
-        #else
-            #define GIF_DIRECTORY "/gifs"
-        #endif
+    // Teensy SD Library requires a trailing slash in the directory name
+    #if gif_size == 64
+        #define GIF_DIRECTORY FS_PREFIX "/gifs64/"
     #else
-        // Teensy SD Library requires a trailing slash in the directory name
-        #if gif_size == 64
-            #define GIF_DIRECTORY "/gifs64/"
-        #else
-            #define GIF_DIRECTORY "/gifs/"
-        #endif
+        #define GIF_DIRECTORY FS_PREFIX "/gifs/"
     #endif
 #endif
 
@@ -729,7 +714,7 @@ uint32_t tft_spi_speed;
 	const uint16_t MATRIX_TILE_WIDTH =  64; // width of EACH NEOPIXEL MATRIX (not total display)
 	const uint16_t MATRIX_TILE_HEIGHT=   1; // height of each matrix
     #else
-	const uint16_t MATRIX_TILE_WIDTH = 384; // width of EACH NEOPIXEL MATRIX (not total display)
+	const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
 	const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
