@@ -166,6 +166,7 @@ uint32_t tft_spi_speed;
         #define GIF_DIRECTORY FS_PREFIX "/gifs"
     #endif
 #elif defined(ARDUINOONPC)
+    #define UNIXFS
     #define FS_PREFIX "/root/NM/"
 #else
     #define FS_PREFIX ""
