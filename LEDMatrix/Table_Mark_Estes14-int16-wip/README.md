@@ -11,3 +11,5 @@ https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix/tree/master/exam
 since it allows setting any size you'd like in software.
 
 Edit neomatrix_config.h and under LINUX_RENDERER_SDL, set MATRIX_TILE_WIDTH/MATRIX_TILE_HEIGHT
+
+Video at 384x256 on top of an rPi: https://www.youtube.com/watch?v=PbuB-QE-WjQ
