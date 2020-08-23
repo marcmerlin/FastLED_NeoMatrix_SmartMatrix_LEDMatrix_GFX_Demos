@@ -44,7 +44,7 @@ uint8_t bestpatterns[] = {
 //, 3, 8, 10, 11, 14, 17, 20, 25, 26, 55, 58, 59, 61, 67, 69, 70, 72, 73, 77, 80, 82, 86, 89, 94, 101, 102, 104, 105, 109, 110, 111, 124, 128, 132, 134, 143, 145, 155, 
 
 // Selection for picture frame:
-3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 26, 55, 58, 59, 61, 67, 69, 70, 72, 73, 77, 79, 80, 81, 82, 84, 86, 87, 89, 90, 94, 96, 98, 99, 101, 102, 103, 104, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 123, 124, 126, 128, 130, 131, 132, 134, 139, 141, 144, 147, 148, 149, 151, 155, 158, 159, 
+3, 4, 7, 8, 10, 11, 12, 14, 16, 17, 18, 19, 20, 21, 25, 26, 55, 58, 59, 61, 67, 69, 70, 72, 73, 77, 79, 80, 81, 82, 84, 86, 87, 89, 90, 94, 96, 98, 99, 101, 102, 103, 104, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 119, 120, 121, 122, 124, 126, 128, 130, 131, 132, 134, 139, 141, 144, 147, 148, 149, 151, 155, 158, 159, 
 // bad hack to avoid patterns that crash at resolutions higher than 256
 // My RPI3 has a lower dispay and the RPI4 has a display that is too big
 #ifndef RPI4
@@ -56,20 +56,32 @@ uint8_t bestpatterns[] = {
 #else
 #define lastpatindex mpatterns
 #endif
-
 // very nice rain going sideways
 // Case: 60  fireball with horizontal mirror
 // Case: 66  hypnoduck
-// Case: 69  drops with effects , Adjunct 3 wind: 56 fancy: 14 afancy: 9 fader: 2Flop-0:  1, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  0,
 // Case: 79  stars3,
 // Case: 92  DRIP2 ,
 // Case: 99  , Adjunct 8
-// Case: 104  circlearc
 // 105: make bigger spiral?
+// Case: 104  circlearc
 // Case: 114  drops with wind , Adjunct 5
 // Case: 142  Crazy Snow, ?
 // Case: 149  VORTEX but only with wide circles and faster speed
 // Case: 130 spin2 but consider removing the occasional fade
+
+// Case: 17  Warp , Adjunct 0 wind: 23 fancy: 37 afancy: 171 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  0, Flop-3:  1, Flop-4:  1, Flop-5:  0, Flop-6:  1, Flop-7:  0, Flop-8:  1, Flop-9:  0,  => very bright
+// Case: 69  drops with effects , Adjunct 3 wind: 56 fancy: 14 afancy: 9 fader: 2Flop-0:  1, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  0,
+// Case: 73  homer egg , Adjunct 30 wind: 0 fancy: 65 afancy: 167 fader: 0Flop-0:  0, Flop-1:  0, Flop-2:  0, Flop-3:  0, Flop-4:  0, Flop-5:  0, Flop-6:  1, Flop-7:  1, Flop-8:  0, Flop-9:  0,  => too bright
+// Case: 89  swirl, Adjunct 30 wind: 0 fancy: 9 afancy: 197 fader: 0Flop-0:  1, Flop-1:  0, Flop-2:  1, Flop-3:  1, Flop-4:  0, Flop-5:  1, Flop-6:  0, Flop-7:  1, Flop-8:  1, Flop-9:  1,  => too bright
+// Case: 101  conf4 warp, Adjunct 31 wind: 11 fancy: 39 afancy: 71 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  0, Flop-3:  1, Flop-4:  0, Flop-5:  1, Flop-6:  0, Flop-7:  1, Flop-8:  1, Flop-9:  1,  ==> all white
+// Case: 102  seasick4, Adjunct 17 wind: 44 fancy: 26 afancy: 150 fader: 0Flop-0:  1, Flop-1:  0, Flop-2:  1, Flop-3:  0, Flop-4:  0, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  0, Flop-9:  0,  => all white
+// Case: 109  xspin, warp, Adjunct 14 wind: 16 fancy: 69 afancy: 181 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  1, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  1, Flop-9:  1,  => too bright
+// Case: 126  whitewarp fireworks, Adjunct 1 wind: 0 fancy: 0 afancy: 155 fader: 0Flop-0:  1, Flop-1:  1, Flop-2:  1, Flop-3:  1, Flop-4:  0, Flop-5:  1, Flop-6:  1, Flop-7:  1, Flop-8:  1, Flop-9:  1,  => white
+// Case: 132  spiral moving, Adjunct 250 wind: 0 fancy: 46 afancy: 91 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  1, Flop-9:  1,  => all yellow many times
+// Case: 139  spiral3 fixed, Adjunct 13 wind: 9 fancy: 41 afancy: 121 fader: 0Flop-0:  1, Flop-1:  0, Flop-2:  1, Flop-3:  1, Flop-4:  0, Flop-5:  0, Flop-6:  0, Flop-7:  1, Flop-8:  1, Flop-9:  0,  => all bright
+// Case: 147  Wt warp , Adjunct 12 wind: 24 fancy: 9 afancy: 111 fader: 0Flop-0:  0, Flop-1:  0, Flop-2:  0, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  1,   = .too right
+// Case: 102  seasick4, Adjunct 19 wind: 11 fancy: 76 afancy: 147 fader: 6Flop-0:  1, Flop-1:  0, Flop-2:  0, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  0, Flop-9:  1, => too bright
+
 // --------------------------- Config End ----------------------------------
 
 
