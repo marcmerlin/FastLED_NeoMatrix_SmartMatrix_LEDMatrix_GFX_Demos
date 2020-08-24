@@ -18,7 +18,8 @@ public:
     // a single frame should be drawn as fast as possible, without any delay or blocking
     // return how many millisecond delay is requested before the next call to drawFrame()
     virtual unsigned int drawFrame() {
-        backgroundLayer.fillScreen({ 0, 0, 0 });
+	// not visible in this file (defined in neomatrix_config.h)
+        //backgroundLayer.fillScreen({ 0, 0, 0 });
         return 0;
     };
 

@@ -161,16 +161,16 @@ class PatternCube : public AuroraDrawable {
 
 #if FASTLED_VERSION >= 3001000
       if (MATRIX_WIDTH > 32)  {
-        blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, 255);
+        blur2d(effects.leds, min(MATRIX_WIDTH, 255), min(MATRIX_HEIGHT, 255), 255);
       } else {
 	// larger numbers = more tails behind
-        fadeToBlackBy( matrixleds, NUMMATRIX, 40);
+        fadeToBlackBy( matrixleds, min(NUMMATRIX,65535), 40);
       }
 #else
       uint8_t blurAmount = beatsin8(2, 10, 240);
       effects.DimAll(blurAmount);
 #endif
-      //fadeToBlackBy( matrixleds, NUMMATRIX, 128);
+      //fadeToBlackBy( matrixleds, min(NUMMATRIX,65535), 128);
 
       //zCamera = beatsin8(2, 100, 140);
       zCamera = beatsin8(2, min(MATRIX_WIDTH*2.5, 120.0), 160);

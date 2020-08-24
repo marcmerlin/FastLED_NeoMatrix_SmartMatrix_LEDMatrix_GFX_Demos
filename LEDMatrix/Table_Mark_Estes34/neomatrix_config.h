@@ -115,8 +115,13 @@ int XY2( int x, int y, bool wrap = false) {
   return matrix->XY(x, MATRIX_HEIGHT - 1 - y);
 }
 
+// FastLED::colorutils needs a signature with uint8_t
 uint16_t XY( uint8_t x, uint8_t y) {
-  return matrix->XY(x, y);
+    return matrix->XY(x,y);
+}
+// but x/y can be bigger than 256
+uint16_t XY16( uint16_t x, uint16_t y) {
+    return matrix->XY(x,y);
 }
 
 int wrapX(int x) {
