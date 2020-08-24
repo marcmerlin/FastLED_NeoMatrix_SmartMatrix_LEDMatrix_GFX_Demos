@@ -34,7 +34,7 @@
 class PatternCube : public AuroraDrawable {
   private:
     float focal = 30; // Focal of the camera
-    int cubeWidth = min(MATRIX_WIDTH-4,MATRIX_HEIGHT-4); // Cube size
+    int cubeWidth = mmin(MATRIX_WIDTH-4,MATRIX_HEIGHT-4); // Cube size
     float Angx = 20.0, AngxSpeed = 0.05; // rotation (angle+speed) around X-axis
     float Angy = 10.0, AngySpeed = 0.05; // rotation (angle+speed) around Y-axis
     float Ox = MATRIX_WIDTH/2, Oy = MATRIX_HEIGHT/2; // position (x,y) of the frame center
@@ -161,19 +161,19 @@ class PatternCube : public AuroraDrawable {
 
 #if FASTLED_VERSION >= 3001000
       if (MATRIX_WIDTH > 32)  {
-        blur2d(effects.leds, min(MATRIX_WIDTH, 255), min(MATRIX_HEIGHT, 255), 255);
+        blur2d(effects.leds, mmin(MATRIX_WIDTH, 255), mmin(MATRIX_HEIGHT, 255), 255);
       } else {
 	// larger numbers = more tails behind
-        fadeToBlackBy( matrixleds, min(NUMMATRIX,65535), 40);
+        fadeToBlackBy( matrixleds, mmin(NUMMATRIX,65535), 40);
       }
 #else
       uint8_t blurAmount = beatsin8(2, 10, 240);
       effects.DimAll(blurAmount);
 #endif
-      //fadeToBlackBy( matrixleds, min(NUMMATRIX,65535), 128);
+      //fadeToBlackBy( matrixleds, mmin(NUMMATRIX,65535), 128);
 
       //zCamera = beatsin8(2, 100, 140);
-      zCamera = beatsin8(2, min(MATRIX_WIDTH*2.5, 120.0), 160);
+      zCamera = beatsin8(2, mmin(MATRIX_WIDTH*2.5, 120.0), 160);
       AngxSpeed = beatsin8(3, 1, 5) / 100.0f;
       AngySpeed = beatcos8(5, 1, 5) / 100.0f;
 

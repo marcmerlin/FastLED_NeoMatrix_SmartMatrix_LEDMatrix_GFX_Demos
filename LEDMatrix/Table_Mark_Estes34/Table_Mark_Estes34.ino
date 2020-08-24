@@ -27,6 +27,7 @@ uint8_t bestpatterns[] = {
 
 // By default audio support is on for what's expected to be teensy.
 #define TME_AUDIO
+// But turn it off on ARDUINOONPC / Raspberry Pi and ESP32
 #ifdef ARDUINOONPC
 #undef TME_AUDIO
 #endif
@@ -120,23 +121,30 @@ struct RECEIVE_DATA_STRUCTURE {
 };
 RECEIVE_DATA_STRUCTURE music;
 
-byte pattern = 112;//this picks the pattern to start with...
-byte slowest = 4, fastest = 22, cool,  bpm[32], targetfps = 10, adjunct = 3, sizzer;
-byte sparky = 80, ccc, xxx, yyy, dot = 3, radius2, rr, gg, bb;
-byte  maxiaud, pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3,  quietcount, ccoolloorr,  h = 0;
-byte dot2 = 6, sdot, dot3 = 1, phew, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth;
-byte mstep, LLaudio[64], RRaudio[64], inner, bfade = 3, kind[MATRIX_WIDTH * 3];
+int16_t pattern = 112;//this picks the pattern to start with...
+int16_t slowest = 4, fastest = 22, cool,  bpm[32], targetfps = 10, adjunct = 3, sizzer;
+int16_t sparky = 80, ccc, xxx, yyy, dot = 3, radius2, rr, gg, bb;
+int16_t  maxiaud, pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3,  quietcount, ccoolloorr,  h = 0;
+int16_t dot2 = 6, sdot, dot3 = 1, phew, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth;
+int8_t mstep, LLaudio[64], RRaudio[64], inner, bfade = 3;
 
-uint16_t raad;
-int howmany, xhowmany, how, fcool[MATRIX_WIDTH], velo = 30 , pointyfix,  fpeed[MATRIX_WIDTH * 3] ;
+uint16_t raad, howmany, xhowmany, how, velo = 30 , pointyfix;
+
+// FIXME(Mark Estes): change int and uint into the correct types (8, 16, or 32)
 int bigmax, directn = 1, quash = 5, quiet = 0, waiter = 7, level, levelfull;
-int  fcolor[MATRIX_WIDTH * 3], fcountr[MATRIX_WIDTH * 3], heaty[MATRIX_WIDTH][MATRIX_HEIGHT], xvort[MATRIX_WIDTH * 3];
-int yvort[MATRIX_WIDTH * 3], xpoffset[MATRIX_WIDTH * 3], fcount[MATRIX_WIDTH * 3], fvelo[MATRIX_WIDTH * 3];
 unsigned int  counter, ringdelay, bringdelay, firedelay, hitcounter;
+
+// FIXME(Mark Estes): arrays take space, it would be nice to reuse the same arrays for some demos.
+// These arrays can all have values indexed on width or height, which means they can go higher than 256
+// if width or height are bigger than 256.
+uint16_t fpeed[MATRIX_WIDTH * 3] ;
+int8_t  fcolor[mmax(MATRIX_WIDTH * 3, MATRIX_HEIGHT)], fcountr[MATRIX_WIDTH * 3];
+uint8_t kind[MATRIX_WIDTH * 3], xpoffset[MATRIX_WIDTH * 3], fvelo[MATRIX_WIDTH * 3];
+uint16_t xvort[MATRIX_WIDTH * 3], yvort[MATRIX_WIDTH * 3], fcount[MATRIX_WIDTH * 3];
+// uint16_t fcool[MATRIX_WIDTH], heaty[MATRIX_WIDTH][MATRIX_HEIGHT]; only used in Fire()
 
 boolean gmusic =  false, flop[12],   nextsong = false;
 boolean rimmer[MATRIX_WIDTH * 3], xbouncer[MATRIX_WIDTH * 3], ybouncer[MATRIX_WIDTH * 3];
-
 boolean  audi = false, mixit = false, slowme = true;
 
 unsigned long lasttest, lastmillis, dwell = TIMING * 200;
@@ -240,10 +248,12 @@ void loop()
     sangle = random(25, 85) / 100.0;
     if (random8() > 128) cangle = -cangle;
     if (random8() > 128) sangle = -sangle;
+/*
     fcool[random(64)] = random (7, 25);
     fcool[random(64)] = random (6, 28);
     fcool[random(64)] = random (8, 25);
     fcool[random(64)] = random (6, 30);
+*/
     blender += random(4, 12);
     xblender -= random(4, 12);
   }

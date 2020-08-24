@@ -281,9 +281,12 @@ void newpattern()//generates all the randomness for each new pattern
       flop[g] = true;
   }
   cool = random (10, 18);
+  /*
   for (int i = 0; i < MATRIX_HEIGHT; i++) {
     fcool[i] = random (9, 21);
   }
+  */
+
   for (int i = 0; i < MATRIX_WIDTH * 3; i++) {
     kind[i] = random8(7);
   }
@@ -3907,7 +3910,7 @@ void solid6()//colors rotate forward
 {
   for (int i = 0; i < MATRIX_WIDTH; i++)
     for (int j = 0; j < MATRIX_HEIGHT; j++)
-      zeds(i, j) = CHSV(i * dot2 + dot / 2 * j +  h, 255, max(max(music.peakL, music.peakR) / 2, 128));
+      zeds(i, j) = CHSV(i * dot2 + dot / 2 * j +  h, 255, mmax(mmax(music.peakL, music.peakR) / 2, 128));
 }
 void fuzzy() {  ///pattern 12
   if (flop[6])
@@ -5604,8 +5607,8 @@ void peakshow()//stereo
   yyy = 0;
   for (int16_t i = 0; i < 9; i ++)
   {
-    xxx = max(music.laudio[i * 2], xxx);
-    yyy = max(music.raudio[i * 2], yyy);
+    xxx = mmax(music.laudio[i * 2], xxx);
+    yyy = mmax(music.raudio[i * 2], yyy);
   }
   zeds(0, MIDLY) = CHSV(h , 255 - velo / 5, 255);
   zeds(1, MIDLY) = CHSV(h , 255 - velo / 5, 255);
@@ -8466,7 +8469,7 @@ void beatsolid(int16_t brit)//colors rotate forward
     phew = random8();
     hitcounter = counter;
   }
-  DFRectangle(0 , 0,  MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1, CHSV(phew, 255 - velo / 5, max(music.peakL, music.peakR) / 2.0 + 128));
+  DFRectangle(0 , 0,  MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1, CHSV(phew, 255 - velo / 5, mmax(music.peakL, music.peakR) / 2.0 + 128));
 }
 
 void beatflash(int16_t brit)//colors rotate forward
@@ -8547,7 +8550,7 @@ void audioprocess()
   LLaudio[63] = music.laudio[16];
   RRaudio[63] = music.raudio[16];
 
-  quiet = max(music.peakL, music.peakR);
+  quiet = mmax(music.peakL, music.peakR);
   maxiaud =  quiet / 4;
   if (maxiaud > bigmax)
     bigmax = maxiaud;
@@ -8753,14 +8756,14 @@ void ADCircle(int16_t xc, int16_t yc, uint16_t r, CRGB Col)
 
 void DFRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB Col)
 {
-  int16_t y = min(y0, y1);
+  int16_t y = mmin(y0, y1);
   for (int16_t c = abs(y1 - y0); c >= 0; --c, ++y)
     DLine(x0, y, x1, y, Col);
 }
 
 void ADFRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB Col)
 {
-  int16_t y = min(y0, y1);
+  int16_t y = mmin(y0, y1);
   for (int16_t c = abs(y1 - y0); c >= 0; --c, ++y)
     DALine(x0, y, x1, y, Col);
 }

@@ -16,6 +16,13 @@
 #include <Adafruit_GFX.h>
 bool init_done = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+// min/max are complicated. Arduino and ESP32 layers try to be helpful by using
+// templates that take specific kinds of arguments, but those do not always work
+// with mixed types:
+// error: no matching function for call to 'max(byte&, int16_t&)'
+// These defines get around this problem.
+#define mmin(a,b) ((a<b)?(a):(b))
+#define mmax(a,b) ((a>b)?(a):(b))
 
 
 //============================================================================

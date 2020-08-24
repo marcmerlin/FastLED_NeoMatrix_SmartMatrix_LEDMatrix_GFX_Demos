@@ -97,6 +97,14 @@ bool init_done = 0;
 uint32_t tft_spi_speed;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+// min/max are complicated. Arduino and ESP32 layers try to be helpful by using
+// templates that take specific kinds of arguments, but those do not always work
+// with mixed types:
+// error: no matching function for call to 'max(byte&, int16_t&)'
+// These defines get around this problem.
+#define mmin(a,b) ((a<b)?(a):(b))
+#define mmax(a,b) ((a>b)?(a):(b))
+
 // The ESP32 FastLED defines below must be defined before FastLED.h is loaded
 // They are not relevant if you don't actually use FastLED pixel output but cause
 // no harm if we only include FastLED for its CRGB struct.

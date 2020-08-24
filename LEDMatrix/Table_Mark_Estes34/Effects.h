@@ -332,7 +332,7 @@ class Effects {
       if (osci[4] % 2 == 0)
         osci[5] = osci[5] + 1; // .5
       for (int i = 0; i < 4; i++) {
-        p[i] = map8(sin8(osci[i]), 0, min(MATRIX_WIDTH - 1, 255)); //why? to keep the result in the range of 0-MATRIX_WIDTH (matrix size)
+        p[i] = map8(sin8(osci[i]), 0, mmin(MATRIX_WIDTH - 1, 255)); //why? to keep the result in the range of 0-MATRIX_WIDTH (matrix size)
       }
     }
 
@@ -356,7 +356,7 @@ class Effects {
     void DimAll(byte value)
     {
       // workaround for arrays of more than 64K pixels
-      fadeToBlackBy( leds, min(NUMMATRIX, 65535), 255 - value);
+      fadeToBlackBy( leds, mmin(NUMMATRIX, 65535), 255 - value);
       // FIXME use this instead of fadeToBlackBy
 #if 0
       for (int i = 0; i < NUM_LEDS; i++)
