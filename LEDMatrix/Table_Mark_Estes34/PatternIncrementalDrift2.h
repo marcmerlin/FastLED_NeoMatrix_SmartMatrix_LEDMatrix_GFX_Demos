@@ -35,7 +35,7 @@ class PatternIncrementalDrift2 : public AuroraDrawable {
       uint8_t dim = beatsin8(2, 170, 250);
       effects.DimAll(dim);
 
-      for (uint8_t i = 0; i < MATRIX_WIDTH; i++)
+      for (uint16_t i = 0; i < MATRIX_WIDTH; i++)
       {
         CRGB color;
 

@@ -37,7 +37,7 @@ private:
 
     byte rotation = 0;
 
-    uint8_t scale = 256 / MATRIX_WIDTH;
+    uint8_t scale = max(256 / MATRIX_WIDTH, 1);
 
     uint16_t maxX = MATRIX_WIDTH - 1;
     uint16_t maxY = MATRIX_HEIGHT - 1;

@@ -2104,7 +2104,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
 
     case 167:
-      Serial.print("auroura // waves: ");
+      Serial.print("aurora // waves: ");
       item = 7;
 
       Serial.print(item);
@@ -2119,7 +2119,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 168:
-      Serial.print("auroura cube: ");
+      Serial.print("aurora cube: ");
       item = 8;
 
       Serial.print(item);
@@ -2134,7 +2134,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 169:
-      Serial.print("auroura //waves: ");
+      Serial.print("aurora //waves: ");
       item = 7;
 
       Serial.print(item);
@@ -2149,7 +2149,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 170:
-      Serial.print("auroura worm: ");
+      Serial.print("aurora worm: ");
       item = 4;
 
       Serial.print(item);
@@ -2163,7 +2163,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 171:
-      Serial.print("auroura pattern: cube");
+      Serial.print("aurora pattern: cube");
       item = 2;
 
       Serial.print(item);
@@ -2177,7 +2177,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       };
       break;
     case 172:
-      Serial.print("auroura whirlly: ");
+      Serial.print("aurora whirlly: ");
       item = 0;
 
       Serial.print(item);
@@ -2209,7 +2209,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 175:
-      Serial.print("auroura cube:");
+      Serial.print("aurora cube:");
 
 
       item = 2;
@@ -2224,10 +2224,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
         bfade = 0;
         fancy = 0;
       }
-
       break;
     case 176:
-      Serial.print("auroura worms: ");
+      Serial.print("aurora worms: ");
 
       item = 4;
       bfade = 0;
@@ -2242,10 +2241,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
         bfade = 1;
         fancy = 0;
       }
-
       break;
     case 177:
-      Serial.print("auroura circ wave: ");
+      Serial.print("aurora circ wave: ");
 
       item = 5;
       bfade = 101;
@@ -2261,7 +2259,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 178:
-      Serial.print("auroura sin wave: ");
+      Serial.print("aurora sin wave: ");
 
       item = 12;
       bfade = 101;
@@ -2269,15 +2267,15 @@ void whatami()// set some parameters specific to the pattern and send some data 
       patternz = items[item];
       patternz->start();
 
-
       if ( flop[3] || flop[4]) {
         wind = 0;
         bfade = 1;
         fancy = 26;
       }
       break;
+
     case 179:
-      Serial.print("auroura flock: ");
+      Serial.print("aurora flock: ");
 
       item = 3;
 
@@ -2293,7 +2291,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 180:
-      Serial.print("auroura offset swirl: ");
+      Serial.print("aurora incrementaldrift2: ");
 
       item = 6;
 
@@ -2309,7 +2307,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 181:
-      Serial.print("auroura : ");
+      Serial.print("aurora spiral: ");
 
       item = 9;
 
@@ -2325,7 +2323,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 182:
-      Serial.print("auroura : ");
+      Serial.print("aurora wave: ");
 
       item = 12;
 
@@ -2342,7 +2340,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       }
       break;
     case 183:
-      Serial.print("auroura : ");
+      Serial.print("aurora swirl: ");
 
       item = 11;
 

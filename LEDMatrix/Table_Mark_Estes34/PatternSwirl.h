@@ -61,11 +61,11 @@ class PatternSwirl : public AuroraDrawable {
 #endif
 
       // Use two out-of-sync sine waves
-      uint8_t  i = beatsin8(27, borderWidth, MATRIX_HEIGHT - borderWidth);
-      uint8_t  j = beatsin8(41, borderWidth, MATRIX_WIDTH - borderWidth);
+      uint16_t  i = beatsin8(27, borderWidth, MATRIX_HEIGHT - borderWidth);
+      uint16_t  j = beatsin8(41, borderWidth, MATRIX_WIDTH - borderWidth);
       // Also calculate some reflections
-      uint8_t ni = (MATRIX_WIDTH - 1) - i;
-      uint8_t nj = (MATRIX_WIDTH - 1) - j;
+      uint16_t ni = (MATRIX_WIDTH - 1) - i;
+      uint16_t nj = (MATRIX_WIDTH - 1) - j;
 
       // The color of each point shifts over time, each at a different speed.
       uint16_t ms = millis();
