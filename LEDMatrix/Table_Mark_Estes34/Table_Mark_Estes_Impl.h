@@ -2421,6 +2421,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
 
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
+#ifdef SHOW_PATTERN_NUM
+  // delete the number in case the screen is used for transformation/mirroring
+  matrix->fillRect(0, 0, 6 * print_width, 8, 0);
+#endif
   switch (pattern) {
     case 0:
       Diamondhole();
