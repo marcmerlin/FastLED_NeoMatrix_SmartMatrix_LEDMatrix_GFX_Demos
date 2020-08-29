@@ -3,10 +3,10 @@
 #define RANDOMSLOWME
 
 // Control whether pattern order is random from the start or after one pass
-//#define MIXIT_AFTER_FIRST_PASS
+#define MIXIT_AFTER_FIRST_PASS
 
 // write the pattern number in upper left (makes more sense on higher res displays)
-//#define SHOW_PATTERN_NUM
+#define SHOW_PATTERN_NUM
 
 // Some pattern transitions look weird without a clear in between
 //#define CLEAR_BETWEEN_PATTERNS
