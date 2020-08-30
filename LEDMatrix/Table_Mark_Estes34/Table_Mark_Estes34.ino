@@ -120,7 +120,7 @@ CRGBPalette16 thepal;
 char readchar;
 
 #ifdef SHOW_PATTERN_NUM
-uint8_t print_width;
+uint8_t print_width = 3;
 #endif
 
 #include "Table_Mark_Estes_Impl.h"
