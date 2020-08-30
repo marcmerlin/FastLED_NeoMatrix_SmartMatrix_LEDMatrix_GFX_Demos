@@ -4,6 +4,9 @@
 #define zeds ledmatrix
 
 #include "Table_Mark_Estes_config.h"
+#ifdef SHOW_PATTERN_NUM
+#include <Fonts/TomThumb.h>
+#endif
 
 // Aurora includes
 #include "matrix.h"
@@ -179,6 +182,11 @@ void setup()
   Serial.print("Scale: ");
   audioprocess();
   Serial.println(music.scale);
+#endif
+
+#ifdef SHOW_PATTERN_NUM
+  // default font is 5x7, this one is 3x5
+  matrix->setFont(&TomThumb);
 #endif
 
 }
