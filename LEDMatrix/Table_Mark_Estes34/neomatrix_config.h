@@ -28,7 +28,7 @@ bool init_done = 0;
 //============================================================================
 
 
-#define GPIOPINOUT 3
+#define GPIOPINOUT 8
 #pragma message "Compiling for SMARTMATRIX"
 #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware
 #include <SmartMatrix3.h>
@@ -124,6 +124,10 @@ uint16_t XY( uint8_t x, uint8_t y) {
   return matrix->XY(x, y);
 }
 
+uint16_t XY16( uint16_t x, uint16_t y) {
+    return matrix->XY(x,y);
+}
+
 int wrapX(int x) {
   if (x < 0 ) return 0;
   if (x >= MATRIX_WIDTH) return (MATRIX_WIDTH - 1);
@@ -134,8 +138,10 @@ void show_free_mem() {
   Framebuffer_GFX::show_free_mem();
 }
 
-void matrix_setup(int reservemem = 40000) {
+void matrix_setup(bool initserial=true, int reservemem = 40000) {
   reservemem = reservemem; // squelch compiler warning if var is unused.
+  if (initserial) Serial.begin(115200);
+  Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
   if (init_done) {
     Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
     return;
@@ -146,8 +152,6 @@ void matrix_setup(int reservemem = 40000) {
 #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
   delay(100);
 #endif
-  //    Serial.begin(115200);
-  Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
   matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
 
   matrix_gamma = 1.5; // SmartMatrix should be good by default.

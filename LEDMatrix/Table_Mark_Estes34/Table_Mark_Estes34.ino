@@ -131,17 +131,19 @@ uint8_t print_width = 3;
 void setup()
 {
 #ifdef TME_AUDIO
+  Serial.begin(57600);
   Serial1.begin(57600);
   ETin.begin(details(music), &Serial1);
-  // warning, the up to date matrix_setup also does serial.begin
-  Serial.begin(57600);
-  delay(2000);
-  Serial.println("Reset");
   randomSeed(analogRead(1) - analogRead(2) + analogRead(5));  
   pinMode(LATCH, OUTPUT);
   digitalWrite(LATCH, LOW);    // sets the audio module hardware to off
+#else
+  Serial.begin(115200);
 #endif
-  matrix_setup();
+  delay(2000);
+  Serial.println("Reset");
+  // don't re-init the serial port.
+  matrix_setup(false);
 
   driftx = random(3, MATRIX_WIDTH - 4);//set an initial location for the animation center
   drifty = random(3, MATRIX_HEIGHT - 4);// set an initial location for the animation center
