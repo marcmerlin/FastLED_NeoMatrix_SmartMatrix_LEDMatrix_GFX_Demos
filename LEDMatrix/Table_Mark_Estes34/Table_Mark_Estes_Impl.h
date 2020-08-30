@@ -2210,8 +2210,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
     case 175:
       Serial.print("aurora cube:");
-
-
       item = 2;
       bfade = 2;
       Serial.print(item);
@@ -2227,7 +2225,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 176:
       Serial.print("aurora worms: ");
-
       item = 4;
       bfade = 0;
       adjunct = 0;
@@ -2244,7 +2241,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 177:
       Serial.print("aurora circ wave: ");
-
       item = 5;
       bfade = 101;
       Serial.print(item);
@@ -2260,7 +2256,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 178:
       Serial.print("aurora sin wave: ");
-
       item = 12;
       bfade = 101;
       Serial.print(item);
@@ -2276,7 +2271,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
     case 179:
       Serial.print("aurora flock: ");
-
       item = 3;
 
       Serial.print(item);
@@ -2292,7 +2286,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
     case 180:
       Serial.print("aurora incrementaldrift2: ");
-
       item = 6;
 
       Serial.print(item);
@@ -2308,7 +2301,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 181:
       Serial.print("aurora spiral: ");
-
       item = 9;
 
       Serial.print(item);
@@ -2324,7 +2316,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 182:
       Serial.print("aurora wave: ");
-
       item = 12;
 
       Serial.print(item);
@@ -2341,7 +2332,6 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 183:
       Serial.print("aurora swirl: ");
-
       item = 11;
 
       Serial.print(item);
