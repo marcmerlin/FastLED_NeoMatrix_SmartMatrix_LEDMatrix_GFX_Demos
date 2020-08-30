@@ -883,18 +883,20 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
 
 void matrix_setup(bool initserial=true, int reservemem = 40000) {
     reservemem = reservemem; // squelch compiler warning if var is unused.
-    // It's bad to call Serial.begin twice, so it's disabled here now, make sure you have it enabled
-    // in your calling script.
-    if (initserial) {
-        Serial.begin(115200);
-        Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
-    }
 
     if (init_done) {
         Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BUG: matrix_setup called twice");
         return;
     }
     init_done = 1;
+
+    // It's bad to call Serial.begin twice, if your calling script runs it first, make sure
+    // you request that it isn't called a 2nd time here.
+    if (initserial) {
+        Serial.begin(115200);
+        Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Serial.begin");
+    }
+
     // Teensy takes a while to initialize serial port.
     // Teensy 3.0, 3.1/3.2, 3.5, 3.6
     #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
