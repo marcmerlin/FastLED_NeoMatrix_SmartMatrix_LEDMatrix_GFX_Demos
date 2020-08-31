@@ -136,11 +136,11 @@ class Effects {
     void CircleStream(uint8_t value) {
       DimAll(value);
 
-      for (uint8_t offset = 0; offset < MATRIX_CENTER_X; offset++) {
+      for (uint16_t offset = 0; offset < MATRIX_CENTER_X; offset++) {
         boolean hasprev = false;
         uint16_t prevxy = 0;
 
-        for (uint8_t theta = 0; theta < 255; theta++) {
+        for (uint16_t theta = 0; theta < 255; theta++) {
           uint8_t x = mapcos8(theta, offset, (MATRIX_WIDTH - 1) - offset);
           uint8_t y = mapsin8(theta, offset, (MATRIX_HEIGHT - 1) - offset);
 
@@ -155,8 +155,8 @@ class Effects {
         }
       }
 
-      for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
-        for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
+      for (uint16_t x = 0; x < MATRIX_WIDTH; x++) {
+        for (uint16_t y = 0; y < MATRIX_HEIGHT; y++) {
           uint16_t xy = XY16(x, y);
           leds[xy] = leds2[xy];
           leds[xy].nscale8(value);
@@ -726,10 +726,10 @@ class Effects {
     }
 
     void FillNoise() {
-      for (uint8_t i = 0; i < MATRIX_WIDTH; i++) {
+      for (uint16_t i = 0; i < MATRIX_WIDTH; i++) {
         uint32_t ioffset = noise_scale_x * (i - MATRIX_CENTRE_Y);
 
-        for (uint8_t j = 0; j < MATRIX_HEIGHT; j++) {
+        for (uint16_t j = 0; j < MATRIX_HEIGHT; j++) {
           uint32_t joffset = noise_scale_y * (j - MATRIX_CENTRE_Y);
 
           byte data = inoise16(noise_x + ioffset, noise_y + joffset, noise_z) >> 8;
@@ -754,8 +754,8 @@ class Effects {
       }
 
       // write back to leds
-      for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
-        for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
+      for (uint16_t y = 0; y < MATRIX_HEIGHT; y++) {
+        for (uint16_t x = 0; x < MATRIX_WIDTH; x++) {
           leds[XY16(x, y)] = leds2[XY(x, y)];
         }
       }
@@ -772,8 +772,8 @@ class Effects {
       }
 
       // write back to leds
-      for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
-        for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
+      for (uint16_t y = 0; y < MATRIX_HEIGHT; y++) {
+        for (uint16_t x = 0; x < MATRIX_WIDTH; x++) {
           leds[XY16(x, y)] = leds2[XY(x, y)];
         }
       }
@@ -797,12 +797,12 @@ class Effects {
       CRGB PixelA;
       CRGB PixelB;
 
-      for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
+      for (uint16_t y = 0; y < MATRIX_HEIGHT; y++) {
         uint16_t amount = noise[0][y] * amt;
         byte delta = 31 - (amount / 256);
         byte fractions = amount - (delta * 256);
 
-        for (uint8_t x = 1; x < MATRIX_WIDTH; x++) {
+        for (uint16_t x = 1; x < MATRIX_WIDTH; x++) {
           PixelA = leds2[XY16(x, y)];
           PixelB = leds2[XY16(x - 1, y)];
 
@@ -840,12 +840,12 @@ class Effects {
       CRGB PixelA;
       CRGB PixelB;
 
-      for (uint8_t x = 0; x < MATRIX_HEIGHT; x++) {
+      for (uint16_t x = 0; x < MATRIX_HEIGHT; x++) {
         uint16_t amount = noise[x][0] * amt;
         byte delta = 31 - (amount / 256);
         byte fractions = amount - (delta * 256);
 
-        for (uint8_t y = 1; y < MATRIX_WIDTH; y++) {
+        for (uint16_t y = 1; y < MATRIX_WIDTH; y++) {
           PixelA = leds2[XY16(x, y)];
           PixelB = leds2[XY16(x, y - 1)];
 
