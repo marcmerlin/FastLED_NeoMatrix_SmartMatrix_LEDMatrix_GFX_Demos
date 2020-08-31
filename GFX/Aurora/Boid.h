@@ -68,7 +68,7 @@ class Boid {
     }
 
     void run(Boid boids [], uint8_t boidCount) {
-      Aflock(boids, boidCount);
+      flock(boids, boidCount);
       update();
       // wrapAroundBorders();
       // render();
@@ -113,7 +113,7 @@ class Boid {
     }
 
     // We accumulate a new acceleration each time based on three rules
-    void Aflock(Boid boids [], uint8_t boidCount) {
+    void flock(Boid boids [], uint8_t boidCount) {
       PVector sep = separate(boids, boidCount);   // Separation
       PVector ali = align(boids, boidCount);      // Alignment
       PVector coh = cohesion(boids, boidCount);   // Cohesion
@@ -325,7 +325,6 @@ class Boid {
 };
 
 // ESP32's newer compiler fails on both 'max' and the 2nd line
-const uint8_t AVAILABLE_BOID_COUNT = MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT;
+const uint16_t AVAILABLE_BOID_COUNT = MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT;
 //Boid boids[AVAILABLE_BOID_COUNT]; // this should work, but a compiler bug(?) for ESP32 does not like it anymore
-// convert to malloc?
 Boid boids[MATRIX_WIDTH>MATRIX_HEIGHT?MATRIX_WIDTH:MATRIX_HEIGHT];

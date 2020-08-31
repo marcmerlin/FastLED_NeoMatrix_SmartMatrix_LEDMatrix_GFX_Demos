@@ -145,7 +145,7 @@ public:
         uint8_t x = mapcos8(theta, offset, (MATRIX_WIDTH - 1) - offset);
         uint8_t y = mapsin8(theta, offset, (MATRIX_HEIGHT - 1) - offset);
 
-        uint16_t xy = XY(x, y);
+        uint16_t xy = XY16(x, y);
 
         if (hasprev) {
           leds2[prevxy] += leds[xy];
@@ -158,7 +158,7 @@ public:
 
     for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
       for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
-        uint16_t xy = XY(x, y);
+        uint16_t xy = XY16(x, y);
         leds[xy] = leds2[xy];
         leds[xy].nscale8(value);
         leds2[xy].nscale8(value);
@@ -333,7 +333,7 @@ public:
     if (osci[4] % 2 == 0)
       osci[5] = osci[5] + 1; // .5
     for (int i = 0; i < 4; i++) {
-      p[i] = map8(sin8(osci[i]), 0, MATRIX_WIDTH - 1); //why? to keep the result in the range of 0-MATRIX_WIDTH (matrix size)
+      p[i] = map8(sin8(osci[i]), 0, mmin(MATRIX_WIDTH - 1, 255)); //why? to keep the result in the range of 0-MATRIX_WIDTH (matrix size)
     }
   }
 
@@ -356,7 +356,7 @@ public:
   // scale the brightness of the screenbuffer down
   void DimAll(byte value)
   {
-    fadeToBlackBy( leds, NUMMATRIX, 255-value);
+    fadeToBlackBy( leds, mmin(NUMMATRIX, 255), 255-value);
 #if 0
     for (int i = 0; i < NUM_LEDS; i++)
     {
@@ -373,9 +373,9 @@ public:
   void Caleidoscope1() {
     for (int x = 0; x < MATRIX_CENTER_X; x++) {
       for (int y = 0; y < MATRIX_CENTER_Y; y++) {
-        leds[XY(MATRIX_WIDTH - 1 - x, y)] = leds[XY(x, y)];
-        leds[XY(MATRIX_WIDTH - 1 - x, MATRIX_HEIGHT - 1 - y)] = leds[XY(x, y)];
-        leds[XY(x, MATRIX_HEIGHT - 1 - y)] = leds[XY(x, y)];
+        leds[XY16(MATRIX_WIDTH - 1 - x, y)] = leds[XY16(x, y)];
+        leds[XY16(MATRIX_WIDTH - 1 - x, MATRIX_HEIGHT - 1 - y)] = leds[XY16(x, y)];
+        leds[XY16(x, MATRIX_HEIGHT - 1 - y)] = leds[XY16(x, y)];
       }
     }
   }
@@ -385,9 +385,9 @@ public:
   void Caleidoscope2() {
     for (int x = 0; x < MATRIX_CENTER_X; x++) {
       for (int y = 0; y < MATRIX_CENTER_Y; y++) {
-        leds[XY(MATRIX_WIDTH - 1 - x, y)] = leds[XY(y, x)];
-        leds[XY(x, MATRIX_HEIGHT - 1 - y)] = leds[XY(y, x)];
-        leds[XY(MATRIX_WIDTH - 1 - x, MATRIX_HEIGHT - 1 - y)] = leds[XY(x, y)];
+        leds[XY16(MATRIX_WIDTH - 1 - x, y)] = leds[XY16(y, x)];
+        leds[XY16(x, MATRIX_HEIGHT - 1 - y)] = leds[XY16(y, x)];
+        leds[XY16(MATRIX_WIDTH - 1 - x, MATRIX_HEIGHT - 1 - y)] = leds[XY16(x, y)];
       }
     }
   }
@@ -396,7 +396,7 @@ public:
   void Caleidoscope3() {
     for (int x = 0; x <= MATRIX_CENTRE_X; x++) {
       for (int y = 0; y <= x; y++) {
-        leds[XY(x, y)] = leds[XY(y, x)];
+        leds[XY16(x, y)] = leds[XY16(y, x)];
       }
     }
   }
@@ -405,7 +405,7 @@ public:
   void Caleidoscope4() {
     for (int x = 0; x <= MATRIX_CENTRE_X; x++) {
       for (int y = 0; y <= MATRIX_CENTRE_Y - x; y++) {
-        leds[XY(MATRIX_CENTRE_Y - y, MATRIX_CENTRE_X - x)] = leds[XY(x, y)];
+        leds[XY16(MATRIX_CENTRE_Y - y, MATRIX_CENTRE_X - x)] = leds[XY16(x, y)];
       }
     }
   }
@@ -414,38 +414,38 @@ public:
   void Caleidoscope5() {
     for (int x = 0; x < MATRIX_WIDTH / 4; x++) {
       for (int y = 0; y <= x; y++) {
-        leds[XY(x, y)] = leds[XY(y, x)];
+        leds[XY16(x, y)] = leds[XY16(y, x)];
       }
     }
 
     for (int x = MATRIX_WIDTH / 4; x < MATRIX_WIDTH / 2; x++) {
       for (int y = MATRIX_HEIGHT / 4; y >= 0; y--) {
-        leds[XY(x, y)] = leds[XY(y, x)];
+        leds[XY16(x, y)] = leds[XY16(y, x)];
       }
     }
   }
 
   void Caleidoscope6() {
     for (int x = 1; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 7)] = leds[XY(x, 0)];
+      leds[XY16(7 - x, 7)] = leds[XY16(x, 0)];
     } //a
     for (int x = 2; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 6)] = leds[XY(x, 1)];
+      leds[XY16(7 - x, 6)] = leds[XY16(x, 1)];
     } //b
     for (int x = 3; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 5)] = leds[XY(x, 2)];
+      leds[XY16(7 - x, 5)] = leds[XY16(x, 2)];
     } //c
     for (int x = 4; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 4)] = leds[XY(x, 3)];
+      leds[XY16(7 - x, 4)] = leds[XY16(x, 3)];
     } //d
     for (int x = 5; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 3)] = leds[XY(x, 4)];
+      leds[XY16(7 - x, 3)] = leds[XY16(x, 4)];
     } //e
     for (int x = 6; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 2)] = leds[XY(x, 5)];
+      leds[XY16(7 - x, 2)] = leds[XY16(x, 5)];
     } //f
     for (int x = 7; x < MATRIX_CENTER_X; x++) {
-      leds[XY(7 - x, 1)] = leds[XY(x, 6)];
+      leds[XY16(7 - x, 1)] = leds[XY16(x, 6)];
     } //g
   }
 
@@ -454,20 +454,20 @@ public:
   void SpiralStream(int x, int y, int r, byte dimm) {
     for (int d = r; d >= 0; d--) { // from the outside to the inside
       for (int i = x - d; i <= x + d; i++) {
-        leds[XY(i, y - d)] += leds[XY(i + 1, y - d)]; // lowest row to the right
-        leds[XY(i, y - d)].nscale8(dimm);
+        leds[XY16(i, y - d)] += leds[XY16(i + 1, y - d)]; // lowest row to the right
+        leds[XY16(i, y - d)].nscale8(dimm);
       }
       for (int i = y - d; i <= y + d; i++) {
-        leds[XY(x + d, i)] += leds[XY(x + d, i + 1)]; // right colum up
-        leds[XY(x + d, i)].nscale8(dimm);
+        leds[XY16(x + d, i)] += leds[XY16(x + d, i + 1)]; // right colum up
+        leds[XY16(x + d, i)].nscale8(dimm);
       }
       for (int i = x + d; i >= x - d; i--) {
-        leds[XY(i, y + d)] += leds[XY(i - 1, y + d)]; // upper row to the left
-        leds[XY(i, y + d)].nscale8(dimm);
+        leds[XY16(i, y + d)] += leds[XY16(i - 1, y + d)]; // upper row to the left
+        leds[XY16(i, y + d)].nscale8(dimm);
       }
       for (int i = y + d; i >= y - d; i--) {
-        leds[XY(x - d, i)] += leds[XY(x - d, i - 1)]; // left colum down
-        leds[XY(x - d, i)].nscale8(dimm);
+        leds[XY16(x - d, i)] += leds[XY16(x - d, i - 1)]; // left colum down
+        leds[XY16(x - d, i)].nscale8(dimm);
       }
     }
   }
@@ -490,24 +490,24 @@ public:
       while (a >= b)
       {
         // move them out one pixel on the radius
-        leds[XY(a + centerX, b + centerY)] = leds[XY(nextA + centerX, nextB + centerY)];
-        leds[XY(b + centerX, a + centerY)] = leds[XY(nextB + centerX, nextA + centerY)];
-        leds[XY(-a + centerX, b + centerY)] = leds[XY(-nextA + centerX, nextB + centerY)];
-        leds[XY(-b + centerX, a + centerY)] = leds[XY(-nextB + centerX, nextA + centerY)];
-        leds[XY(-a + centerX, -b + centerY)] = leds[XY(-nextA + centerX, -nextB + centerY)];
-        leds[XY(-b + centerX, -a + centerY)] = leds[XY(-nextB + centerX, -nextA + centerY)];
-        leds[XY(a + centerX, -b + centerY)] = leds[XY(nextA + centerX, -nextB + centerY)];
-        leds[XY(b + centerX, -a + centerY)] = leds[XY(nextB + centerX, -nextA + centerY)];
+        leds[XY16(a + centerX, b + centerY)] = leds[XY16(nextA + centerX, nextB + centerY)];
+        leds[XY16(b + centerX, a + centerY)] = leds[XY16(nextB + centerX, nextA + centerY)];
+        leds[XY16(-a + centerX, b + centerY)] = leds[XY16(-nextA + centerX, nextB + centerY)];
+        leds[XY16(-b + centerX, a + centerY)] = leds[XY16(-nextB + centerX, nextA + centerY)];
+        leds[XY16(-a + centerX, -b + centerY)] = leds[XY16(-nextA + centerX, -nextB + centerY)];
+        leds[XY16(-b + centerX, -a + centerY)] = leds[XY16(-nextB + centerX, -nextA + centerY)];
+        leds[XY16(a + centerX, -b + centerY)] = leds[XY16(nextA + centerX, -nextB + centerY)];
+        leds[XY16(b + centerX, -a + centerY)] = leds[XY16(nextB + centerX, -nextA + centerY)];
 
         // dim them
-        leds[XY(a + centerX, b + centerY)].nscale8(dimm);
-        leds[XY(b + centerX, a + centerY)].nscale8(dimm);
-        leds[XY(-a + centerX, b + centerY)].nscale8(dimm);
-        leds[XY(-b + centerX, a + centerY)].nscale8(dimm);
-        leds[XY(-a + centerX, -b + centerY)].nscale8(dimm);
-        leds[XY(-b + centerX, -a + centerY)].nscale8(dimm);
-        leds[XY(a + centerX, -b + centerY)].nscale8(dimm);
-        leds[XY(b + centerX, -a + centerY)].nscale8(dimm);
+        leds[XY16(a + centerX, b + centerY)].nscale8(dimm);
+        leds[XY16(b + centerX, a + centerY)].nscale8(dimm);
+        leds[XY16(-a + centerX, b + centerY)].nscale8(dimm);
+        leds[XY16(-b + centerX, a + centerY)].nscale8(dimm);
+        leds[XY16(-a + centerX, -b + centerY)].nscale8(dimm);
+        leds[XY16(-b + centerX, -a + centerY)].nscale8(dimm);
+        leds[XY16(a + centerX, -b + centerY)].nscale8(dimm);
+        leds[XY16(b + centerX, -a + centerY)].nscale8(dimm);
 
         b++;
         if (radiusError < 0)
@@ -537,12 +537,12 @@ public:
   {
     for (int x = fromX + 1; x < toX; x++) {
       for (int y = fromY; y < toY; y++) {
-        leds[XY(x, y)] += leds[XY(x - 1, y)];
-        leds[XY(x, y)].nscale8(scale);
+        leds[XY16(x, y)] += leds[XY16(x - 1, y)];
+        leds[XY16(x, y)].nscale8(scale);
       }
     }
     for (int y = fromY; y < toY; y++)
-      leds[XY(0, y)].nscale8(scale);
+      leds[XY16(0, y)].nscale8(scale);
   }
 
   // give it a linear tail to the left
@@ -550,12 +550,12 @@ public:
   {
     for (int x = toX; x < fromX; x++) {
       for (int y = fromY; y < toY; y++) {
-        leds[XY(x, y)] += leds[XY(x + 1, y)];
-        leds[XY(x, y)].nscale8(scale);
+        leds[XY16(x, y)] += leds[XY16(x + 1, y)];
+        leds[XY16(x, y)].nscale8(scale);
       }
     }
     for (int y = fromY; y < toY; y++)
-      leds[XY(0, y)].nscale8(scale);
+      leds[XY16(0, y)].nscale8(scale);
   }
 
   // give it a linear tail downwards
@@ -563,12 +563,12 @@ public:
   {
     for (int x = 0; x < MATRIX_WIDTH; x++) {
       for (int y = 1; y < MATRIX_HEIGHT; y++) {
-        leds[XY(x, y)] += leds[XY(x, y - 1)];
-        leds[XY(x, y)].nscale8(scale);
+        leds[XY16(x, y)] += leds[XY16(x, y - 1)];
+        leds[XY16(x, y)].nscale8(scale);
       }
     }
     for (int x = 0; x < MATRIX_WIDTH; x++)
-      leds[XY(x, 0)].nscale8(scale);
+      leds[XY16(x, 0)].nscale8(scale);
   }
 
   // give it a linear tail upwards
@@ -576,12 +576,12 @@ public:
   {
     for (int x = 0; x < MATRIX_WIDTH; x++) {
       for (int y = MATRIX_HEIGHT - 2; y >= 0; y--) {
-        leds[XY(x, y)] += leds[XY(x, y + 1)];
-        leds[XY(x, y)].nscale8(scale);
+        leds[XY16(x, y)] += leds[XY16(x, y + 1)];
+        leds[XY16(x, y)].nscale8(scale);
       }
     }
     for (int x = 0; x < MATRIX_WIDTH; x++)
-      leds[XY(x, MATRIX_HEIGHT - 1)].nscale8(scale);
+      leds[XY16(x, MATRIX_HEIGHT - 1)].nscale8(scale);
   }
 
   // give it a linear tail up and to the left
@@ -589,14 +589,14 @@ public:
   {
     for (int x = 0; x < MATRIX_WIDTH - 1; x++) {
       for (int y = MATRIX_HEIGHT - 2; y >= 0; y--) {
-        leds[XY(x, y)] += leds[XY(x + 1, y + 1)];
-        leds[XY(x, y)].nscale8(scale);
+        leds[XY16(x, y)] += leds[XY16(x + 1, y + 1)];
+        leds[XY16(x, y)].nscale8(scale);
       }
     }
     for (int x = 0; x < MATRIX_WIDTH; x++)
-      leds[XY(x, MATRIX_HEIGHT - 1)].nscale8(scale);
+      leds[XY16(x, MATRIX_HEIGHT - 1)].nscale8(scale);
     for (int y = 0; y < MATRIX_HEIGHT; y++)
-      leds[XY(MATRIX_WIDTH - 1, y)].nscale8(scale);
+      leds[XY16(MATRIX_WIDTH - 1, y)].nscale8(scale);
   }
 
   // give it a linear tail up and to the right
@@ -604,24 +604,24 @@ public:
   {
     for (int x = 0; x < MATRIX_WIDTH - 1; x++) {
       for (int y = MATRIX_HEIGHT - 2; y >= 0; y--) {
-        leds[XY(x + 1, y)] += leds[XY(x, y + 1)];
-        leds[XY(x, y)].nscale8(scale);
+        leds[XY16(x + 1, y)] += leds[XY16(x, y + 1)];
+        leds[XY16(x, y)].nscale8(scale);
       }
     }
     // fade the bottom row
     for (int x = 0; x < MATRIX_WIDTH; x++)
-      leds[XY(x, MATRIX_HEIGHT - 1)].nscale8(scale);
+      leds[XY16(x, MATRIX_HEIGHT - 1)].nscale8(scale);
 
     // fade the right column
     for (int y = 0; y < MATRIX_HEIGHT; y++)
-      leds[XY(MATRIX_WIDTH - 1, y)].nscale8(scale);
+      leds[XY16(MATRIX_WIDTH - 1, y)].nscale8(scale);
   }
 
   // just move everything one line down
   void MoveDown() {
     for (int y = MATRIX_HEIGHT - 1; y > 0; y--) {
       for (int x = 0; x < MATRIX_WIDTH; x++) {
-        leds[XY(x, y)] = leds[XY(x, y - 1)];
+        leds[XY16(x, y)] = leds[XY16(x, y - 1)];
       }
     }
   }
@@ -630,7 +630,7 @@ public:
   void VerticalMoveFrom(int start, int end) {
     for (int y = end; y > start; y--) {
       for (int x = 0; x < MATRIX_WIDTH; x++) {
-        leds[XY(x, y)] = leds[XY(x, y - 1)];
+        leds[XY16(x, y)] = leds[XY16(x, y - 1)];
       }
     }
   }
@@ -640,7 +640,7 @@ public:
   void Copy(byte x0, byte y0, byte x1, byte y1, byte x2, byte y2) {
     for (int y = y0; y < y1 + 1; y++) {
       for (int x = x0; x < x1 + 1; x++) {
-        leds[XY(x + x2 - x0, y + y2 - y0)] = leds[XY(x, y)];
+        leds[XY16(x + x2 - x0, y + y2 - y0)] = leds[XY16(x, y)];
       }
     }
   }
@@ -649,7 +649,7 @@ public:
   void RotateTriangle() {
     for (int x = 1; x < MATRIX_CENTER_X; x++) {
       for (int y = 0; y < x; y++) {
-        leds[XY(x, 7 - y)] = leds[XY(7 - x, y)];
+        leds[XY16(x, 7 - y)] = leds[XY16(7 - x, y)];
       }
     }
   }
@@ -658,7 +658,7 @@ public:
   void MirrorTriangle() {
     for (int x = 1; x < MATRIX_CENTER_X; x++) {
       for (int y = 0; y < x; y++) {
-        leds[XY(7 - y, x)] = leds[XY(7 - x, y)];
+        leds[XY16(7 - y, x)] = leds[XY16(7 - x, y)];
       }
     }
   }
@@ -684,7 +684,7 @@ public:
     int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
     int err = dx + dy, e2;
     for (;;) {
-      leds[XY(x0, y0)] += color;
+      leds[XY16(x0, y0)] += color;
       if (x0 == x1 && y0 == y1) break;
       e2 = 2 * err;
       if (e2 > dy) {
@@ -700,7 +700,7 @@ public:
 
   // write one pixel with the specified color from the current palette to coordinates
   void Pixel(int x, int y, uint8_t colorIndex) {
-    leds[XY(x, y)] = ColorFromCurrentPalette(colorIndex);
+    leds[XY16(x, y)] = ColorFromCurrentPalette(colorIndex);
   }
 
   CRGB ColorFromCurrentPalette(uint8_t index = 0, uint8_t brightness = 255, TBlendType blendType = LINEARBLEND) {
@@ -745,17 +745,17 @@ public:
   void MoveX(byte delta) {
     for (int y = 0; y < MATRIX_HEIGHT; y++) {
       for (int x = 0; x < MATRIX_WIDTH - delta; x++) {
-        leds2[XY(x, y)] = leds[XY(x + delta, y)];
+        leds2[XY16(x, y)] = leds[XY16(x + delta, y)];
       }
       for (int x = MATRIX_WIDTH - delta; x < MATRIX_WIDTH; x++) {
-        leds2[XY(x, y)] = leds[XY(x + delta - MATRIX_WIDTH, y)];
+        leds2[XY16(x, y)] = leds[XY16(x + delta - MATRIX_WIDTH, y)];
       }
     }
 
     // write back to leds
     for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
       for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
-        leds[XY(x, y)] = leds2[XY(x, y)];
+        leds[XY16(x, y)] = leds2[XY16(x, y)];
       }
     }
   }
@@ -763,17 +763,17 @@ public:
   void MoveY(byte delta) {
     for (int x = 0; x < MATRIX_WIDTH; x++) {
       for (int y = 0; y < MATRIX_HEIGHT - delta; y++) {
-        leds2[XY(x, y)] = leds[XY(x, y + delta)];
+        leds2[XY16(x, y)] = leds[XY16(x, y + delta)];
       }
       for (int y = MATRIX_HEIGHT - delta; y < MATRIX_HEIGHT; y++) {
-        leds2[XY(x, y)] = leds[XY(x, y + delta - MATRIX_HEIGHT)];
+        leds2[XY16(x, y)] = leds[XY16(x, y + delta - MATRIX_HEIGHT)];
       }
     }
 
     // write back to leds
     for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) {
       for (uint8_t x = 0; x < MATRIX_WIDTH; x++) {
-        leds[XY(x, y)] = leds2[XY(x, y)];
+        leds[XY16(x, y)] = leds2[XY16(x, y)];
       }
     }
   }
@@ -785,10 +785,10 @@ public:
       byte delta = 31 - (amount / 256);
 
       for (int x = 0; x < MATRIX_WIDTH - delta; x++) {
-        leds2[XY(x, y)] = leds[XY(x + delta, y)];
+        leds2[XY16(x, y)] = leds[XY16(x + delta, y)];
       }
       for (int x = MATRIX_WIDTH - delta; x < MATRIX_WIDTH; x++) {
-        leds2[XY(x, y)] = leds[XY(x + delta - MATRIX_WIDTH, y)];
+        leds2[XY16(x, y)] = leds[XY16(x + delta - MATRIX_WIDTH, y)];
       }
     }
 
@@ -802,22 +802,22 @@ public:
       byte fractions = amount - (delta * 256);
 
       for (uint8_t x = 1; x < MATRIX_WIDTH; x++) {
-        PixelA = leds2[XY(x, y)];
-        PixelB = leds2[XY(x - 1, y)];
+        PixelA = leds2[XY16(x, y)];
+        PixelB = leds2[XY16(x - 1, y)];
 
         PixelA %= 255 - fractions;
         PixelB %= fractions;
 
-        leds[XY(x, y)] = PixelA + PixelB;
+        leds[XY16(x, y)] = PixelA + PixelB;
       }
 
-      PixelA = leds2[XY(0, y)];
-      PixelB = leds2[XY(MATRIX_WIDTH - 1, y)];
+      PixelA = leds2[XY16(0, y)];
+      PixelB = leds2[XY16(MATRIX_WIDTH - 1, y)];
 
       PixelA %= 255 - fractions;
       PixelB %= fractions;
 
-      leds[XY(0, y)] = PixelA + PixelB;
+      leds[XY16(0, y)] = PixelA + PixelB;
     }
   }
 
@@ -828,10 +828,10 @@ public:
       byte delta = 31 - (amount / 256);
 
       for (int y = 0; y < MATRIX_WIDTH - delta; y++) {
-        leds2[XY(x, y)] = leds[XY(x, y + delta)];
+        leds2[XY16(x, y)] = leds[XY16(x, y + delta)];
       }
       for (int y = MATRIX_WIDTH - delta; y < MATRIX_WIDTH; y++) {
-        leds2[XY(x, y)] = leds[XY(x, y + delta - MATRIX_WIDTH)];
+        leds2[XY16(x, y)] = leds[XY16(x, y + delta - MATRIX_WIDTH)];
       }
     }
 
@@ -845,22 +845,22 @@ public:
       byte fractions = amount - (delta * 256);
 
       for (uint8_t y = 1; y < MATRIX_WIDTH; y++) {
-        PixelA = leds2[XY(x, y)];
-        PixelB = leds2[XY(x, y - 1)];
+        PixelA = leds2[XY16(x, y)];
+        PixelB = leds2[XY16(x, y - 1)];
 
         PixelA %= 255 - fractions;
         PixelB %= fractions;
 
-        leds[XY(x, y)] = PixelA + PixelB;
+        leds[XY16(x, y)] = PixelA + PixelB;
       }
 
-      PixelA = leds2[XY(x, 0)];
-      PixelB = leds2[XY(x, MATRIX_WIDTH - 1)];
+      PixelA = leds2[XY16(x, 0)];
+      PixelB = leds2[XY16(x, MATRIX_WIDTH - 1)];
 
       PixelA %= 255 - fractions;
       PixelB %= fractions;
 
-      leds[XY(x, 0)] = PixelA + PixelB;
+      leds[XY16(x, 0)] = PixelA + PixelB;
     }
   }
 

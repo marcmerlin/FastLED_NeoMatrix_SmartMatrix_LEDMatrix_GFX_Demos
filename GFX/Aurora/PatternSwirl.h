@@ -51,21 +51,21 @@ class PatternSwirl : public AuroraDrawable {
 #if FASTLED_VERSION >= 3001000
       // FIXME: the 2D blur isnot blurry/spread enough on higher res screens
       if (MATRIX_WIDTH < 25) {
-	  blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, blurAmount);
+	  blur2d(effects.leds, mmin(MATRIX_WIDTH, 255), mmin(MATRIX_HEIGHT, 255), blurAmount);
       } else {
 	  // Never mind, on my 64x96 array, the dots are just too small
-	  blur2d(effects.leds, MATRIX_WIDTH, MATRIX_HEIGHT, 172);
+	  blur2d(effects.leds, mmin(MATRIX_WIDTH, 255), mmin(MATRIX_HEIGHT, 255), 172);
       }
 #else
       effects.DimAll(blurAmount);
 #endif
 
       // Use two out-of-sync sine waves
-      uint8_t  i = beatsin8(27, borderWidth, MATRIX_HEIGHT - borderWidth);
-      uint8_t  j = beatsin8(41, borderWidth, MATRIX_WIDTH - borderWidth);
+      uint16_t  i = beatsin8(27, borderWidth, MATRIX_HEIGHT - borderWidth);
+      uint16_t  j = beatsin8(41, borderWidth, MATRIX_WIDTH - borderWidth);
       // Also calculate some reflections
-      uint8_t ni = (MATRIX_WIDTH - 1) - i;
-      uint8_t nj = (MATRIX_WIDTH - 1) - j;
+      uint16_t ni = (MATRIX_WIDTH - 1) - i;
+      uint16_t nj = (MATRIX_WIDTH - 1) - j;
 
       // The color of each point shifts over time, each at a different speed.
       uint16_t ms = millis();

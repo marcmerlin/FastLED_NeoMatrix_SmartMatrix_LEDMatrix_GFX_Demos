@@ -37,7 +37,7 @@ class PatternSpiro : public AuroraDrawable {
     uint8_t miny = MATRIX_CENTER_Y - radiusy;
     uint8_t maxy = MATRIX_CENTER_Y + radiusy + 1;
 
-    uint8_t spirocount = 5;
+    uint16_t spirocount = 5;
     uint8_t spirooffset = 256 / spirocount;
     boolean spiroincrement = false;
 

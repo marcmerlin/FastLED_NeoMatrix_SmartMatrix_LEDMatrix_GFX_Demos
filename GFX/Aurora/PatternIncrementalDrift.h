@@ -48,8 +48,8 @@ class PatternIncrementalDrift : public AuroraDrawable {
         //uint8_t y = beatsin8((MATRIX_CENTER_Y + 1 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
 
 	// This looks not bad
-        //uint8_t x = beatcos8((min(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
-        //uint8_t y = beatsin8((min(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
+        //uint8_t x = beatcos8((mmin(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
+        //uint8_t y = beatsin8((mmin(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_Y - i, MATRIX_CENTER_Y + i);
 
 	// This looks better on a non square thing, feels more dense
         uint8_t x = beatcos8((max(MATRIX_CENTER_X, MATRIX_CENTER_Y) + 1 - i) * 2, MATRIX_CENTER_X - i, MATRIX_CENTER_X + i);
