@@ -75,12 +75,12 @@ uint8_t bestpatterns[] = {
 // Case: 89  swirl, Adjunct 30 wind: 0 fancy: 9 afancy: 197 fader: 0Flop-0:  1, Flop-1:  0, Flop-2:  1, Flop-3:  1, Flop-4:  0, Flop-5:  1, Flop-6:  0, Flop-7:  1, Flop-8:  1, Flop-9:  1,  => too bright
 // Case: 101  conf4 warp, Adjunct 31 wind: 11 fancy: 39 afancy: 71 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  0, Flop-3:  1, Flop-4:  0, Flop-5:  1, Flop-6:  0, Flop-7:  1, Flop-8:  1, Flop-9:  1,  ==> all white
 // Case: 102  seasick4, Adjunct 17 wind: 44 fancy: 26 afancy: 150 fader: 0Flop-0:  1, Flop-1:  0, Flop-2:  1, Flop-3:  0, Flop-4:  0, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  0, Flop-9:  0,  => all white
+// Case: 102  seasick4, Adjunct 19 wind: 11 fancy: 76 afancy: 147 fader: 6Flop-0:  1, Flop-1:  0, Flop-2:  0, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  0, Flop-9:  1, => too bright
 // Case: 109  xspin, warp, Adjunct 14 wind: 16 fancy: 69 afancy: 181 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  1, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  1, Flop-9:  1,  => too bright
 // Case: 126  whitewarp fireworks, Adjunct 1 wind: 0 fancy: 0 afancy: 155 fader: 0Flop-0:  1, Flop-1:  1, Flop-2:  1, Flop-3:  1, Flop-4:  0, Flop-5:  1, Flop-6:  1, Flop-7:  1, Flop-8:  1, Flop-9:  1,  => white
 // Case: 132  spiral moving, Adjunct 250 wind: 0 fancy: 46 afancy: 91 fader: 0Flop-0:  0, Flop-1:  1, Flop-2:  0, Flop-3:  0, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  1, Flop-9:  1,  => all yellow many times
 // Case: 139  spiral3 fixed, Adjunct 13 wind: 9 fancy: 41 afancy: 121 fader: 0Flop-0:  1, Flop-1:  0, Flop-2:  1, Flop-3:  1, Flop-4:  0, Flop-5:  0, Flop-6:  0, Flop-7:  1, Flop-8:  1, Flop-9:  0,  => all bright
 // Case: 147  Wt warp , Adjunct 12 wind: 24 fancy: 9 afancy: 111 fader: 0Flop-0:  0, Flop-1:  0, Flop-2:  0, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  0, Flop-7:  0, Flop-8:  1, Flop-9:  1,   = .too right
-// Case: 102  seasick4, Adjunct 19 wind: 11 fancy: 76 afancy: 147 fader: 6Flop-0:  1, Flop-1:  0, Flop-2:  0, Flop-3:  1, Flop-4:  1, Flop-5:  1, Flop-6:  1, Flop-7:  0, Flop-8:  0, Flop-9:  1, => too bright
 
 // --------------------------- Config End ----------------------------------
 
