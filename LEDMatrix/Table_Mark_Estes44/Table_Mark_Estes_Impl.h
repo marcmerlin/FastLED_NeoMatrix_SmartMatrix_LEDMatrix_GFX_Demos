@@ -402,11 +402,11 @@ DEFINE_GRADIENT_PALETTE( pal6 ) {
 void checkshifty() {
   if (counter % shifty == 0) {
     driftx =  driftx + cangle;//move the x center every so often
-    if (driftx > (MATRIX_WIDTH - MIDLX / 3)) { //change directin of drift if you get near the right 1/4 of the screen
+    if (driftx > (MATRIX_WIDTH - MIDLX / 3)) { //change direction of drift if you get near the right 1/4 of the screen
       cangle = 0 - fabs(cangle);
       driftx =  driftx + cangle;//move the x center every so often
     }
-    if (driftx < MIDLX / 3) { //change directin of drift if you get near the right 1/4 of the screen
+    if (driftx < MIDLX / 3) { //change direction of drift if you get near the right 1/4 of the screen
       cangle = fabs(cangle);
       driftx =  driftx + cangle;//move the x center every so often
     }
@@ -2453,7 +2453,12 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
 void runpattern() {//here the actuall effect is called based on the pattern number,  sometimes more than one is called, sometimes the logical switches, dictate what is called
 #ifdef SHOW_PATTERN_NUM
-  zeds.DrawFilledRectangle(0, 0, 6 * print_width - 1, 7, 0);
+  // delete the number in case the screen is used for transformation/mirroring
+  matrix->fillRect(0, 0, 4 * print_width, 7, 0);
+#endif
+#ifdef DISPLAY_FPS
+    // Make dark overlay for the white font to be visible
+    matrix->fillRect(MATRIX_WIDTH - 1 - 4 * 3, 0, 4 * 3 + 1, 7, 0);
 #endif
   switch (pattern) {
     case 0:
@@ -3755,9 +3760,15 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
 #ifdef SHOW_PATTERN_NUM
   // Make dark overlay for the white font to be visible
-  matrix->fillRect(0, 0, 4 * print_width, 6, 0);
-  matrix->setCursor(0, 5);
+  matrix->fillRect(0, 0, 4 * print_width, 7, 0);
+  matrix->setCursor(1, 6);
   matrix->print(pattern);
+#endif
+#ifdef DISPLAY_FPS
+    // Make dark overlay for the white font to be visible
+    matrix->fillRect(MATRIX_WIDTH - 1 - 4 * 3, 0, 4 * 3 + 1, 7, 0);
+    matrix->setCursor(MATRIX_WIDTH - 4 * 3, 6);
+    matrix->print(matrix->fps());
 #endif
 }
 
@@ -3929,7 +3940,7 @@ void solid6()//colors rotate forward
 {
   for (int i = 0; i < MATRIX_WIDTH; i++)
     for (int j = 0; j < MATRIX_HEIGHT; j++)
-      zeds(i, j) = CHSV(i * dot2 + dot / 2 * j +  h, 255, max(max(music.peakL, music.peakR) / 2, 128));
+      zeds(i, j) = CHSV(i * dot2 + dot / 2 * j +  h, 255, mmax(mmax(music.peakL, music.peakR) / 2, 128));
 }
 void fuzzy() {  ///pattern 12
   if (flop[6])
@@ -5619,8 +5630,8 @@ void peakshow()//stereo
   yyy = 0;
   for (int16_t i = 0; i < 9; i ++)
   {
-    xxx = max(music.laudio[i * 2], xxx);
-    yyy = max(music.raudio[i * 2], yyy);
+    xxx = mmax(music.laudio[i * 2], xxx);
+    yyy = mmax(music.raudio[i * 2], yyy);
   }
   zeds(0, MIDLY) = CHSV(h , 255 - velo / 5, 255);
   zeds(1, MIDLY) = CHSV(h , 255 - velo / 5, 255);
@@ -8491,7 +8502,7 @@ void beatsolid(int16_t brit)//colors rotate forward
     phew = random8();
     hitcounter = counter;
   }
-  DFRectangle(0 , 0,  MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1, CHSV(phew, 255 - velo / 5, max(music.peakL, music.peakR) / 2.0 + 128));
+  DFRectangle(0 , 0,  MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1, CHSV(phew, 255 - velo / 5, mmax(music.peakL, music.peakR) / 2.0 + 128));
 }
 
 void beatflash(int16_t brit)//colors rotate forward
@@ -8572,7 +8583,7 @@ void audioprocess()
   LLaudio[63] = music.laudio[16];
   RRaudio[63] = music.raudio[16];
 
-  quiet = max(music.peakL, music.peakR);
+  quiet = mmax(music.peakL, music.peakR);
   maxiaud =  quiet / 4;
   if (maxiaud > bigmax)
     bigmax = maxiaud;
@@ -8778,14 +8789,14 @@ void ADCircle(int16_t xc, int16_t yc, uint16_t r, CRGB Col)
 
 void DFRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB Col)
 {
-  int16_t y = min(y0, y1);
+  int16_t y = mmin(y0, y1);
   for (int16_t c = abs(y1 - y0); c >= 0; --c, ++y)
     DLine(x0, y, x1, y, Col);
 }
 
 void ADFRectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, CRGB Col)
 {
-  int16_t y = min(y0, y1);
+  int16_t y = mmin(y0, y1);
   for (int16_t c = abs(y1 - y0); c >= 0; --c, ++y)
     DALine(x0, y, x1, y, Col);
 }

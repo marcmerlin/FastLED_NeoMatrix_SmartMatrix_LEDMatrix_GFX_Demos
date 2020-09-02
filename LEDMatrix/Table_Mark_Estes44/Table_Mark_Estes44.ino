@@ -190,7 +190,10 @@ void setup()
   // default font is 5x7, this one is 3x5
   matrix->setFont(&TomThumb);
 #endif
-
+  // Disable showing FPS on serial port in Framebuffer_GFX, but compute it
+#ifdef DISPLAY_FPS
+  matrix->setfpsfreq(0);
+#endif
 }
 
 void loop()
