@@ -33,7 +33,7 @@
 
 // This allows a selection of only my favourite patterns.
 // Comment this out to get all the patterns -- merlin
-#define BESTPATTERNS
+//#define BESTPATTERNS
 #ifdef BESTPATTERNS
 // 82 and 89 are similar     55 and 102 are similar
 uint8_t bestpatterns[] = {
