@@ -80,7 +80,7 @@ struct RECEIVE_DATA_STRUCTURE {
 };
 RECEIVE_DATA_STRUCTURE music;
 
-int16_t slowest = 4, fastest = 22, cool,  bpm[32], targetfps = 10, adjunct = 3, sizzer;
+int16_t slowest = 4, fastest = 26, cool,  bpm[32], targetfps = 10, adjunct = 3, sizzer;
 int16_t sparky = 80, ccc, xxx, yyy, dot = 3, radius2, rr, gg, bb;
 int16_t  maxiaud, pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3,  quietcount, ccoolloorr,  h = 0;
 int16_t dot2 = 6, sdot, dot3 = 1, phew, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth;
