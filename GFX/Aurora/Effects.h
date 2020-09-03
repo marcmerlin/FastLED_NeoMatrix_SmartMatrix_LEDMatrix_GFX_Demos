@@ -356,7 +356,7 @@ public:
   // scale the brightness of the screenbuffer down
   void DimAll(byte value)
   {
-    fadeToBlackBy( leds, mmin(NUMMATRIX, 255), 255-value);
+    fadeToBlackBy( leds, mmin(NUMMATRIX, 65535), 255-value);
 #if 0
     for (int i = 0; i < NUM_LEDS; i++)
     {
