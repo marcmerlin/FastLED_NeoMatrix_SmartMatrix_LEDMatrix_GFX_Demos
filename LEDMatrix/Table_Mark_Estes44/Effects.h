@@ -116,6 +116,7 @@ uint8_t mapcos8(uint8_t theta, uint8_t lowest = 0, uint8_t highest = 255) {
 }
 
 // Array of temperature readings at each simulation cell
+// FIXME: convert to malloc?
 byte heat[NUM_LEDS];
 
 uint32_t noise_x;
@@ -124,6 +125,7 @@ uint32_t noise_z;
 uint32_t noise_scale_x;
 uint32_t noise_scale_y;
 
+// FIXME: 2nd array, convert to malloc?
 uint8_t noise[MATRIX_WIDTH][MATRIX_HEIGHT];
 
 uint8_t noisesmoothing;
@@ -131,6 +133,7 @@ uint8_t noisesmoothing;
 class Effects {
   public:
     CRGB *leds;
+    // FIXME: Sigh, 3rd array taking memory, convert to malloc?
     CRGB leds2[NUM_LEDS];
 
     void CircleStream(uint8_t value) {
