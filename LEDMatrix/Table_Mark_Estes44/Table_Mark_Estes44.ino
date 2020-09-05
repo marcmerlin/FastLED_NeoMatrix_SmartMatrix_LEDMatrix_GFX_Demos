@@ -86,7 +86,7 @@ int16_t  maxiaud, pointy,  hue, steper,  xblender, hhowmany, blender = 120, radi
 int16_t dot2 = 6, sdot, dot3 = 1, phew, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth;
 int8_t mstep, LLaudio[64], RRaudio[64], inner, bfade = 3;
 
-uint16_t raad, howmany, xhowmany, how, velo = 30 , pointyfix;
+uint16_t raad, howmany, xhowmany, how, velo = 30 , pointyfix = 4;
 
 // FIXME(Mark Estes): change int and uint into the correct types (8, 16, or 32)
 int bigmax, directn = 1, quash = 5, quiet = 0, waiter = 7, level, levelfull;
