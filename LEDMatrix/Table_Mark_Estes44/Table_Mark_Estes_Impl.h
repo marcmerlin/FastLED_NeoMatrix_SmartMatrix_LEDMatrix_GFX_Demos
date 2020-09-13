@@ -4022,7 +4022,6 @@ void fuzzy() {  ///pattern 12
 void audiofireball() {// with colored dots in pairs sometimes
   if (counter == 0)
   {
-    BIGGER * 2;
     for (int u = 0; u < howmany; u++) {
       xfire[u] = driftx;
       yfire[u] = drifty;
@@ -8685,7 +8684,7 @@ void fire2() {
 
 void stopred()
 {
-  if (pattern > 166 && pattern < 173 || pattern > 174 && pattern < 184)
+  if ((pattern > 166 && pattern < 173) || (pattern > 174 && pattern < 184))
     if (zeds[0, 0] > 0 && zeds[0, MATRIX_HEIGHT - 1] > 0 && zeds[MATRIX_WIDTH - 1, 0] > 0 && zeds[MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1] > 0) {
       Serial.println("avoiding the red");
       newpattern();
