@@ -22,6 +22,7 @@ PatternBounce bounce;
 #include "PatternCube.h"
 PatternCube cube;
 #include "PatternFlock.h"
+
 PatternFlock flock;
 #include "PatternFlowField.h"
 PatternFlowField flowfield;
@@ -66,7 +67,8 @@ int8_t item = random(13);
 #define MIDLY               (MATRIX_HEIGHT/2)
 #define mpatterns           (190)// max number of patterns
 #define BallCount           30
-
+#define BIGGER              mmax(MATRIX_WIDTH, MATRIX_HEIGHT)
+#define MAXBIG              BIGGER * 2
 #ifdef TME_AUDIO
 EasyTransfer ETin;
 #endif
@@ -89,26 +91,26 @@ int8_t mstep, LLaudio[64], RRaudio[64], inner, bfade = 3;
 uint16_t raad, howmany, xhowmany, how, velo = 30 , pointyfix = 4;
 
 // FIXME(Mark Estes): change int and uint into the correct types (8, 16, or 32)
-int bigmax, directn = 1, quash = 5, quiet = 0, waiter = 7, level, levelfull;
-unsigned int  counter, ringdelay, bringdelay, firedelay, hitcounter;
+int8_t bigmax, directn = 1, quash = 5, quiet = 0, waiter = 7;
+uint16_t  counter, ringdelay, bringdelay, firedelay, hitcounter;
 
 // FIXME(Mark Estes): arrays take space, it would be nice to reuse the same arrays for some demos.
 // These arrays can all have values indexed on width or height, which means they can go higher than 256
 // if width or height are bigger than 256.
-uint16_t fpeed[MATRIX_WIDTH * 3] ;
-int8_t  fcolor[mmax(MATRIX_WIDTH * 3, MATRIX_HEIGHT)], fcountr[MATRIX_WIDTH * 3];
-uint8_t kind[MATRIX_WIDTH * 3], xpoffset[MATRIX_WIDTH * 3], fvelo[MATRIX_WIDTH * 3];
-uint16_t xvort[MATRIX_WIDTH * 3], yvort[MATRIX_WIDTH * 3], fcount[MATRIX_WIDTH * 3];
-// uint16_t fcool[MATRIX_WIDTH], heaty[MATRIX_WIDTH][MATRIX_HEIGHT]; only used in Fire()
+uint16_t fpeed[MAXBIG] ;
+int8_t  fcolor[MAXBIG], fcountr[MAXBIG];
+uint8_t kind[BallCount], xpoffset[MAXBIG], fvelo[MAXBIG];
+uint16_t xvort[MAXBIG], yvort[MAXBIG], fcount[MAXBIG];
+// uint16_t fcool[BIGGER], heaty[BIGGER][MATRIX_HEIGHT]; only used in Fire()
 
 boolean gmusic =  false, flop[12],   nextsong = false;
-boolean rimmer[MATRIX_WIDTH * 3], xbouncer[MATRIX_WIDTH * 3], ybouncer[MATRIX_WIDTH * 3];
+boolean rimmer[MAXBIG], xbouncer[MAXBIG], ybouncer[MAXBIG];
 boolean  audi = false, mixit = false, slowme = true;
 
 unsigned long lasttest, lastmillis, dwell = TIMING * 200;
 
 float  mscale = 1.4, fps = 30;
-float radius, xslope[MATRIX_WIDTH * 3], yslope[MATRIX_WIDTH * 3], xfire[MATRIX_WIDTH * 3], yfire[MATRIX_WIDTH * 3], cangle, sangle;
+float radius, xslope[MAXBIG], yslope[MAXBIG], xfire[MAXBIG], yfire[MAXBIG], cangle, sangle;
 float locusx, locusy, driftx, drifty, xcen, ycen, yangle, xangle, eeksangle, whyangle;
 float Gravity = -9.81;
 int StartHeighty = 1;
@@ -227,6 +229,7 @@ void loop()
   }
 
   runpattern();//go generate a updted screen
+  if (counter ==0)stopred();
   counter++;//increment the counter which is used for many things
   // spititout();//map the 2d screen to the 8 outpus and push them out on my other matrix, not used here
   matrix->show();
