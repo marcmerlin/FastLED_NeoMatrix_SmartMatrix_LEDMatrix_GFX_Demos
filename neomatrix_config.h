@@ -723,8 +723,10 @@ uint32_t tft_spi_speed;
 	const uint16_t MATRIX_TILE_WIDTH =  64; // width of EACH NEOPIXEL MATRIX (not total display)
 	const uint16_t MATRIX_TILE_HEIGHT=   1; // height of each matrix
     #else
-	const uint16_t MATRIX_TILE_WIDTH = 384; // width of EACH NEOPIXEL MATRIX (not total display)
-	const uint16_t MATRIX_TILE_HEIGHT= 256; // height of each matrix
+        #undef gif_size
+        #define gif_size 192
+	const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
+	const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
@@ -753,6 +755,8 @@ uint32_t tft_spi_speed;
     #define min(a,b) ((a<b)?(a):(b))
     #define max(a,b) ((a>b)?(a):(b))
     #include <led-matrix.h>
+    #undef gif_size
+    #define gif_size 192
     
     uint8_t matrix_brightness = 255;
     #ifdef RPI4
