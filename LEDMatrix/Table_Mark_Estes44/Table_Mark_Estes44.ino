@@ -91,8 +91,8 @@ int8_t mstep, LLaudio[64], RRaudio[64], inner, bfade = 3;
 uint16_t raad, howmany, xhowmany, how, velo = 30 , pointyfix = 4;
 
 // FIXME(Mark Estes): change int and uint into the correct types (8, 16, or 32)
-int8_t bigmax, directn = 1, quash = 5, quiet = 0, waiter = 7;
-uint16_t  counter, ringdelay, bringdelay, firedelay, hitcounter;
+int8_t bigmax, directn = 1, quash = 5, quiet = 0;
+uint16_t  counter, ringdelay, bringdelay, firedelay, hitcounter, waiter = 7;
 
 // FIXME(Mark Estes): arrays take space, it would be nice to reuse the same arrays for some demos.
 // These arrays can all have values indexed on width or height, which means they can go higher than 256
@@ -229,7 +229,7 @@ void loop()
   }
 
   runpattern();//go generate a updted screen
-  if (counter ==0)stopred();
+  //if (counter ==0)stopred();
   counter++;//increment the counter which is used for many things
   // spititout();//map the 2d screen to the 8 outpus and push them out on my other matrix, not used here
   matrix->show();
