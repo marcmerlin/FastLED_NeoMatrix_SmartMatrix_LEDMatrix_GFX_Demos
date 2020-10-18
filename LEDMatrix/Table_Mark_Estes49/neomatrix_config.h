@@ -45,12 +45,12 @@ uint8_t matrix_brightness = 255;//this is the one that sets brightnessss
 #pragma message "Compiling for Teensy with 64x64 32 scan panel xx"
 const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
 //const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
-const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
-const uint16_t MATRIX_TILE_HEIGHT = 32; // height of each matrix
+const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
+const uint16_t MATRIX_TILE_HEIGHT = 64; // height of each matrix
 
 // Used by LEDMatrix
 const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-const uint8_t MATRIX_TILE_V     = 4;  // number of matrices arranged vertically
+const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
 // Used by NeoMatrix
 const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;

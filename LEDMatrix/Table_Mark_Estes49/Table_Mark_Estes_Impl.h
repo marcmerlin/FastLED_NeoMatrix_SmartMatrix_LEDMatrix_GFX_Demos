@@ -23,7 +23,7 @@ void audio9();
 void audiofireball();
 void audioprocess();
 void audocheckers();
-void audochess();
+void audiochess();
 void Bargraph();
 void beatflash();
 void beatsolid();
@@ -87,20 +87,20 @@ void magictime();
 void mirror();
 void noisetest();
 void nringer(int16_t i);
-
+void cringer(int16_t i);
 void pyrimid();
-void Raudio2();
 void Raudio1();
+void Raudio2();
 void Raudio3();
-void Raudio13();
-void Raudio14();
 void Raudio4();
 void Raudio5();
-void Raudio15();
 void Raudio6();
 void Raudio7();
-void Raudio17();
 void Raudio8();
+void Raudio13();
+void Raudio14();
+void Raudio15();
+void Raudio17();
 void Raudio18();
 void Raudio19();
 void RaudioRoger();
@@ -273,6 +273,8 @@ void newpattern()//generates all the randomness for each new pattern
   dot2 = random(2, 6);
   dot3 = random(1, 4);
   adjunct = random(40);//controls which screen wide effect is used if any.  this uses bigger value than number of adjuncts so allows the default to do naught.
+  if (!square && adjunct < 15 && adjunct > 1)
+    adjunct = random(2, 6);
   dwell = 1000 * (random(TIMING , TIMING * 2)); //set how long the pattern will play
   ringdelay = random(30, 80);//sets how often one of the effects will happen
   bringdelay = random(70, 110);//sets how often one of the effects will happen
@@ -458,36 +460,58 @@ void checkfader() {
       break;
 
     case 6:
-      redfado(20 + (random8() >> 3));
+      redfado(9);
       break;
     case 7:
-      greenfado(20 + (random8() >> 3));
+      greenfado(9);
       break;
     case 8:
-      bluefado(20 + (random8() >> 3));
+      bluefado(9);
       break;
+
+    case 9:
+      redfado(16);
+      break;
+    case 10:
+      greenfado(16);
+      break;
+    case 11:
+      bluefado(16);
+      break;
+
+
+    case 12:
+      redfado(25);
+      break;
+    case 13:
+      greenfado(25);
+      break;
+    case 14:
+      bluefado(25);
+      break;
+
     case 99:
       break;
-    case 100:
 
-      lfado(6); //almost none  8/256 or 2%
+    case 100:
+      lfado(8); //almost none  8/256 or 2%
       break;
     case 101:
-
-      lfado(3); //almost none  12/256 or 3.1%
+      lfado(4); //almost none  12/256 or 3.1%
       break;
 
     case 108:
-      bluefado(26);
+      bluefado(32);
       break;
     case 109:
-      greenfado(26);
+      greenfado(32);
       break;
     case 110:
-      redfado(26);
+      redfado(32);
       break;
+
     default:
-      lfado(8 + (bfade << 4)); //
+      lfado(8 + (bfade << 3)); //
       break;
   }
 }
@@ -587,13 +611,20 @@ void checkfancy()
       break;
 
     case 25:
-      audioprocess();
-      beatflash();
+      bkboxer();
+      triangler();
       break;
 
     case 26:
-      audioprocess();
-      beatsolid();
+      ringer();
+      break;
+
+    case 27:
+      cringer(counter % BIGGER);
+      break;
+
+    case 28:
+      nringer(counter % BIGGER);
       break;
 
     default:
@@ -660,11 +691,11 @@ void whatami()// set some parameters specific to the pattern and send some data 
   {
     case 0:
       Serial.print("Dhole ");//label
-      adjunct = random(2, 5); //specify the screen effect as 2 which in this case means HorizontalMirror()  followed by VerticalMirror()  if not specified, it will be what ever was assigned randomly for this pattern
+      adjunct = random(2, 6); //specify the screen effect as 2 which in this case means HorizontalMirror()  followed by VerticalMirror()  if not specified, it will be what ever was assigned randomly for this pattern
       break;
     case 1:
       Serial.print("Inca ");
-      adjunct = random(2, 5);
+      adjunct = random(2, 6);
       if (flop[8])
         fancy = 0;
       break;
@@ -683,7 +714,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
     case 3:
       Serial.print("Drifter ");
-      targetfps = random(10, 40);
+      targetfps = random(10, 30);
       if (flop[5])
         Serial.print("& spire");
       else {
@@ -692,7 +723,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
         else if (flop[9])
           Serial.print("spin1");
       }
-
+      fancy = 0;
       break;
 
 
@@ -702,7 +733,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
         Serial.print("& spin2");
       else if (flop[7])
         Serial.print("& spire3");
-      targetfps = random(10, 40);
+      targetfps = random(10, 20);
       fancy = 0;
       break;
 
@@ -710,15 +741,14 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("Drfter ");
       if (flop[5])
         Serial.print(" & spin2");
-      targetfps = random(10, 40);
-
+      targetfps = random(10, 30);
+      fancy = 0;
       break;
     case 6:
       adjunct = 0;
       bfade = 99;
       Serial.print("DRIP ");
       wind = 0;
-
       fancy = 0;
       break;
     case 7:
@@ -748,19 +778,25 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("fireball ");
       slowme = false;
       shifty = 1;
-      adjunct = random (1, 8);
+      if ( square)
+        adjunct = random (1, 15);
+      else
+        adjunct = random(1, 6);
       break;
     case 11:
       adjunct = 0;
       targetfps = random(10, 40);
-      Serial.print("Wt warp ");
+      Serial.print("SQ warp ");
+      bfade = random(6, 9);// the color fados
       break;
     case 12:
-      Serial.print("Fzy ");
-      bfade = 0;
-      targetfps = random (5, 15);
+      Serial.print("Roundhole ");
+      if (flop[5])
+        Serial.print("& spin1");
+      else if (flop[7])
+        Serial.print("& spire2");
+      targetfps = random(5, 20);
       fancy = 0;
-      slowme = false;
       break;
     case 13:
       Serial.print("Volc ");
@@ -789,6 +825,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("Warp ");
       adjunct = 0;
       targetfps = 15;
+      bfade = random(6, 9);// the color fados
       break;
     case 18:
       adjunct = 0;
@@ -806,13 +843,14 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("triple ");
       targetfps = random(15, 30);
       bfade = random(3, 6);
+      fancy = 0;
       //  dot = 1;
       break;
     case 21:
-      bfade = 2;
+      bfade = random(7, 13);
       if (flop[4]) bfade = 100;
       fancy = 0;
-      Serial.print("spire3 ");
+      Serial.print("spire5 ");
       targetfps = 40;
       break;
     case 22:
@@ -821,21 +859,19 @@ void whatami()// set some parameters specific to the pattern and send some data 
       Serial.print("BarG mirror");
       break;
     case 23:
-      if (flop[5])
-        fancy = 25;
-      Serial.print("roger ");
-      targetfps = 5;
-      bfade = 1;
+      Serial.print("triforce slow");
+      targetfps = random(5, 10);
+      bfade = random(6, 9);
       break;
     case 24:
       if  (flop[0])
       {
-        adjunct = 11;//6 is quad, 11 is cool
+        adjunct = 3;//
         wind = 8;
       }
       else
       {
-        adjunct = 6;
+        adjunct = 5;
         wind = 4;
       }
       bfade = 4;
@@ -906,15 +942,16 @@ void whatami()// set some parameters specific to the pattern and send some data 
       bfade = random(1, 4);
       dwell = 3 * dwell;
       flop[10] = true;
+
       if (!flop[0]) {
-        adjunct = 11;  //wow this is cool
+        adjunct = 5;  //wow this is cool
         wind = 8;
         bfade = 3;
-        Serial.print("Audio 2 Quad Bot Tri Mir");
+        Serial.print("Audio 2 ");
       }
       else {
-        adjunct = 5;
-        Serial.print("Audio2 V mirror");
+        adjunct = 3;
+        Serial.print("Audio2");
       }
       fancy = 0;
       slowme = false;//no slowmo.
@@ -1031,7 +1068,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
       if (!flop[0])
         adjunct = 3;//quad triangle
       else
-        adjunct = 11;//triangle mirrow
+        adjunct = 5;//
+      if (square)
+        adjunct = 11;
+
       slowme = false;//no slowmo.
       bfade = random(1, 4);
       dwell = 3 * dwell;
@@ -1044,15 +1084,16 @@ void whatami()// set some parameters specific to the pattern and send some data 
       dwell = 3 * dwell;
       slowme = false;//no slowmo.
       if (flop[1] && flop[2])
-        adjunct = 12;
-      else {
-        adjunct = random(1, 7);
-        if (flop[9]) {
-          adjunct = 4;
-          wind = 15;
-          fancy = 62;
+        if (square)
+          adjunct = 12;
+        else {
+          adjunct = random(6);
+          if (flop[9]) {
+            adjunct = 4;
+            wind = 15;
+            fancy = 62;
+          }
         }
-      }
       Serial.print("RAudio7");
       targetfps = 80;
       break;
@@ -1066,16 +1107,16 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
       if ( flop[0])
       {
-        adjunct = 11;
+        if (square)adjunct = 11;
+        else
+          adjunct = 4;
         wind = 6;
 
       }
       else if (flop[1])
-        adjunct = 12;
+        adjunct = 9;
       else
         adjunct = 0;
-
-
       targetfps = 80;
       break;
 
@@ -1084,19 +1125,22 @@ void whatami()// set some parameters specific to the pattern and send some data 
       dwell = 3 * dwell;
       if ( flop[0])
       {
-        adjunct = 11;
+        if (square)
+          adjunct = 11;
+        else
+          adjunct = random(2, 6);
         wind = 6;
-        Serial.print(" adj=11");
       }
 
       else {
         if (flop[1]) {
-          adjunct = 12;
-          Serial.print(" adj=12");
+          if (square)
+            adjunct = 12;
+          else
+            adjunct = random(2, 6);
         }
         else {
           adjunct = 0;
-          Serial.print(" adj = 0");
         }
       }
       slowme = false;//no slowmo.
@@ -1144,7 +1188,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
       fancy = 0;
       slowme = false;//no slowmo.
-      if (adjunct == 6) adjunct = 7;
+      if (adjunct == 6) adjunct = 3;
       Serial.print("2x raudio4 and raudio5");
       targetfps = 80;
       break;
@@ -1165,8 +1209,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
       dwell = 3 * dwell;
       bfade = random(3, 6);
       fancy = 0;
-
-      adjunct = 12;
+      if (square)
+        adjunct = 12;
+      else adjunct = random (2, 6);
       Serial.print("raudio 5 ");
       targetfps = 80;
       slowme = false;//no slowmo.
@@ -1215,7 +1260,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = 50;
       fancy = 0;
       if (flop[6])
-        adjunct = 10;
+        adjunct = random(2, 6);
       //wind = 0;
       break;
     case 54:
@@ -1232,12 +1277,21 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = 0;
       break;
     case 56:
-      Serial.print("bounce and whitewarp");
-      fancy = random(1, 35);//more likely
+      targetfps = random(10, 30);
+      bfade = 100;
+      if (flop[7] && flop[8])
+        bfade = 101;
+      Serial.print("VORTEX ");
+      wind = 0;
+      adjunct = 0;
+      fancy = 0;
+      slowme = false;
+      if (flop[2] && (flop[3] || flop[4]))
+        slowme = true;
       break;
     case 57:
       Serial.print("bounce adj ");
-      adjunct = random(3, 12);
+      if (square) adjunct = random(2, 6);
       fancy = random(1, 28);//more likely than not
       break;
     case 58:
@@ -1253,7 +1307,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 60:
       targetfps = random (25, 38);
-      adjunct = random(3, 11);
+      if (square) adjunct = random(2, 15);
       Serial.print("fireball");
       if ( flop[0]) {
         dot = 2;
@@ -1287,7 +1341,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = random(1, 11);
       targetfps = random(5, 25);
       if (flop[4])
-        adjunct = random(4, 8);
+        adjunct = random(2, 6);
       //fancy = random(1, 23);
       Serial.print("triple");
       break;
@@ -1374,8 +1428,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
 
     case 78:
       Serial.print("tri warp ");
+      flop[7] = true;
       targetfps = random(15, 32);
-      if (flop[4] || flop[5])
+      if (flop[4])
         wind = 0;
       fancy = 0;
       break;
@@ -1422,6 +1477,8 @@ void whatami()// set some parameters specific to the pattern and send some data 
       fancy = 0;
       wind = 0;
       bfade ++;
+      if (flop[7] || flop[9] || flop[8])
+        adjunct = 3;
       break;
     case 86:
       Serial.print("starbounce ");
@@ -1431,15 +1488,22 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 87:
       Serial.print("wheels2 ");
+      if (flop[7] || flop[9] || flop[8])
+        adjunct = 3;
       break;
 
     case 88:
       Serial.print("triforce ");
+      fancy = random(10);
+      bfade = 3;
+
       break;
     case 89:
-      targetfps = random(6, 20);
+      targetfps = random(9, 25);
       Serial.print("swirl");
       wind = 0;
+      fancy = 0;
+      bfade = random(2, 6);
       break;
 
     case 90:
@@ -1512,10 +1576,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 98:
-      dwell = dwell * 2;
+
       targetfps = random (10, 20);
       Serial.print("swirl5");
-      bfade = random (1, 5);
+      bfade = random (6, 9);
       if (flop[3])
         wind = wind * 2 + 1;//less likely and odd
       fancy = 0;
@@ -1580,7 +1644,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
     case 108:
       Serial.print("white warp rmagic adjust");
       targetfps = random(8, 20);
-      adjunct = random(2, 10);
+      if (square)
+        adjunct = random(2, 15);
+      else
+        adjunct = random(2, 6);
       break;
 
     case 109:
@@ -1661,7 +1728,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(25, 38);
       bfade = random (1, 5);
       wind = random(2, 5);
-      if (BIGGER == 64) adjunct = 11 ;
+      if (square) adjunct = 11 ;
 
       fancy = 0;
       break;
@@ -1671,7 +1738,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       targetfps = random(15, 30);
       bfade = random (2, 6);
       wind = random(2, 5);
-      if (BIGGER == 64) adjunct = 11 ;
+      if (square) adjunct = 11 ;
 
       fancy = 0;
       break;
@@ -1750,9 +1817,10 @@ void whatami()// set some parameters specific to the pattern and send some data 
         fancy = 0;
       break;
     case 132:
-      bfade = random (108, 111);
-      Serial.print("spiral moving");
-      targetfps = random(10, 30);
+      if (flop[4])
+        bfade = random (108, 111);
+      Serial.print("spiraly moving");
+      targetfps = random(8, 20);
       adjunct = random8();
       wind = 0;
       fancy = random8();
@@ -1778,7 +1846,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = wind * 2 + 1;
       if (flop[6])
         fancy = 0;
-      bfade = random(2, 5);
+      bfade = random(2, 6);
 
       break;
     case 135:
@@ -1824,7 +1892,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 139:
-      Serial.print("spiral3 fixed");
+      Serial.print("spiral3");
       targetfps = random(8 , 24);
       adjunct = random8();
       wind = wind * 2 + 1;
@@ -1934,7 +2002,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
 
     case 147:
-      adjunct = 12;
+      if (square) adjunct = 12;
+      else
+        adjunct = random(8, 10);
       targetfps = random(8, 20);
       Serial.print("Wtwarp adj 12");
       break;
@@ -1950,16 +2020,16 @@ void whatami()// set some parameters specific to the pattern and send some data 
       break;
     case 149:
       targetfps = random(10, 30);
-      bfade = 1;
+      bfade = 101;
       if (flop[7] && flop[8])
-        bfade = 101;
+        bfade = 2;
       Serial.print("VORTEX ");
-      if (flop[7] || !flop[6]) {
+      if (flop[7] || flop[6]) {
         wind = 0;
       }
-      if (flop[1] || !flop[8]) {
-        adjunct = 0;
-      }
+
+      adjunct = 0;
+
       fancy = 0;
       slowme = false;
       if (flop[2] && (flop[3] || flop[4]))
@@ -2001,7 +2071,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
       dwell = 3 * dwell;
       bfade = 3;
       fancy = 0;
-      adjunct = 12;
+      if (square) adjunct = 12;
+      else
+        adjunct = random(6);
       Serial.print("fuzzy raudio 5 and  Raudio19");
       targetfps = 80;
       slowme = false;//no slowmo.
@@ -2013,7 +2085,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       dwell = 3 * dwell;
       bfade = 0;
       fancy = 0;
-      //adjunct = 12;
+
       Serial.print("Raudio18 and solid5");
       targetfps = 80;
       slowme = false;//no slowmo.
@@ -2497,6 +2569,9 @@ void whatami()// set some parameters specific to the pattern and send some data 
 #endif
       break;
   }
+  if (!square) {
+
+  }
   tellit();
 }
 
@@ -2571,24 +2646,24 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 7:
       if (flop[2] || flop[1])
         solid5();
-
       volcano();
-
       adjustme();
       break;
     case 8:
-
-      solid5();
       pyrimid();
 
       adjustme();
       break;
     case 9:
       solidpyrimid();
+
       adjustme();
       break;
     case 10:
-
+      if (flop[3])
+        cringer(counter % BIGGER);
+      else
+        nringer(counter % BIGGER);
       fireball();
       // driftx = MIDLX;
       //  drifty = MIDLY;
@@ -2601,7 +2676,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 12:
-      fuzzy();
+      Roundhole();
+      if (flop[5])
+        spin1();
+      else if (flop[7])
+        spire2();
+      adjustme();
       break;
 
     case 13:
@@ -2649,6 +2729,10 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 20:
 
       triple();
+      if (flop[7])
+        cringer(counter % BIGGER);
+      else
+        nringer(counter % BIGGER);
       if (flop[3]  || (flop[4] && flop[8]) )
         adjustme();
       break;
@@ -2667,7 +2751,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 23:
-      roger();
+      triforce();
       if (flop[6] && (flop[1] || !flop[2])) adjustme();
       break;
 
@@ -2685,14 +2769,14 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 26:
       sinx();
-      if (flop[7] || flop[5] || !flop[2])
+      if (flop[7] || flop[5] )
         adjustme();
       break;
 
 
     case 27:
       audio12();
-      if (flop[7] || flop[5])
+      if (flop[7] && flop[5])
         adjustme();
       break;
 
@@ -2848,9 +2932,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 41:
-      if (flop[6] || flop[7]) {
-        beatflash();
-      }
+
       if (flop[1] || flop[3]) {
         driftx = MIDLX ;
         drifty = MIDLY ;
@@ -2944,7 +3026,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
       break;
 
     case 51:
-      audochess();
+      audiochess();
       break;
 
     case 52:
@@ -2972,9 +3054,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 56:
 
 
-      whitewarp();
-      bouncey();
-      adjustme();
+      VORTEX();
+
       break;
 
     case 57:
@@ -3005,7 +3086,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
 
     case 61:
-      EVERY_N_SECONDS(dot3 + dot2 * dot) {
+      EVERY_N_SECONDS(20) {
         fancy = random(1, 23);
         adjunct = random (12);
       }
@@ -3146,13 +3227,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 85:
       wheelz();
-      if (flop[5] || flop[6])
+      if (flop[5] )
         adjustme();
       break;
 
     case 86:
-      if (flop[7])
-        solid2();
+
       starbounce();
       if (flop[5] && flop[6])
         adjustme();
@@ -3160,13 +3240,12 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 87:
       wheelz2();
-      if (flop[5] || flop[6])
+      if ( flop[6])
         adjustme();
       break;
 
     case 88:
-      if (!flop[2])
-        warp();
+
 
       triforce();
       if (flop[4])
@@ -3176,6 +3255,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 89:
       swirly();
+      spin1();
       break;
 
     case 90:
@@ -3184,7 +3264,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
 
     case 91:
       swirl3();
-      EVERY_N_SECONDS(5 + 3 * dot)
+      EVERY_N_SECONDS(20)
       fancy = random(1, 22);
       if (flop[2] || flop[3])
         adjustme();
@@ -3230,7 +3310,7 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 100:
       if (flop[7])
         solid5();
-      EVERY_N_SECONDS(2 + 3 * dot)
+      EVERY_N_SECONDS(26)
       fancy = random(1, 22);
       adjustme();
       //confetti2();
@@ -3338,10 +3418,8 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
         driftx = MIDLX;
         drifty = MIDLY;
       }
-      if (flop[5]) {
-        audioprocess();
-        beatflash();
-      }
+
+
       streaker();
       drawtriangle();
 
@@ -3559,8 +3637,11 @@ void runpattern() {//here the actuall effect is called based on the pattern numb
     case 147:
       whitewarp();
       adjustme();
-      EVERY_N_SECONDS(10 * dot) {
-        adjunct = random(16);
+      EVERY_N_SECONDS(30) {
+        if (square)
+          adjunct = random(15);
+        else
+          adjunct = random(6);
         flop[6] = !flop[6];
       }
       break;
@@ -3916,9 +3997,9 @@ void Roundhole()// eff 4
     radius3 = random(6, 13);
     shifty = shifty / 2;
   }
-  if (flop[7] && (flop[6] || flop[3]))
-    DFCircle(driftx + (radius3 * ((cos8( 2 * h ) - 128)) >> 7) , drifty + ((radius3 * (sin8( 2 * h) - 128)) >> 7), MATRIX_HEIGHT + 9, CHSV(blender - h * 2 , 255 , 130));
-  for (int y = 0; y < BIGGER - 1 ; y += dot3)
+  /*if (flop[7] && (flop[6] || flop[3]))
+    DFCircle(driftx + (radius3 * ((cos8( 2 * h ) - 128)) >> 7) , drifty + ((radius3 * (sin8( 2 * h) - 128)) >> 7), MATRIX_HEIGHT + 9, CHSV(blender - h * 2 , 255 , 130));*/
+  for (int y = 0; y < BIGGER - 1 ; y += dot3 + 1)
 
     DCircle(driftx + (radius3 * ((cos8(4 * y + 2 * h ) - 128)) >> 7) , drifty + ((radius3 * (sin8(4 * y + 2 * h) - 128)) >> 7), MATRIX_HEIGHT - y, CHSV(blender + y * dot2 - h * 3 , 255 -  velo / 8, 255));
 }
@@ -3929,8 +4010,8 @@ void drifter()//pattern=5
     radius3 = random(6, 13);
     shifty = shifty / 2;
   }
-  if (flop[7] && (flop[6] && flop[3]))
-    DFCircle(driftx + (radius3 * ((cos8(- 3 * h ) - 128)) >> 7) , drifty + ((radius3 * (sin8(- 3 * h) - 128)) >> 7), MATRIX_HEIGHT + 9, CHSV(blender - h * 2 , 255 , 130));
+  /*if (flop[7] && (flop[6] && flop[3]))
+    DFCircle(driftx + (radius3 * ((cos8(- 3 * h ) - 128)) >> 7) , drifty + ((radius3 * (sin8(- 3 * h) - 128)) >> 7), MATRIX_HEIGHT + 9, CHSV(blender - h * 2 , 255 , 130));*/
   for (int y = 0; y < MATRIX_HEIGHT - 1 ; y += dot)
 
     DCircle(driftx + (radius3 * ((cos8(4 * y - 3 * h ) - 128)) >> 7) , drifty + ((radius3 * (sin8(4 * y - 3 * h) - 128)) >> 7), MATRIX_HEIGHT - y, CHSV(blender + y * dot2 - h * 3 , 255 -  velo / 5, 255));
@@ -3942,18 +4023,18 @@ void drifter()//pattern=5
 void volcano()//pattern=7
 {
 
-  for (int y = 0; y <  BIGGER; y++)
-    DFCircle(driftx , drifty  ,  MATRIX_WIDTH + 2  - y, CHSV( 3 * h - y * 4, 255 - velo / 3, 255));
+  for (int y = 0; y <  BIGGER / 2; y += 2)
+    DFCircle(driftx , drifty  ,  BIGGER / 2 + 1  - y, CHSV(4 * h - y * 4, 255 - velo / 3, 255));
 }
 
 void pyrimid()//pattern=8
 {
 
 
-  dot = beatsin8(dot3 , 1, 4, 0);
+  dot = random(3, 5);
 
-  for (int y = 0; y < BIGGER; y += dot )
-    DFCircle(driftx, drifty,  BIGGER + 2  - y, CHSV(2 * h  - y * 4, 255 - velo / 5, 255));
+  for (int y = dot; y < BIGGER * 2 / 3; y += dot )
+    DFCircle(driftx, drifty,  BIGGER + 1  - y, CHSV(2 * h  - y * 4, 255 - velo / 3, 255));
 
 }
 
@@ -4096,55 +4177,49 @@ void tuber()//
 void fireball() {// with colored dots in pairs sometimes
   if (counter == 0)
   {
-    howmany = random(BIGGER  ,  BIGGER * 2);
+    howmany = random(BIGGER * 2 / 3  ,  BIGGER * 3 / 2);
     how = howmany;
     for (int u = 0; u < howmany; u++) {
       xfire[u] = driftx;
       yfire[u] = drifty;
-      fpeed[u] = random(1, 5);
-      yslope[u] = (cos8(random8()) - 128.0) / 128.0;
-      xslope[u] = (sin8(random8()) - 128.0) / 128.0;
-      fvelo[u] = random8();
+      xblender = random8();
+      yslope[u] = (cos8(xblender) - 128.0) / 128.0;
+      xslope[u] = (sin8(xblender) - 128.0) / 128.0;
+      fvelo[u] = random(128);
       if (flop[0])
-        fcolor[u] = blender + random(69);
+        fcolor[u] = blender + random(99); //red to yellow
       else
-        fcolor[u] = random8();
+        fcolor[u] = 170 + random(84); //purple to red
     }
   }
   if (flop[4] || flop[5])
     howmany = beatsin8(4, how / 8, how, 0);
   for (int u = 0; u < howmany; u++) {
-    zeds(xfire[u], yfire[u]) = CHSV(fcolor[u], 255 - fvelo[u] / 4, 255);
+    if (BIGGER < 65)
+      zeds(xfire[u], yfire[u]) = CHSV(fcolor[u], 255 - fvelo[u] , 255);
+    else
+      DFCircle(xfire[u], yfire[u], BIGGER / 64, CHSV(fcolor[u], 255 - fvelo[u], 255));
+
     xfire[u] = xfire[u] + xslope[u];
     yfire[u] = yfire[u] + yslope[u];
     //fcount[u] = 0;
     if (yfire[u] < 0 || yfire[u] > MATRIX_HEIGHT - 1 || xfire[u] < 0 || xfire[u] >  MATRIX_WIDTH - 1) {
       xfire[u] = driftx;
       yfire[u] = drifty;
-      if (flop[0])
-        fcolor[u] = blender + random(64);
-      else
-        fcolor[u] = random8();
-
       xblender = random8();
       yslope[u] = (cos8(xblender) - 128.0) / 128.0;
       xslope[u] = (sin8(xblender) - 128.0) / 128.0;
-
     }
-
   }
-  zeds(driftx, drifty) = CHSV(ccoolloorr - 96, 255 - velo / 5, 225);//the moving source
+  zeds(driftx, drifty) = CHSV(110, 200, 225);//the moving source
 }
-
 
 void fireworks() {// with colored dots in pairs sometimes
   if (counter == 0)
   {
     flop[3] = true;
     firedelay = random8() + 20;
-
     howmany =  random(BIGGER + 8 , BIGGER * 2);
-
     for (int u = 0; u < howmany; u++) {
       xfire[u] = driftx;
       yfire[u] =   drifty;
@@ -4177,9 +4252,7 @@ void fireworks() {// with colored dots in pairs sometimes
         blender = random8();
         yslope[u] = (cos8(blender) - 128.0) / 128.0;
         xslope[u] = (sin8(blender) - 128.0) / 128.0;
-
       }
-
     }
     zeds(driftx, drifty) = CHSV(ccoolloorr - 96, 255 - velo / 5, 255);//the lpne target
   }
@@ -4194,8 +4267,6 @@ void fireworks() {// with colored dots in pairs sometimes
 void streaker() {
   if (counter == 0)
   {
-
-
     howmany =  BIGGER * 3 / 2;
     how = howmany;
     for (int u = 0; u < howmany; u++) {
@@ -4206,14 +4277,15 @@ void streaker() {
       yslope[u] = (cos8(blender) - 128.0) / 128.0;
       xslope[u] = (sin8(blender) - 128.0) / 128.0;
       fvelo[u] = random8();
-      if ( flop[0])fcolor[u] = ccoolloorr + random(42);
+      if (flop[0])
+        fcolor[u] = ccoolloorr + random(80);
       else
         fcolor[u] = random8();
 
     }
   }
-  if (flop[4] || flop[6])
-    howmany = beatsin8(4, how / 5, how / 2, 0);
+  if (flop[4])
+    howmany = beatsin8(4, how / 3, how * 2 / 3, 0);
   for (int u = 0; u < howmany; u++)
   {
     zeds(xfire[u], yfire[u]) = CHSV(fcolor[u], fvelo[u] / 4 + 192, 255);
@@ -4582,7 +4654,7 @@ void bubbles2() {
       fcount[u] = random(4,  (MIDLX >> 1) - 4 ); //radius
       fpeed[u] = random(1, 4); //speed
       xslope[u] = random(13, 52) + random(4) * 64; //angle avoiding square
-      if (random8() > 168) {
+      if (random8() > 99) {
         rimmer[u] = true;
         xbouncer[u] = false;
         ybouncer[u] = false;
@@ -4613,10 +4685,11 @@ void bubbles2() {
     if (yfire[u] > MATRIX_HEIGHT - fcount[u] || yfire[u] < fcount[u]  )
       ybouncer[u] = !ybouncer[u];
 
-    if (flop[3])
-      ADFCircle(xfire[u],  yfire[u] , fcount[u], CHSV(fcolor[u] + h , fvelo[u] / 4 + 192, 255));
-
-    if (u % 2 == 0)DFCircle(xfire[u],  yfire[u] , fcount[u], CHSV(fcolor[u] + h , fvelo[u] / 4 + 192, 255));
+    if (flop[3] && u % 9 == 0)
+      ADFCircle(xfire[u],  yfire[u] , fcount[u], CHSV(fcolor[u] + h , 255 - fvelo[u] / 8 , 255));
+    else
+      DFCircle(xfire[u],  yfire[u] , fcount[u], CHSV(fcolor[u] + h , 255 - fvelo[u] / 4 , 255));
+    
     if (rimmer[u])
       DCircle(xfire[u],  yfire[u] , fcount[u], CHSV(fcolor[u] + h + 128, fvelo[u] / 4 + 192, 255));
     else
@@ -4950,8 +5023,8 @@ void tinybubbles3() {//151
         ybouncer[u] = true;
       }
     }
-    //if (!flop[7]);
-    howmany = howmany / 2;
+    if (!flop[7])
+      howmany = howmany / 2;
   }
 
   if (flop[7])
@@ -5045,6 +5118,12 @@ void Bargraph() {
 }
 
 void adjustme() {  // applies the screen wide effect
+  if (counter == 0) {
+    Serial.print (",  Adjusting: ");
+    Serial.print(adjunct);
+    Serial.print("  ");
+
+  }
   switch (adjunct) {
     case 0://no effect
       break;
@@ -5063,10 +5142,10 @@ void adjustme() {  // applies the screen wide effect
     case 5:
       zeds.VerticalMirror();
       break;
-    case 6:
+    case 6:// ng with fat
       zeds.QuadrantRotateMirror();
       break;
-    case 7:
+    case 7:// ng with fat
       zeds.TriangleTopMirror(1);
       break;
     case 8:
@@ -5075,37 +5154,35 @@ void adjustme() {  // applies the screen wide effect
     case 9:
       zeds.HorizontalMirror(1);
       break;
-    case 10:
+    case 10:// ng with fat
       zeds.TriangleBottomMirror(1);
       break;
-    case 11:
+    case 11:// ng with fat
       zeds.TriangleBottomMirror(1);
       break;
-    case 12:
+    case 12:// ng with fat
       zeds.TriangleTopMirror(1);
       zeds.VerticalMirror();
       break;
     case 13:
       mirror();
       break;
-    case 14:
+    case 14:// ng with fat
       zeds.TriangleTopMirror(1);
       break;
-
     default:// no effect
       break;
   }
 }
 
 void spire2() {
-
   if (counter == 0)
   {
     radius =  BIGGER / 2 ;
     flop[0] = true;
     radius2 =  5;
     flop[1] = false;
-    dot = dot + 5 + random(5);
+    dot = dot + 5 + random(3, 7);
   }
 
   if (h % 24 == 0)
@@ -5165,7 +5242,7 @@ void spire3() {
     radius2 =  5;
     flop[1] = false;
     dot = dot  + random(2, 6);
-    howmany = random (4, 8);
+    howmany = random (4, 9);
   }
 
 
@@ -5195,19 +5272,19 @@ void spire3() {
     float xer = driftx + radius * (cos8(2 * h + i * 256 / howmany) - 128.0) / 128.0;
     float yer = drifty + radius * (sin8(2 * h + i * 256 / howmany) - 128.0) / 128.0;
     if (!flop[2])
-      DCircle(xer, yer, dot + 1, CHSV(h + i * 256 / howmany, 255 - velo / 5, 255));
+      DCircle(xer, yer, dot + 3, CHSV(h + i * 256 / howmany, 255 - velo / 5, 255));
     else {
-      DFCircle(xer, yer, dot, CHSV(h + i * 256 / howmany, 255 - velo / 5, 205));
-      DCircle(xer, yer, dot, CHSV(85 + h + i * 256 / howmany, 255 - velo / 5, 255));
+      DFCircle(xer, yer, dot+3, CHSV(h + i * 256 / howmany, 255 - velo / 5, 205));
+      DCircle(xer, yer, dot+3, CHSV(85 + h + i * 256 / howmany, 255 - velo / 5, 255));
     }
     xer = driftx - radius2 * (cos8(2 * h + 128 / howmany + i * 256 / howmany) - 128.0) / 128.0;
     yer = drifty - radius2 * (sin8(2 * h + 128 / howmany + i * 256 / howmany) - 128.0) / 128.0;
     if (!flop[2])
-      DCircle(xer, yer, dot + 1, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
+      DCircle(xer, yer, dot + 3, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
     else {
-      DFCircle(xer, yer, dot, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 205));
+      DFCircle(xer, yer, dot+3, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 205));
 
-      DCircle(xer, yer, dot, CHSV(85 + h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
+      DCircle(xer, yer, dot+3, CHSV(85 + h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
     }
   }
 }
@@ -5221,14 +5298,12 @@ void spire5() {
     flop[0] = true;
     radius2 =  5;
     flop[1] = false;
-    dot = dot  + random(2, 6);
-    howmany = random (4, 8);
+    dot = random(8, 16);
+    howmany = random (4, 9);
   }
-
 
   if (h % 16 == 0)
   {
-
     if (radius < 4)
       flop[0] = 1 - flop[0];
     if (radius > 9 + BIGGER / 2)
@@ -5237,8 +5312,6 @@ void spire5() {
       radius --;
     else
       radius++;
-
-
     if (radius2 < 4)
       flop[1] = 1 - flop[1];
     if (radius2 > 8 + BIGGER / 2)
@@ -5252,19 +5325,18 @@ void spire5() {
     float xer = driftx + radius * (cos8(2 * h + i * 256 / howmany) - 128.0) / 128.0;
     float yer = drifty + radius * (sin8(2 * h + i * 256 / howmany) - 128.0) / 128.0;
     if (!flop[2])
-      DCircle(xer, yer, dot + 1, CHSV(h + i * 256 / howmany, 255 - velo / 5, 255));
+      DCircle(xer, yer, dot + 2, CHSV(h + i * 256 / howmany, 255 - velo / 5, 255));
     else {
-      ADFCircle(xer, yer, dot, CHSV(h + i * 256 / howmany, 255 - velo / 5, 205));
-      DCircle(xer, yer, dot, CHSV(85 + h + i * 256 / howmany, 255 - velo / 5, 255));
+      DFCircle(xer, yer, dot+2, CHSV(h + i * 256 / howmany, 255 - velo / 6, 220));
+      DCircle(xer, yer, dot+2, CHSV(85 + h + i * 256 / howmany, 255 - velo / 2, 255));
     }
     xer = driftx - radius2 * (cos8(2 * h + 128 / howmany + i * 256 / howmany) - 128.0) / 128.0;
     yer = drifty - radius2 * (sin8(2 * h + 128 / howmany + i * 256 / howmany) - 128.0) / 128.0;
     if (!flop[2])
-      DCircle(xer, yer, dot + 1, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
+      DCircle(xer, yer, dot + 2, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
     else {
-      ADFCircle(xer, yer, dot, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 5, 205));
-
-      DCircle(xer, yer, dot, CHSV(85 + h + 32 + i * 256 / howmany, 255 - velo / 5, 255));
+      DFCircle(xer, yer, dot+2, CHSV(h + 32 + i * 256 / howmany, 255 - velo / 6, 220));
+      DCircle(xer, yer, dot+2, CHSV(85 + h + 32 + i * 256 / howmany, 255 - velo / 2, 255));
     }
   }
 }
@@ -5324,24 +5396,25 @@ void spire() {
 
 void triple() {
   if (counter == 0) {
-    radius2 = random(BIGGER / 5 , BIGGER / 2) - 3;
+
+    howmany = random(BIGGER / 5 , BIGGER / 3);
   }
-  dot2 = beatsin8(6, 4, 10, 0);
-  radius3 = beatsin8(5, radius2 / 2 , radius2 * 3 / 2, 0);
-  for (int i = radius2 ; i > 1 ; i--) {
-    DFCircle(driftx + ((radius3 * (cos8(h * dot) - 128)) >> 7), drifty + ((radius3 * (sin8(h * dot) - 128)) >> 7), i, CHSV( h + dot3 * i, 255 - velo / 5, 255));
-    DFCircle(driftx + ((radius3 * (cos8(h * dot + 85) - 128) ) >> 7), drifty + ((radius3 * (sin8(h * dot + 85 ) - 128) ) >> 7), i, CHSV(h + dot3 * i + 85 , 255 - velo / 5, 255));
-    DFCircle(driftx + (( radius3 * (cos8(h * dot - 85) - 128)) >> 7), drifty + ((radius3 * (sin8(h * dot - 85 ) - 128) ) >> 7), i, CHSV(h + dot3 * i - 85  , 255 - velo / 5, 255));
+
+  radius3 = beatsin8(6, howmany / 2 , howmany , 0);
+  for (int i = howmany ; i > 1 ; i -= 2) {
+    DFCircle(driftx + ((radius3 * (cos8(h ) - 128)) >> 7), drifty + ((radius3 * (sin8(h ) - 128)) >> 7), i, CHSV( h + dot3 * i, 255 - velo / 5, 255));
+    DFCircle(driftx + ((radius3 * (cos8(h  + 85) - 128) ) >> 7), drifty + ((radius3 * (sin8(h + 85 ) - 128) ) >> 7), i, CHSV(h + dot3 * i + 85 , 255 - velo / 5, 255));
+    DFCircle(driftx + (( radius3 * (cos8(h  - 85) - 128)) >> 7), drifty + ((radius3 * (sin8(h  - 85 ) - 128) ) >> 7), i, CHSV(h + dot3 * i - 85  , 255 - velo / 5, 255));
     if (!flop[2]) {
-      DFCircle(driftx + ((dot / 2 * radius3 * (cos8(h * dot + 42) - 128)) >> 7), drifty + ((dot / 2 * radius3 * (sin8(h * dot + 42) - 128)) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 , 255 - velo / 5, 255));
-      DFCircle(driftx + ((dot / 2 * radius3 * (cos8(h * dot + 85 + 42) - 128) ) >> 7), drifty + ((dot / 2 * radius3 * (sin8(h * dot + 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 + 85  , 255 - velo / 5, 255));
-      DFCircle(driftx + ((dot / 2 * radius3 * (cos8(h * dot - 85 + 42) - 128)) >> 7), drifty + ((dot / 2 * radius3 * (sin8(h * dot - 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 - 85   , 255 - velo / 5, 255));
+      DFCircle(driftx + (( radius3 / 2 * (cos8(h  + 42) - 128)) >> 7), drifty + ((radius3 / 2 * (sin8(h  + 42) - 128)) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 , 255 - velo / 5, 255));
+      DFCircle(driftx + (( radius3 / 2 * (cos8(h  + 85 + 42) - 128) ) >> 7), drifty + ((  radius3 / 2 * (sin8(h  + 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 + 85  , 255 - velo / 5, 255));
+      DFCircle(driftx + (( radius3 / 2 * (cos8(h  - 85 + 42) - 128)) >> 7), drifty + (( radius3 / 2 * (sin8(h  - 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 - 85   , 255 - velo / 5, 255));
     }
     else
     {
-      DFCircle(driftx + ((dot  * radius3 * (cos8(h * dot + 42) - 128)) >> 7), drifty + ((dot  * radius3 * (sin8(h * dot + 42) - 128)) >> 7), i * 2 / 3, CHSV(h + dot2 * i + 128 , 255 - velo / 5, 255));
-      DFCircle(driftx + ((dot  * radius3 * (cos8(h * dot + 85 + 42) - 128) ) >> 7), drifty + ((dot  * radius3 * (sin8(h * dot + 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 + 85  , 255 - velo / 5, 255));
-      DFCircle(driftx + ((dot  * radius3 * (cos8(h * dot - 85 + 42) - 128)) >> 7), drifty + ((dot  * radius3 * (sin8(h * dot - 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 - 85   , 255 - velo / 5, 255));
+      DFCircle(driftx + (( radius3 * (cos8(h  + 42) - 128)) >> 7), drifty + (( radius3 * (sin8(h  + 42) - 128)) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 , 255 - velo / 5, 255));
+      DFCircle(driftx + (( radius3 * (cos8(h  + 85 + 42) - 128) ) >> 7), drifty + ((radius3 * (sin8(h  + 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 + 85  , 255 - velo / 5, 255));
+      DFCircle(driftx + (( radius3 * (cos8(h  - 85 + 42) - 128)) >> 7), drifty + (( radius3 * (sin8(h  - 85 + 42) - 128) ) >> 7), i * 2 / 3, CHSV(h + dot3 * i + 128 - 85   , 255 - velo / 5, 255));
     }
   }
 }
@@ -5353,7 +5426,7 @@ void ghosts() {
     drifty = MIDLY;
   }
   if (counter == 0) {
-    radius2 = random(BIGGER * .2, BIGGER * .6);
+    radius2 = random(BIGGER / 4, BIGGER * 3 / 4);
     radius3 = random(radius2  , radius2 * 3 / 2 );
   }
   dot2 = 3;
@@ -5377,6 +5450,7 @@ void ghosts() {
 void siny() {
 
   if (counter == 0) {
+    dot++;
     radius2 = random(BIGGER >> 2, (BIGGER >> 1) - 4);
     radius3 = random (4, BIGGER / 4 - 4 );
     ringdelay = ringdelay * random(2, 5);
@@ -5393,69 +5467,18 @@ void siny() {
 void whitewarp() {
   if (counter == 0 )
   {
-    howmany = random (BIGGER / 2 + 8 , BIGGER + 8 );
+    dot4 = random (5, 8);
+    howmany = random (BIGGER * 2 / 3, BIGGER * 4 / 3);
 
     for (int i = 0; i < howmany; i++) {
       fcount[i] = random8(); //angle
-      fcolor[i] = blender + random8(90);
-      fvelo[i] = random8();
-      fpeed[i] = random(2, 12);
-      xfire[i] = driftx;
-      yfire[i] = drifty;
-
-    }
-  }
-
-  for (int i = 0; i < howmany; i++)
-  {
-    xfire[i] = xfire[i] + fpeed[i] / 4.0 * (sin8(fcount[i] + h ) - 128.0) / 128.0;
-    yfire[i] = yfire[i] + fpeed[i] / 4.0 * (cos8(fcount[i] + h ) - 128.0) / 128.0;
-
-    if (flop[6])
-      zeds(xfire[i], yfire[i]) = CHSV(fcolor[i] , fvelo[i] / 4 + 192, 255); //one shade of color
-    else
-      zeds(xfire[i], yfire[i]) = CRGB::White;
-
-    if (xfire[i] < 0 || yfire[i] < 0 || xfire[i] > MATRIX_WIDTH || yfire[i] > MATRIX_HEIGHT) {
-      xfire[i] = driftx;
-      yfire[i] = drifty;
-      fcount[i] = random8(); //angle
-      fcolor[i] = blender + random8(99);
-      fvelo[i] = random8();
-      fpeed[i] = random8(2, 12);
-    }
-  }
-
-  for (int i = 1; i < howmany / 2; i++)
-    if (flop[6]) {
-      zeds(xfire[howmany - i] - 1, yfire[howmany - i] - 1) = CHSV(fcolor[howmany - i] , 255, 255); //many color
-      // zeds(xfire[howmany - i] - 2, yfire[howmany - i] - 2) = CHSV(fcolor[howmany - i] , 255, 255); //many color
-    }
-    else {
-      zeds(xfire[howmany - i] - 1, yfire[howmany - i] - 1) = CRGB::White;
-      //  zeds(xfire[howmany - i] - 2, yfire[howmany - i] - 2) = CRGB::White;
-    }
-
-  if (flop[6]) { //contrast
-    zeds(xfire[howmany - 1] , yfire[howmany - 1] ) = CRGB::White;
-    zeds(xfire[howmany - 1] - 1 , yfire[howmany - 1] + 1 ) = CRGB::White;
-  }
-  else {
-    zeds(xfire[howmany - 1] , yfire[howmany - 1 ] ) = CHSV(fcolor[howmany - 1] , fvelo[howmany ] / 255, 255); //many color
-    zeds(xfire[howmany - 1] + 1 , yfire[howmany - 1] - 1 ) = CHSV(fcolor[howmany - 1] , fvelo[howmany ] / 255, 255); //many color
-  }
-}
-
-void warp() {
-  if (counter == 0 )
-  {
-    howmany = random (BIGGER * 2 / 3, BIGGER * 3 / 2);
-
-    for (int i = 0; i < howmany; i++) {
-      fcount[i] = random8(); //angle
-      fcolor[i] = blender + random(96);//color
-      fvelo[i] = random8();
-      fpeed[i] = random(2, 12);
+      fcolor[i] = h;//color
+      fvelo[i] = random8();//saturation
+      fpeed[i] = random(2, 12);//speed
+      if (flop[9])
+        xpoffset[i] = random(5, 8);//size
+      else
+        xpoffset[i] = dot4;
       xfire[i] = driftx;
       yfire[i] = drifty;
 
@@ -5464,49 +5487,168 @@ void warp() {
   poffset = 0;
   if (flop[9])
     poffset = h;
-  for (int i = 0; i < howmany; i++)
+
+  if (flop[0])
+    zeds(driftx, drifty)  = CRGB::White;
+  else {
+    if (flop[1])
+      zeds(driftx, drifty) = CHSV(fcolor[0] + poffset, 255 - fvelo[0] / dot, 255); //selected colors
+    else
+      zeds(driftx, drifty) = CHSV(128 + blender + poffset , 255 - fvelo[0] / dot, 255); //one shade of color
+  }
+
+
+  for (int i = 1; i < howmany; i++)
+  {
+    xfire[i] = xfire[i] + (fpeed[i] / 4.0) * (sin8(fcount[i] + poffset ) - 128.0) / 128.0;
+    yfire[i] = yfire[i] + ( fpeed[i] / 4.0) * (cos8(fcount[i] + poffset ) - 128.0) / 128.0;
+
+    if (flop[7]) {
+      if (flop[0])
+        zeds(xfire[i], yfire[i]) += CHSV(fcolor[i] + poffset, 255 - fvelo[i] / dot, 255); //selected colors
+      else {
+        if (flop[1])
+          zeds(xfire[i], yfire[i]) += CRGB::White;
+        else
+          zeds(xfire[i], yfire[i]) += CHSV(blender + poffset , 255 - fvelo[i] / dot, 255); //one shade of color
+      }
+    }
+
+    else {
+      if (flop[0]) {
+        DFRectangle(xfire[i] - xpoffset[i], yfire[i] - xpoffset[i], xfire[i] + xpoffset[i], yfire[i] + xpoffset[i], CRGB::Green); //selected colors
+        DFRectangle(xfire[i] - xpoffset[i] + 2, yfire[i] - xpoffset[i] + 2, xfire[i] + xpoffset[i] - 2, yfire[i] + xpoffset[i] - 2, CRGB::Black); //selected colors
+        DFRectangle(xfire[i] - xpoffset[i] + 4, yfire[i] - xpoffset[i] + 4, xfire[i] + xpoffset[i] - 4, yfire[i] + xpoffset[i] - 4, CRGB::Purple); //selected colors
+      }
+      else {
+        if (flop[1]) {
+          DFRectangle(xfire[i] - xpoffset[i], yfire[i] - xpoffset[i], xfire[i] + xpoffset[i], yfire[i] + xpoffset[i], CHSV(fcolor[i] + poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFRectangle(xfire[i] - xpoffset[i] + 2, yfire[i] - xpoffset[i] + 2, xfire[i] + xpoffset[i] - 2, yfire[i] + xpoffset[i] - 2, CHSV(fcolor[i] + 64 + poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFRectangle(xfire[i] - xpoffset[i] + 4, yfire[i] - xpoffset[i] + 4, xfire[i] + xpoffset[i] - 4, yfire[i] + xpoffset[i] - 4, CHSV(fcolor[i] - 64 + poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+        }
+        else {
+          DFRectangle(xfire[i] - xpoffset[i], yfire[i] - xpoffset[i], xfire[i] + xpoffset[i], yfire[i] + xpoffset[i], CHSV(blender - poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFRectangle(xfire[i] - xpoffset[i] + 2, yfire[i] - xpoffset[i] + 2, xfire[i] + xpoffset[i] - 2, yfire[i] + xpoffset[i] - 2, CHSV(blender - 64 - poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFRectangle(xfire[i] - xpoffset[i] + 4, yfire[i] - xpoffset[i] + 4, xfire[i] + xpoffset[i] - 4, yfire[i] + xpoffset[i] - 4, CHSV(blender + 64 - poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+        }
+      }
+    }
+
+    if (xfire[i] < 0 || yfire[i] < 0 || xfire[i] > MATRIX_WIDTH || yfire[i] > MATRIX_HEIGHT) {
+      xfire[i] = driftx;
+      yfire[i] = drifty;
+      fcount[i] = random8(); //angle
+      if (flop[4])
+        fcolor[i] = fcolor[i] + h; //color
+
+
+    }
+  }
+
+}
+
+void warp() {
+  if (counter == 0 )
+  {
+    howmany = random (BIGGER * 2 / 3, BIGGER );
+    dot4 = random (4, 7);
+    for (int i = 0; i < howmany; i++) {
+      fcount[i] = random8(); //angle
+      fcolor[i] = h;//color
+      fvelo[i] = random8();
+      fpeed[i] = random(2, 12);
+      xfire[i] = driftx;
+      yfire[i] = drifty;
+      if (flop[9])
+        xpoffset[i] = random(5, 8);
+      else
+        xpoffset[i] = dot4;
+
+    }
+  }
+  poffset = 0;
+  if (flop[9])
+    poffset = h;
+
+  if (flop[7]) {
+
+    if (flop[0])
+      zeds(driftx, drifty)  = CRGB::White;
+    else {
+      if (flop[1])
+        zeds(driftx, drifty) = CHSV(fcolor[0] + poffset, 255 - fvelo[0] / (dot4 + 1), 255); //selected colors
+      else
+        zeds(driftx, drifty) = CHSV(128 + blender + poffset , 255 - fvelo[0] / (dot4 + 1), 255); //one shade of color
+    }
+  }
+  else {
+    if (flop[0]) {
+      DFCircle(driftx, drifty, xpoffset[0], CHSV(fcolor[0] + poffset, 255 - fvelo[0] / (dot + 1), 255)); //selected colors//selected colors
+      DFCircle(driftx, drifty, xpoffset[0] - 2, CRGB::Black); //selected colors
+      DFCircle(driftx, drifty, xpoffset[0] - 4, CHSV(fcolor[0] - 64 + poffset, 255 - fvelo[0] / (dot + 1), 255)); //selected colors
+    }
+    else {
+      if (flop[1]) {
+        DFCircle(driftx, drifty, xpoffset[0], CRGB::White);
+        DFCircle(driftx, drifty, xpoffset[0] - 2, CHSV(fcolor[0] + 64 + poffset, 255 - fvelo[0] / (dot + 1), 255)); //selected colors
+        DFCircle(driftx, drifty, xpoffset[0] - 4, CRGB::White);
+      }
+
+      else {
+        DFCircle(driftx, drifty, xpoffset[0], CHSV(128 + blender - poffset, 255 - fvelo[0] / (dot + 1), 255)); //selected colors
+        DFCircle(driftx, drifty, xpoffset[0] - 2, CHSV(128 + blender - 64 - poffset, 255 - fvelo[0] / (dot + 1), 255)); //selected colors
+        DFCircle(driftx, drifty, xpoffset[0] - 4, CHSV(128 + blender + 64 - poffset, 255 - fvelo[0] / (dot + 1), 255)); //selected colors
+      }
+    }
+  }
+  for (int i = i; i < howmany; i++)
   {
     xfire[i] = xfire[i] + (fpeed[i] / 4.0) * (sin8(fcount[i] + poffset ) - 128.0) / 128.0;
     yfire[i] = yfire[i] + ( fpeed[i] / 4.0) * (cos8(fcount[i] + poffset ) - 128.0) / 128.0;
     if (flop[7]) {
 
       if (flop[0])
-        zeds(xfire[i], yfire[i]) += CHSV(fcolor[i] + poffset, 255 - fvelo[i]/dot, 255); //selected colors
+        zeds(xfire[i], yfire[i]) = CHSV(fcolor[i] + poffset, 255 - fvelo[i] / (dot + 1), 255); //selected colors
       else {
         if (flop[1])
-          zeds(xfire[i], yfire[i]) += CRGB::White;
+          zeds(xfire[i], yfire[i]) = CRGB::White;
         else
-          zeds(xfire[i], yfire[i]) += CHSV(blender + poffset , 255 - fvelo[i]/dot, 255); //one shade of color
+          zeds(xfire[i], yfire[i]) = CHSV(blender + poffset , 255 - fvelo[i] / (dot + 1), 255); //one shade of color
       }
     }
     else {
       if (flop[0]) {
-        DFCircle(xfire[i], yfire[i], 4, CRGB::White); //selected colors
-        DFCircle(xfire[i], yfire[i], 3, CRGB::Black); //selected colors
-        DFCircle(xfire[i], yfire[i], 2, CRGB::White); //selected colors
+        DFCircle(xfire[i], yfire[i], xpoffset[i], CRGB::Red); //selected colors
+        DFCircle(xfire[i], yfire[i], xpoffset[i] - 2, CRGB::Blue); //selected colors
+        DFCircle(xfire[i], yfire[i], xpoffset[i] - 4, CRGB::Yellow); //selected colors
       }
       else {
         if (flop[1]) {
-          DFCircle(xfire[i], yfire[i], 4, CHSV(fcolor[i] + poffset, 255 - fvelo[i]/dot, 255)); //selected colors
-          DFCircle(xfire[i], yfire[i], 3, CHSV(fcolor[i] + 48 + poffset, 255 - fvelo[i]/dot, 255)); //selected colors
-          DFCircle(xfire[i], yfire[i], 2, CHSV(fcolor[i] - 48 + poffset, 255 - fvelo[i]/dot, 255)); //selected colors
+          DFCircle(xfire[i], yfire[i], xpoffset[i], CHSV(fcolor[i] + poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFCircle(xfire[i], yfire[i], xpoffset[i] - 2, CHSV(fcolor[i] + 64 + poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFCircle(xfire[i], yfire[i], xpoffset[i] - 4, CHSV(fcolor[i] - 64 + poffset, 255 - fvelo[i] / dot, 255)); //selected colors
         }
 
         else {
-          DFCircle(xfire[i], yfire[i], 4, CHSV(blender - poffset, 255 - fvelo[i]/dot, 255)); //selected colors
-          DFCircle(xfire[i], yfire[i], 3, CHSV(blender - 48 - poffset, 255 - fvelo[i]/dot, 255)); //selected colors
-          DFCircle(xfire[i], yfire[i], 2, CHSV(blender + 48 - poffset, 255 - fvelo[i]/dot, 255)); //selected colors
+          DFCircle(xfire[i], yfire[i], xpoffset[i], CHSV(blender - poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFCircle(xfire[i], yfire[i], xpoffset[i] - 2, CHSV(blender - 64 - poffset, 255 - fvelo[i] / dot, 255)); //selected colors
+          DFCircle(xfire[i], yfire[i], xpoffset[i] - 4, CHSV(blender + 64 - poffset, 255 - fvelo[i] / dot, 255)); //selected colors
         }
       }
     }
+
+
+
 
 
     if (xfire[i] < 0 || yfire[i] < 0 || xfire[i] > MATRIX_WIDTH || yfire[i] > MATRIX_HEIGHT) {
       xfire[i] = driftx;
       yfire[i] = drifty;
       fcount[i] = random8(); //angle
-      fcolor[i] = blender + random(100);//color
-      fpeed[i] = random8(2, 12);
+
+      if (flop[4])
+        fcolor[i] = fcolor[i] + h; //color
+
     }
   }
 
@@ -5516,14 +5658,14 @@ void warp() {
 void spiraly() {
   if (counter == 0 )
   {
-    howmany = random(BIGGER / 6, BIGGER / 4);
+    howmany = random(BIGGER / 8, BIGGER / 6);
     for (int i = 0; i < howmany; i++)
       fcount[i] = i * 255 / howmany; //angle and color
   }
 
   for (int i = 0; i < howmany; i++)
   {
-    for (int jj = 0; jj < MATRIX_WIDTH ; jj++) {
+    for (int jj = 0; jj < BIGGER / 2 ; jj++) {
 
       if (flop[1]) {//crazy helix
         xx =  driftx + jj  * (sin8(fcount[i] + h + 2 * jj ) - 128.0) / 128.0;
@@ -5547,14 +5689,14 @@ void spiraly() {
 void spiral2() {
   if (counter == 0 )
   {
-    howmany = random(BIGGER / 6,  BIGGER / 4);
+    howmany = random(BIGGER / 8,  BIGGER / 6);
     for (int i = 0; i < howmany; i++)
       fcount[i] = i * 255 / howmany; //angle
   }
 
   for (int i = 0; i < howmany; i++)
   {
-    for (int jj = 0; jj < 8 + triwave8(counter % 256) / 4  ; jj++)
+    for (int jj = 0; jj < BIGGER / 2 ; jj++)
     {
 
       if (flop[1]) {//crazy helix
@@ -5591,7 +5733,8 @@ void spiral2() {
 
     }
   }
-  if (flop[5])zeds(driftx, drifty) = CHSV(blender + 128 * 2 + h , 205, 255);
+  if (flop[5])
+    zeds(driftx, drifty) = CHSV(blender + 128 * 2 + h , 205, 255);
   DRectangle(0, 0, MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1, CRGB::Black);
 
 }
@@ -5600,7 +5743,7 @@ void spiral2() {
 void spiral3() {
   if (counter == 0 )
   {
-    howmany = random(BIGGER / 6,  BIGGER / 4);
+    howmany = random(BIGGER / 8,  BIGGER / 6);
     for (int i = 0; i < howmany; i++)
       fcount[i] = i * 255 / howmany; //angle
   }
@@ -5640,7 +5783,7 @@ void spiral3() {
     }
   }
 
-  DRectangle(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, CRGB::Black);
+  DRectangle(0, 0, MATRIX_WIDTH - 1, MATRIX_HEIGHT - 1, CRGB::Black);
 }
 
 void lfado(int8_t bbc)
@@ -5656,33 +5799,32 @@ void redfado(int8_t bbc) {
   for ( int16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
     for (int jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flop[2])
-        zeds(hhh, jjj) -= CRGB((bbc / 3), (bbc), (bbc));//leave more red
+        zeds(hhh, jjj) -= CRGB((bbc / 2), (bbc), (bbc));//leave more red
       else
-        zeds(hhh, jjj) -= CRGB((bbc / 3), (bbc / 3), (bbc));// leave more yellow
+        zeds(hhh, jjj) -= CRGB((bbc / 2), (bbc / 2), (bbc));// leave more yellow
 }
 
 void greenfado(int8_t bbc) {
   for ( int16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
     for (int jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flop[2])
-        zeds(hhh, jjj) -= CRGB((bbc ), (bbc / 3), (bbc));
+        zeds(hhh, jjj) -= CRGB((bbc ), (bbc / 2), (bbc));
       else
-        zeds(hhh, jjj) -= CRGB((bbc), (bbc / 3), (bbc / 3)); // leave more teal
+        zeds(hhh, jjj) -= CRGB((bbc), (bbc / 2), (bbc / 2)); // leave more teal
 }
 
 void bluefado(int8_t bbc) {
   for ( int16_t hhh = 0; hhh < MATRIX_WIDTH ; hhh++)
     for (int jjj = 0; jjj < MATRIX_HEIGHT ; jjj++)
       if (flop[2])
-        zeds(hhh, jjj) -= CRGB((bbc), (bbc), (bbc / 3));
+        zeds(hhh, jjj) -= CRGB((bbc), (bbc), (bbc / 2));
       else
-        zeds(hhh, jjj) -= CRGB((bbc / 3 ), (bbc), (bbc / 3)); //leave more purple
+        zeds(hhh, jjj) -= CRGB((bbc / 2 ), (bbc), (bbc / 2)); //leave more purple
 
 }
 
 void audocheckers()//45
 {
-
   for (int16_t i = 0; i < 4; i++)
     for (int16_t qq = 0; qq < 4; qq++) {
       radius2 = MATRIX_HEIGHT / 4;
@@ -5703,10 +5845,8 @@ void audocheckers()//45
   audioprocess();
 }
 
-
-void audochess()
+void audiochess()
 {
-
   solid2();
   for (int16_t i = 0; i < 4; i++)
     for (int16_t qq = 0; qq < 4; qq++) {
@@ -5716,201 +5856,175 @@ void audochess()
       sizzer = music.laudio[(i * 4) + qq]; //brightness
 
       if (flop[2]) {
-        DFCircle(i * radius3 + 8, qq * radius2 + 8,  radius3 / 2 - 1, CRGB::Black);
-        DFCircle(i * radius3 + 8, qq * radius2 + 8, (sizzer / 64.0) * radius3 / 2 - 1,  CHSV(ccoolloorr, 255 - velo / 5, 255));
-        DCircle(i * radius3 + 8, qq * radius2 + 8,  radius3 / 2 - 1, CHSV(ccoolloorr, 255 - velo / 2, 255));
+        DFCircle(i * radius3 + 8, qq * radius2 + 8,  1 + radius3 / 2 , CRGB::Black);
+        DFCircle(i * radius3 + 8, qq * radius2 + 8, (sizzer / 64.0) * (1 + radius3 / 2) ,  CHSV(ccoolloorr, 255 - velo / 5, 255));
+        DCircle(i * radius3 + 8, qq * radius2 + 8,  1 + radius3 / 2 , CHSV(ccoolloorr, 255 - velo / 2, 255));
       }
       else {
-        DFCircle(i * radius3 + 8, qq * radius2 + 8,  radius3 / 2 - 1, CRGB::Black);
-        DFCircle(i * radius3 + 8, qq * radius2 + 8, (sizzer / 64.0) * radius3 / 2 - 1, CHSV(ccoolloorr, 255 - velo / 5, 255));
-        DCircle(i * radius3 + 8, qq * radius2 + 8,  radius3 / 2 - 1, CRGB::White);
+        DFCircle(i * radius3 + 8, qq * radius2 + 8,  1 + radius3 / 2 , CRGB::Black);
+        DFCircle(i * radius3 + 8, qq * radius2 + 8, (sizzer / 64.0) * (1 + radius3 / 2) , CHSV(ccoolloorr, 255 - velo / 5, 255));
+        DCircle(i * radius3 + 8, qq * radius2 + 8,  1 + radius3 / 2 , CRGB::White);
       }
     }
-
   audioprocess();
 }
 
 void audio8()//stereo !!!
 {
-
-  for (int i = 0; i < MATRIX_HEIGHT; i++)
-  {
-    if (flop[2]) {
-      DLine( 0 , i, LLaudio[i * Hscale ] * 64 / MATRIX_WIDTH / 2, i, CHSV(i * mstep +  h, 255 - velo / 5, 255));
-      DLine( MATRIX_WIDTH - 1 , i, MATRIX_WIDTH - 1 - RRaudio[i * Hscale] * 64 / MATRIX_WIDTH / 2, i, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerH; j++)
+    {
+      if (flop[2]) {
+        DLine( 0 , i * iscalerH + j, LLaudio[i ] * MATRIX_WIDTH / 64 / 2, i * iscalerH + j, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+        DLine( MATRIX_WIDTH - 1 , i * iscalerH + j, MATRIX_WIDTH - 1 - RRaudio[i ] * MATRIX_WIDTH / 64 / 2, i * iscalerH + j, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+      }
+      else {
+        DLine( MATRIX_WIDTH - 1 , i * iscalerH + j, MATRIX_WIDTH - 1 - RRaudio[i ] *  MATRIX_WIDTH / 64 / 2, i * iscalerH + j, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+        DLine( 0 , i * iscalerH + j, LLaudio[i ] * MATRIX_WIDTH / 64 / 2, i * iscalerH + j, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+      }
     }
-    else {
-      DLine( MATRIX_WIDTH - 1 , i, MATRIX_WIDTH - 1 - RRaudio[i * Hscale] * 64 / MATRIX_WIDTH / 2, i, CHSV(i * mstep +  h, 255 - velo / 5, 255));
-      DLine( 0 , i, LLaudio[i * Hscale] * 64 / MATRIX_WIDTH / 2, i, CHSV(i * mstep +  h, 255 - velo / 5, 255));
-    }
-
-
-  }
-
   audioprocess();
 }
 
 void audio9()//stereo
 {
-
-  for (int i = 0; i < MATRIX_WIDTH; i++)
-  {
-    DLine(i, MIDLY, i, MIDLY + LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / 2.0, CHSV(i * mstep +  h, 255 - velo / 5, 255));
-    DLine(i, MIDLY - 1, i, MIDLY - 1 - RRaudio[i * Wscale] * 64 / MATRIX_WIDTH / 2.0, CHSV(i * mstep +  h, 255 - velo / 5, 255));
-    if (i > 0) {
-      if (!flop[2]) {
-        DLine(i, MIDLY + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / 2.0, i - 1, MIDLY + LLaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0  ,   CHSV(h, 255 - velo / 5, 255)); // last 2
-        DLine(i, MIDLY - 1 - RRaudio[i * Wscale ] * 64 / MATRIX_WIDTH / 2.0, i - 1, MIDLY - 1 - RRaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0  ,   CHSV(h, 255 - velo / 5, 255));
-      } // last 2
-      else {
-        DLine(i, MIDLY + LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / 2.0 , i - 1, MIDLY + LLaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0 ,  CRGB::White); // last 2
-        DLine(i, MIDLY - 1 - RRaudio[i * Wscale ] * 64 / MATRIX_WIDTH / 2.0 , i - 1, MIDLY - 1  - RRaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0 ,  CRGB::White);
-      } // last 2
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++)
+    {
+      DLine(i * iscalerW + j, MIDLY, i * iscalerW + j, MIDLY + LLaudio[i  ] *  MATRIX_WIDTH / 64 / 2.0, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+      DLine(i * iscalerW + j, MIDLY - 1, i * iscalerW + j, MIDLY - 1 - RRaudio[i  ] *  MATRIX_WIDTH / 64 / 2.0, CHSV(i * mstep +  h, 255 - velo / 5, 255));
+      if (i > 0) {
+        if (!flop[2]) {
+          DLine(i * iscalerW + j, MIDLY + LLaudio[i] *  MATRIX_WIDTH / 64 / 2.0, i * iscalerW - 1 + j, MIDLY + LLaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0  ,   CHSV(h, 255 - velo / 5, 255)); // last 2
+          DLine(i * iscalerW + j, MIDLY - 1 - RRaudio[i ] *  MATRIX_WIDTH / 64 / 2.0, i * iscalerW - 1 + j, MIDLY - 1 - RRaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0  ,   CHSV(h, 255 - velo / 5, 255));
+        } // last 2
+        else {
+          DLine(i * iscalerW + j, MIDLY + LLaudio[i ] *  MATRIX_WIDTH / 64 / 2.0 , i * iscalerW - 1 + j, MIDLY + LLaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0 ,  CHSV(blender, 255 - velo / 5, 255));
+          DLine(i * iscalerW + j, MIDLY - 1 - RRaudio[i ] *  MATRIX_WIDTH / 64 / 2.0 , i * iscalerW - 1 + j, MIDLY - 1  - RRaudio[-1 + i] * 64 / MATRIX_WIDTH / 2.0 , CHSV(blender, 255 - velo / 5, 255));
+        } // last 2
+      }
     }
-  }
   audioprocess();
 }
 
 void audio10()//stereo display
 {
-  if (flop[2] && flop[1]) solid3();
-  if ( flop[0]) {
-    for (int i = 0; i < MATRIX_WIDTH; i++)
-    {
-      DLine(i, MIDLY, i, MIDLY + LLaudio[i * Wscale ] * 64 / MATRIX_HEIGHT, CHSV(i * mstep / dot3 +  h, 255 - velo / 4, 255));
-      DLine(i, MIDLY - 1, i, MIDLY - 1 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT, CHSV(i * mstep / dot3 +  h, 255 - velo / 5, 255));
-    }
-  }
-  else
-    for (int i = 0; i < MATRIX_WIDTH; i++)
-    {
-      DLine(i, MIDLY, i, MIDLY + LLaudio[MATRIX_WIDTH - i] * 64 / MATRIX_HEIGHT, CHSV(i * mstep / dot3 +  h, 255 - velo / 5, 255));
-      DLine(i, MIDLY - 1, i, MIDLY - 1 - RRaudio[MATRIX_WIDTH - i] * 64 / MATRIX_HEIGHT, CHSV(i * mstep / dot3 +  h, 255 - velo / 4, 255));
-    }
-  audioprocess();
-}
 
+  if ( flop[0])
+    for (int i = 0; i < 64 ; i ++)
+      for (int j = 0; j < iscalerW; j++)
+      {
+        DLine(i * iscalerW + j, MIDLY, i * iscalerW + j, MIDLY + LLaudio[i ] *  MATRIX_HEIGHT / 64, CHSV(i * mstep / dot3 +  h, 255 - velo / 4, 255));
+        DLine(i * iscalerW + j, MIDLY - 1, i * iscalerW + j, MIDLY - 1 - RRaudio[i] *  MATRIX_HEIGHT / 64, CHSV(i * mstep / dot3 +  h, 255 - velo / 5, 255));
+      }
+
+  else
+    for (int i = 0; i < 64 ; i ++)
+      for (int j = 0; j < iscalerW; j++)
+      {
+        DLine(i * iscalerW + j, MIDLY, i * iscalerW + j, MIDLY + LLaudio[MATRIX_WIDTH - i] * 64 / MATRIX_HEIGHT, CHSV(i * mstep / dot3 +  h, 255 - velo / 5, 255));
+        DLine(i * iscalerW + j, MIDLY - 1, i * iscalerW + j, MIDLY - 1 - RRaudio[MATRIX_WIDTH - i] * 64 / MATRIX_HEIGHT, CHSV(i * mstep / dot3 +  h, 255 - velo / 4, 255));
+      }
+  audioprocess();
+
+}
 void audio11()// stereo from the sides.
 {
 
-  for (int i = 0; i < MATRIX_HEIGHT; i++)
-  {
-    if (!flop[1]) {
-      DLine(i, 0 , i, RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT , CHSV(i * mstep +  h + 128, 255 - velo / 5, 255));
-      DLine(i, MATRIX_HEIGHT - 1 , i, MATRIX_HEIGHT - 1 - LLaudio[i * Wscale ] * 64 / MATRIX_HEIGHT , CHSV(i * mstep +  h + 128, 255 - velo / 5, 255));
-    }
-    else {
-      DLine(i, 0 , i, RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT , CHSV(blender +  h + 128, 255 - velo / 5, 255));
-      DLine(i, MATRIX_HEIGHT - 1 , i, MATRIX_HEIGHT - 1 - LLaudio[i * Wscale ] * 64 / MATRIX_HEIGHT , CHSV(blender +  h + 128, 255 - velo / 5, 255));
-    }
-    /*
-      if (i > 0)
-      {
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++)
+
       if (!flop[1]) {
-        DLine(i, RRaudio[i * Wscale] * 64 / MATRIX_WIDTH , i - 1, RRaudio[-1 + i] * 64 /MATRIX_WIDTH   ,   CHSV(i * mstep +  h , 255 - velo / 5, 255)); // last 2
-        DLine(i, MATRIX_HEIGHT - 1 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH , i - 1, MATRIX_HEIGHT - 1 - LLaudio[-1 + i] * 64 / MATRIX_WIDTH   ,   CHSV(i * mstep +  h , 255 - velo / 5, 255)); // last 2
+        DLine(i * iscalerW + j, 0 , i * iscalerW + j, RRaudio[i] *  MATRIX_HEIGHT / 64 , CHSV(i * mstep +  h + 128, 255 - velo / 5, 255));
+        DLine(i * iscalerW + j, MATRIX_HEIGHT - 1 , i * iscalerW + j, MATRIX_HEIGHT - 1 - LLaudio[i ] *  MATRIX_HEIGHT / 64 , CHSV(i * mstep +  h + 128, 255 - velo / 5, 255));
       }
       else {
-        if ( flop[0]) {
-          DLine(i, RRaudio[i * Wscale] * 64 / MATRIX_WIDTH , i - 1, RRaudio[-1 + i] * 64 / MATRIX_WIDTH   ,   CHSV(blender, 255 - velo / 5, 255)); // last 2
-          DLine(i, MATRIX_HEIGHT - 1 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH , i - 1, MATRIX_HEIGHT - 1 - LLaudio[-1 + i] * 64 / MATRIX_WIDTH   ,   CHSV(blender, 255 - velo / 5, 255)); // last 2
-        }
-
-        else {
-          DLine(i, RRaudio[i * Wscale] * 64 / MATRIX_WIDTH  , i - 1, RRaudio[-1 + i] * 64 / MATRIX_WIDTH  ,  CRGB::White); // last 2
-          DLine(i, MATRIX_HEIGHT - 1 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH , i - 1, MATRIX_HEIGHT - 1 - LLaudio[-1 + i] * 64 / MATRIX_WIDTH   ,   CRGB::White); // last 2
-        }
+        DLine(i * iscalerW + j, 0 , i * iscalerW + j, RRaudio[i] *  MATRIX_HEIGHT / 64 , CHSV(blender +  h + 128, 255 - velo / 5, 255));
+        DLine(i * iscalerW + j, MATRIX_HEIGHT - 1 , i * iscalerW + j, MATRIX_HEIGHT - 1 - LLaudio[i ] *  MATRIX_HEIGHT / 64 , CHSV(blender +  h + 128, 255 - velo / 5, 255));
       }
-      }*/
-  }
+
+
   audioprocess();
 }
 
 void audio12()//stereo display
 {
-  if (flop[2] && flop[1]) solid5();
-  if (flop[0]) {
-    for (int i = 0; i < MATRIX_WIDTH; i++)
-    {
-      DLine(i, MIDLY / 2, i, MIDLY / 2 + LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT, CHSV(i * mstep +  h, 255 - velo / 4, 255));
-      DLine(i, MIDLY / 2, i, MIDLY / 2 - LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT, CHSV(i * mstep +  h, 255 - velo / 4, 255));
-      DLine(i, MIDLY * 3 / 2, i, MIDLY * 3 / 2 - RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT  , CHSV(i * mstep +  h, 255 - velo / 5, 255));
-      DLine(i, MIDLY * 3 / 2, i, MIDLY * 3 / 2 + RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT  , CHSV(i * mstep +  h, 255 - velo / 5, 255));
+
+
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      {
+        DLine(i * iscalerW + j, MIDLY / 2, i * iscalerW + j, MIDLY / 2 + (LLaudio[i  ]  * MATRIX_HEIGHT / 64 / 2 / 2)  , CHSV((i * iscalerW + j) * mstep +  h, 255 - velo / 4, 255));
+        DLine(i * iscalerW + j, MIDLY / 2, i * iscalerW + j, MIDLY / 2 - (LLaudio[i  ]  * MATRIX_HEIGHT / 64 / 2 / 2)  , CHSV((i * iscalerW + j) * mstep +  h, 255 - velo / 4, 255));
+        DLine(i * iscalerW + j, MIDLY * 3 / 2, i * iscalerW + j, MIDLY * 3 / 2 - (RRaudio[i ]  *  MATRIX_HEIGHT / 64 / 2 / 2)   , CHSV((i * iscalerW + j) * mstep +  h, 255 - velo / 5, 255));
+        DLine(i * iscalerW + j, MIDLY * 3 / 2, i * iscalerW + j, MIDLY * 3 / 2 + (RRaudio[i ] *  MATRIX_HEIGHT / 64 / 2 / 2) , CHSV((i * iscalerW + j) * mstep +  h, 255 - velo / 5, 255));
+      }
     }
-  }
-  else
-    for (int i = 0; i < MATRIX_WIDTH; i++)
-    {
-      DLine(i, MIDLY / 2, i, MIDLY / 2 + LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT, CHSV(i * mstep -  h, 255 - velo / 4, 255));
-      DLine(i, MIDLY / 2, i, MIDLY / 2 - LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT, CHSV(i * mstep -  h, 255 - velo / 4, 255));
-      DLine(i, MIDLY * 3 / 2, i, MIDLY * 3 / 2 - RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT  , CHSV(i * mstep -  h + 128, 255 - velo / 5, 255));
-      DLine(i, MIDLY * 3 / 2, i, MIDLY * 3 / 2 + RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT  , CHSV(i * mstep -  h + 128, 255 - velo / 5, 255));
-    }
-  for (int i = 1; i < MATRIX_WIDTH; i++)
-    if (!flop[7]) {
-      DLine(i, MIDLY / 2 + LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT , i - 1, MIDLY / 2 + LLaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT  ,  CRGB::White);
-      DLine(i, MIDLY / 2 - LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT , i - 1, MIDLY / 2 - LLaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT  ,  CRGB::White);
-      DLine(i, MIDLY * 3 / 2 + RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT   , i - 1, MIDLY * 3 / 2 + RRaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT    ,  CRGB::White);
-      DLine(i, MIDLY * 3 / 2 - RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT   , i - 1, MIDLY * 3 / 2 - RRaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT    ,  CRGB::White);
-    }
-    else {
-      DLine(i, MIDLY / 2 + LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT , i - 1, MIDLY / 2 + LLaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT  ,  CHSV(h, 255 - velo / 5, 255));
-      DLine(i, MIDLY / 2 - LLaudio[i * Wscale ] * 32 / MATRIX_HEIGHT , i - 1, MIDLY / 2 - LLaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT  ,  CHSV(h, 255 - velo / 5, 255));
-      DLine(i, MIDLY * 3 / 2 + RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT   , i - 1, MIDLY * 3 / 2 + RRaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT    ,  CHSV(h + 128, 255 - velo / 5, 255));
-      DLine(i, MIDLY * 3 / 2 - RRaudio[i * Wscale] * 32 / MATRIX_HEIGHT   , i - 1, MIDLY * 3 / 2 - RRaudio[-1 + i * Wscale] * 32 / MATRIX_HEIGHT    ,  CHSV(h + 128, 255 - velo / 5, 255));
-    }
+  /*
+    for (int i = 1; i < 64 ; i ++)
+      for (int j = 0; j < iscalerW; j++)
+        if (!flop[7]) {
+          DLine(i * iscalerW + j, MIDLY / 2 + (LLaudio[i  ]  * MATRIX_HEIGHT) / 64 / 2 /2, i - 1 + j, MIDLY / 2 + (LLaudio[-1 + i  ]  * MATRIX_HEIGHT) / 64 / 2/2 ,  CRGB::Purple);
+          DLine(i * iscalerW + j, MIDLY / 2 - (LLaudio[i  ]  * MATRIX_HEIGHT) / 64 / 2/2 , i - 1 + j, MIDLY / 2 - (LLaudio[-1 + i  ]  * MATRIX_HEIGHT) / 64 / 2/2 ,  CRGB::Purple);
+          DLine(i * iscalerW + j, MIDLY * 3 / 2 + (RRaudio[i ]  *  MATRIX_HEIGHT) / 64 / 2/2   , i - 1 + j, MIDLY * 3 / 2 + (RRaudio[-1 + i ]  *  MATRIX_HEIGHT) / 64 / 2 /2   ,  CRGB::Purple);
+          DLine(i * iscalerW + j, MIDLY * 3 / 2 - (RRaudio[i ]  *  MATRIX_HEIGHT) / 64 / 2/2   , i - 1 + j, MIDLY * 3 / 2 - (RRaudio[-1 + i ]  *  MATRIX_HEIGHT) / 64 / 2 /2    ,  CRGB::Purple);
+        }
+        else {
+          DLine(i * iscalerW + j, MIDLY / 2 + (LLaudio[i  ]  * MATRIX_HEIGHT) / 64 / 2/2 , i - 1 + j, MIDLY / 2 + (LLaudio[-1 + i  ]  * MATRIX_HEIGHT) / 64 / 2/2 ,  CHSV(h, 255 - velo / 5, 255));
+          DLine(i * iscalerW + j, MIDLY / 2 - (LLaudio[i  ]  * MATRIX_HEIGHT) / 64 / 2/2 , i - 1 + j, MIDLY / 2 - (LLaudio[-1 + i  ]  * MATRIX_HEIGHT) / 64 / 2/2 ,  CHSV(h, 255 - velo / 5, 255));
+          DLine(i * iscalerW + j, MIDLY * 3 / 2 + (RRaudio[i ]  *  MATRIX_HEIGHT) / 64 / 2 /2 , i - 1 + j, MIDLY * 3 / 2 + (RRaudio[-1 + i ]  *  MATRIX_HEIGHT) / 64 / 2/2  ,  CHSV(h + 128, 255 - velo / 5, 255));
+          DLine(i * iscalerW + j, MIDLY * 3 / 2 - (RRaudio[i ]  *  MATRIX_HEIGHT) / 64 / 2 /2  , i - 1 + j, MIDLY * 3 / 2 - (RRaudio[-1 + i ]  *  MATRIX_HEIGHT) / 64 / 2 /2   ,  CHSV(h + 128, 255 - velo / 5, 255));
+        }*/
   audioprocess();
 }
 
 
 void audio13()//stereo display crossed....do it..
 {
-  if (flop[2] && flop[1])
-    solid2();
-
-  for (int i = 0; i < MATRIX_WIDTH; i++)
-  {
-    DLine(i, MIDLY , i, MIDLY  - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT , CHSV(2 *  h, 255 - velo / 5, 255));
-    DLine(i, MIDLY , i, MIDLY  + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT , CHSV(2 *  h, 255 - velo / 5, 255));
-  }
-  for (int i = 0; i < MATRIX_HEIGHT; i++)
-  {
-    DLine(MIDLX, i, MIDLX + LLaudio[i * Hscale ] * 32 / MATRIX_WIDTH , i, CHSV( 85 + h, 255 - velo / 4, 255));
-    DLine(MIDLX, i, MIDLX - LLaudio[i * Hscale ] * 32 / MATRIX_WIDTH , i, CHSV(85 +  h, 255 - velo / 4, 255));
-  }
 
 
-
-  audioprocess();
-}
-
-void audio2()
-{
-
-  for (int i = 0; i < MATRIX_WIDTH; i++)
-  {
-    DLine(i, 0, i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH , CHSV(i * mstep + blender, 255 - velo / 5, 255));
-    if (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH > MATRIX_HEIGHT * 0.50 )
-      DLine(i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH - 4, i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ,  CHSV(i * mstep / dot3 + 85 + blender, 255 - velo / 5, 255));
-    if (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH > MATRIX_HEIGHT * 0.70 ) {
-      DLine(i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH - 2, i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ,  CHSV(i * mstep / dot3 - 85 + blender, 255 - velo / 5, 255));
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++)
+    {
+      DLine(i * iscalerW + j, MIDLY , i * iscalerW + j, MIDLY  - RRaudio[i] *  MATRIX_HEIGHT / 64 , CHSV(2 *  h, 255 - velo / 5, 255));
+      DLine(i * iscalerW + j, MIDLY , i * iscalerW + j, MIDLY  + RRaudio[i] *  MATRIX_HEIGHT / 64 , CHSV(2 *  h, 255 - velo / 5, 255));
     }
-  }
+  for (int i = 0; i < 64 ; i += scalerH)
+    for (int j = 0; j < scalerH; j++)
+    {
+      DLine(MIDLX, i * iscalerW + j, MIDLX + LLaudio[i  ] * MATRIX_WIDTH / 64, i * iscalerW + j, CHSV( 85 + h, 255 - velo / 4, 255));
+      DLine(MIDLX, i * iscalerW + j, MIDLX - LLaudio[i  ] * MATRIX_WIDTH / 64, i * iscalerW + j, CHSV(85 +  h, 255 - velo / 4, 255));
+    }
+
+
+
   audioprocess();
 }
 
+void audio2()// different S on big hits
+{
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+
+      DLine(i * iscalerW + j, 0, i * iscalerW + j, LLaudio[i ] * MATRIX_HEIGHT / 64 / 2, CHSV(i * mstep + blender, 255, 255));
+
+      DLine(i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64 / 2 - 8, i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64 / 2,  CHSV(i * mstep  + blender - 85, 166, 255));
+
+      DLine(i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64 / 2 - 4, i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64 / 2,  CHSV(i * mstep  + blender + 85, 128, 255));
+    }
+  audioprocess();
+}
 void audio3()// different S on big hits
 {
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
 
-  for (int i = 0; i < MATRIX_WIDTH; i++)
-  {
-    DLine(i, 0, i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH , CHSV(i * mstep + blender, 255, 255));
-    if (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH > MATRIX_HEIGHT * 0.50 )
-      DLine(i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH - 4, i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ,  CHSV(i * mstep  + blender, 196, 255));
-    if (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH > MATRIX_HEIGHT * 0.70 ) {
-      DLine(i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH - 2, i, LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ,  CHSV(i * mstep  + blender + 32, 128, 255));
+      DLine(i * iscalerW + j, 0, i * iscalerW + j, LLaudio[i ] * MATRIX_HEIGHT / 64, CHSV(i * mstep + blender, 255, 255));
+
+      DLine(i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64 * 2 / 3, i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64,  CHSV(i * mstep  + blender + 85, 166, 255));
+
+      DLine(i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64 / 3, i * iscalerW + j, LLaudio[i  ] * MATRIX_HEIGHT / 64,  CHSV(i * mstep  + blender - 85, 128, 255));
     }
-  }
   audioprocess();
 }
 
@@ -5918,34 +6032,36 @@ void Raudio19()  // 2 stereo rotating ring,  dots  , freq rotates, colors do not
 {
   if (counter == 0)dot = random8(1, 3);
 
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep  +  h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep  +  h ) - 128.0) / 128.0;
-    if (flop[2])
-    {
-      DFCircle(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale), dot, CHSV(i * mstep / 2 + blender , 255 - velo / 5, 255));
-      DFCircle(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale), dot, CHSV(i * mstep / 2 + xblender + 128, 255 - velo / 5, 255));
-    }
-    else {
-      if (flop[1])
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  - h ) - 128.0) / 128.0;
+
+      if (flop[2])
       {
-        DFCircle(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale), dot, CHSV(i * mstep / 2 + blender , 255 - velo / 5, 255));
-        DFCircle(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale), dot, CRGB::White);
+        DFCircle(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i ] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i ] *  MATRIX_HEIGHT / 64 / mscale), dot, CHSV(i * mstep / 2 + blender , 255 - velo / 5, 255));
+        DFCircle(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i] *  MATRIX_HEIGHT / 64 / mscale), dot, CHSV(i * mstep / 2 + xblender + 128, 255 - velo / 5, 255));
       }
       else {
-        if ( flop[0])
+        if (flop[1])
         {
-          zeds(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale)) = CRGB::White;;
-          zeds(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale)) = CRGB::White;;
+          DFCircle(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i ] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i ] *  MATRIX_HEIGHT / 64 / mscale), dot, CHSV(i * mstep / 2 + blender , 255 - velo / 5, 255));
+          DFCircle(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i] *  MATRIX_HEIGHT / 64 / mscale), dot, CRGB::White);
         }
-        else
-        {
-          zeds(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / mscale)) = CHSV(i * mstep / 2 + blender, 255 - velo / 5, 255);
-          zeds(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale)) = CHSV(i * mstep / 2 + blender, 255 - velo / 5, 255);
+        else {
+          if ( flop[0])
+          {
+            zeds(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i ] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i ] *  MATRIX_HEIGHT / 64 / mscale)) = CRGB::White;;
+            zeds(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i] *  MATRIX_HEIGHT / 64 / mscale)) = CRGB::White;;
+          }
+          else
+          {
+            zeds(MIDLX + xangle * (MATRIX_WIDTH / 2 - LLaudio[i ] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i ] *  MATRIX_HEIGHT / 64 / mscale)) = CHSV(i * mstep / 2 + blender, 255 - velo / 5, 255);
+            zeds(MIDLX + xangle * (1 + MATRIX_WIDTH / 2 - RRaudio[i] *  MATRIX_WIDTH / 64 / mscale) , MIDLY + yangle * (1 + MATRIX_HEIGHT / 2 - RRaudio[i] *  MATRIX_HEIGHT / 64 / mscale)) = CHSV(i * mstep / 2 + blender, 255 - velo / 5, 255);
+          }
         }
       }
     }
-  }
   audioprocess();
 }
 
@@ -6028,7 +6144,6 @@ void circleaudio2()// a circular spectrograph
 
 void circleaudio3()// a circular spectrograph
 {
-  // solid2();
   for (int16_t j = 0; j < 16; j++) {
     for (int i = 0; i < LLaudio[j] ; i++) {
       xangle =  (sin8(i * 3) - 128.0 ) / 128.0;
@@ -6060,68 +6175,72 @@ void circleaudio3()// a circular spectrograph
 
 void Raudio18()// ring, lines, colors rotate, freq does not rotate  black
 {
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep + h) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep + h) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.6 * mscale)), CHSV(i * mstep + h  , 255 - velo / 2, 255));
-    zeds( MIDLX + xangle * (MIDLX - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.6 * mscale))) = CHSV(i * mstep + h  , 255 - velo / 2, 255);
-    xangle =  (sin8(i * mstep + mstep / 2 + h) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep + mstep / 2 + h) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.6 * mscale)), CHSV(i * mstep + h  , 255 - velo / 8, 255));
-    zeds( MIDLX + xangle * (MIDLX - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.6 * mscale))) = CHSV(i * mstep + h  , 255 - velo / 8, 255);
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  - h ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i ] *  MATRIX_WIDTH / 64 / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i ] *  MATRIX_HEIGHT / 64 / (1.6 * mscale)), CHSV(i * mstep + h  , 255 - velo / 2, 255));
+      zeds( MIDLX + xangle * (MIDLX - RRaudio[i] *  MATRIX_HEIGHT / 64 / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i ] *  MATRIX_HEIGHT / 64 / (1.6 * mscale))) = CHSV(i * mstep + h  , 255 - velo / 2, 255);
+      xangle =  (sin8((i * iscalerW + j) * mstep / 2  + h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep / 2  + h ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - RRaudio[i] *  MATRIX_WIDTH / 64 / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - RRaudio[i] *  MATRIX_HEIGHT / 64 / (1.6 * mscale)), CHSV(i * mstep + h  , 255 - velo / 8, 255));
+      zeds( MIDLX + xangle * (MIDLX - RRaudio[i] *  MATRIX_WIDTH / 64 / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i ] *  MATRIX_HEIGHT / 64 / (1.6 * mscale))) = CHSV(i * mstep + h  , 255 - velo / 8, 255);
+    }
   audioprocess();
 }
 
 void Raudio2()// ring, lines, colors rotate, freq does not rotate
 {
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep  ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep  ) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.6 * mscale)), CHSV(i * mstep + blender  , 255 - velo / 5, 255));
-    xangle =  (sin8(i * mstep + mstep / 2 ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep + mstep / 2 ) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.6 * mscale)), CHSV(i * mstep + blender  , 255 - velo / 5, 255));
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i ] *  MATRIX_WIDTH / 64 / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i ] *  MATRIX_HEIGHT / 64 / (1.6 * mscale)), CHSV((i + j) * mstep + blender  , 255 - velo / 5, 255));
+      xangle =  (sin8((i * iscalerW + j) * mstep + mstep / 2 ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep + mstep / 2 ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - RRaudio[i] *  MATRIX_HEIGHT / 64 / (1.6 * mscale)) , MIDLY + yangle * (MIDLY - RRaudio[i] *  MATRIX_HEIGHT / 64 / (1.6 * mscale)), CHSV((i + j) * mstep + blender  , 255 - velo / 5, 255));
+    }
   audioprocess();
 }
 
 void Raudio1()// ring, lines, colors rotate, freq does not rotate
 {
 
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.7 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH / (1.7 * mscale)), CHSV(i * mstep + poffset , 255 - velo / 5, 255));
-    xangle =  (sin8(i * mstep  + mstep / 2  ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep  + mstep / 2) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.7 * mscale)) , MIDLY + yangle * (MIDLY - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (1.7 * mscale)), CHSV(i * mstep + poffset , 255 - velo / 5, 255));
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep - h ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep - h ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i ] *  MATRIX_WIDTH / 64 / (1.7 * mscale)) , MIDLY + yangle * (MIDLY - LLaudio[i ] *  MATRIX_WIDTH / 64 / (1.7 * mscale)), CHSV(i * mstep + poffset , 255 - velo / 5, 255));
+      xangle =  (sin8((i * iscalerW + j) * mstep  + mstep / 2  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  + mstep / 2) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - RRaudio[i] *  MATRIX_HEIGHT / 64 / (1.7 * mscale)) , MIDLY + yangle * (MIDLY - RRaudio[i] *  MATRIX_HEIGHT / 64 / (1.7 * mscale)), CHSV(i * mstep + poffset , 255 - velo / 5, 255));
+    }
   // audioprocess();
 }
 
 void Raudio3()//star shaped colors rotate
 {
 
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep   ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep  ) - 128.0) / 128.0;
-    DLine( driftx + xangle * 3 , drifty + yangle * 3 , driftx  + xangle * ( 3 + (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ) / (2 * mscale)) , drifty  + yangle * (3 + (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ) / (2 * mscale)), CHSV(i * mstep + blender , 255 - velo / 5, 255));
-    DLine( driftx + xangle * 24 , drifty + yangle * 24 , driftx  + xangle * ( 24 + (RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT ) / (2 * mscale)) , drifty  + yangle * (24 + (RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT ) / (2 * mscale)), CHSV(i * mstep + xblender , 255 - velo / 5, 255));
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep   ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  ) - 128.0) / 128.0;
+      DLine( driftx + xangle * 3 , drifty + yangle * 3 , driftx  + xangle * ( 3 + (LLaudio[i ] *  MATRIX_WIDTH / 64 ) / (2 * mscale)) , drifty  + yangle * (3 + (LLaudio[i ] *  MATRIX_WIDTH / 64 ) / (2 * mscale)), CHSV(i * mstep + blender , 255 - velo / 5, 255));
+      DLine( driftx + xangle * 24 , drifty + yangle * 24 , driftx  + xangle * ( 24 + (RRaudio[i] *  MATRIX_HEIGHT / 64 ) / (2 * mscale)) , drifty  + yangle * (24 + (RRaudio[i] *  MATRIX_HEIGHT / 64 ) / (2 * mscale)), CHSV(i * mstep + xblender , 255 - velo / 5, 255));
+    }
 
   audioprocess();
 }
 
 void Raudio14()//star shaped colors rotate
 {
-
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep  + h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep - h  ) - 128.0) / 128.0;
-    DLine( driftx + xangle * 3 , drifty + yangle * 3 , driftx  + xangle * ( 3 + (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ) / (2 * mscale)) , drifty  + yangle * (3 + (LLaudio[i * Wscale ] * 64 / MATRIX_WIDTH ) / (2 * mscale)), CHSV(i * mstep + blender + h, 255 - velo / 5, 255));
-    DLine( driftx + xangle * 24 , drifty + yangle * 24 , driftx  + xangle * ( 24 + (RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT ) / (2 * mscale)) , drifty  + yangle * (24 + (RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT ) / (2 * mscale)), CHSV(i * mstep + xblender + h , 255 - velo / 5, 255));
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  + h ) - 128.0) / 128.0;
+      DLine( driftx + xangle * 3 , drifty + yangle * 3 , driftx  + xangle * ( 3 + (LLaudio[i ] *  MATRIX_WIDTH / 64 ) / (2 * mscale)) , drifty  + yangle * (3 + (LLaudio[i ] *  MATRIX_WIDTH / 64 ) / (2 * mscale)), CHSV(i * mstep + blender + h, 255 - velo / 5, 255));
+      DLine( driftx + xangle * 24 , drifty + yangle * 24 , driftx  + xangle * ( 24 + (RRaudio[i] *  MATRIX_HEIGHT / 64 ) / (2 * mscale)) , drifty  + yangle * (24 + (RRaudio[i] *  MATRIX_HEIGHT / 64 ) / (2 * mscale)), CHSV(i * mstep + xblender + h , 255 - velo / 5, 255));
+    }
 
   audioprocess();
 }
@@ -6130,11 +6249,12 @@ void Raudio13()//roving star shaped colors rotate
 {
   if (counter == 0)
     poffset = random8();
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep - h  ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
-    DLine( driftx + xangle * 5 ,  drifty + yangle * 5 , driftx  + xangle * ( 5 + (RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT ) / (2 * mscale)) , drifty  + yangle * (5 + (RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT ) / (2 * mscale)), CHSV(i * mstep + poffset , 255 - velo / 5, 255));
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  - h ) - 128.0) / 128.0;
+      DLine( driftx + xangle * 5 ,  drifty + yangle * 5 , driftx  + xangle * ( 5 + (RRaudio[i ] *  MATRIX_WIDTH / 64 ) / (2 * mscale)) , drifty  + yangle * (5 + (RRaudio[i] *  MATRIX_HEIGHT / 64 ) / (2 * mscale)), CHSV(i * mstep + poffset , 255 - velo / 5, 255));
+    }
 
   audioprocess();
 }
@@ -6146,19 +6266,23 @@ void Raudio4() // multi color hollow star witht variable height outward non rota
   if (flop[6])
     floyd = floyd / dot3;
 
-  for (int i = 0; i < MATRIX_WIDTH  ; i++) {
-    if (flop[3]) {
-      xangle =  (sin8(i * mstep + h ) - 128.0) / 128.0;
-      yangle =  (cos8(i * mstep + h ) - 128.0) / 128.0;
-    }
-    else
-    {
-      xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
-      yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
-    }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      if (flop[3]) {
+        xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
+        yangle =  (cos8((i * iscalerW + j) * mstep  - h ) - 128.0) / 128.0;
 
-    DLine(driftx + (dot + 1) * xangle, drifty + (dot + 1)* yangle, driftx + xangle * (dot + 1 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty + yangle * (dot + 1 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)), CHSV(i * floyd + poffset , 255 - velo / 8, 255));
-  }
+
+      }
+      else
+      {
+        xangle =  (sin8((i * iscalerW + j) * mstep  + h  ) - 128.0) / 128.0;
+        yangle =  (cos8((i * iscalerW + j) * mstep  + h ) - 128.0) / 128.0;
+
+      }
+
+      DLine(driftx + (dot + 1) * xangle, drifty + (dot + 1)* yangle, driftx + xangle * (dot + 1 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty + yangle * (dot + 1 + LLaudio[i ] * MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * floyd + poffset , 255 - velo / 8, 255));
+    }
   audioprocess();
 }
 
@@ -6170,51 +6294,56 @@ void Raudio5()  // multi color  ring witht variable height  colors stay with fre
   floyd = mstep;
   if (flop[6])
     floyd = floyd / dot3;
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep  - h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep  - h ) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (1.4 * mscale )) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (1.4 * mscale )), CHSV(i * floyd , 255 - velo / 5, 255));
-  }
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i * iscalerW + j) * mstep  - h ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i ] * MATRIX_WIDTH / 64 / (1.4 * mscale )) , MIDLY + yangle * (MIDLY - LLaudio[i ] *  MATRIX_WIDTH / 64 / (1.4 * mscale )), CHSV(i * floyd , 255 - velo / 5, 255));
+    }
   audioprocess();
 }
 
 void Raudio15()  // multi color  ring witht variable height  colors stay with freq, freq rotates
 {
 
+  for (int i = 0; i < 64 ; i ++)
+    for (int j = 0; j < iscalerW; j++) {
+      xangle =  (sin8((i * iscalerW + j) * mstep  - h  ) - 128.0) / 128.0;
 
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep  - h ) - 128.0) / 128.0;
-    if (flop[0] || flop[1])
-      yangle =  (cos8(i * mstep  - h ) - 128.0) / 128.0;
-    else
-      yangle =  (cos8(i * mstep  + h ) - 128.0) / 128.0;
-    DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (1.4 * mscale )) , MIDLY + yangle * (MIDLY - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (1.4 * mscale )), CHSV(i * mstep / dot3 - h , 255 - velo / 5, 255));
-  }
+      if (flop[0] || flop[1])
+        yangle =  (cos8((i * iscalerW + j) * mstep  - h ) - 128.0) / 128.0;
+      else
+        yangle =  (cos8((i * iscalerW + j) * mstep  + h ) - 128.0) / 128.0;
+      DLine(MIDLX + MIDLX * xangle, MIDLY + MIDLY * yangle, MIDLX + xangle * (MIDLX - LLaudio[i] * MATRIX_WIDTH / 64 / (1.4 * mscale )) , MIDLY + yangle * (MIDLY - LLaudio[i] * MATRIX_HEIGHT / 64 / (1.4 * mscale )), CHSV(i * mstep / dot3 - h , 255 - velo / 5, 255));
+    }
   audioprocess();
 }
 
 void Raudio6()  // color ring of dots, roughly circular ,
 {
-  if (counter == 0)
+  if (counter == 0) {
     poffset = random8();
-  for (int i = 0; i < MATRIX_WIDTH ; i++) {
-    xangle =  (sin8(i * mstep  - h  ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep  - h ) - 128.0) / 128.0;
-    if (flop[1] || flop[2] )//mostly stereo
-    {
-      zeds( driftx + xangle * ( MATRIX_WIDTH / 2 - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale) , drifty + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale)) = CHSV(i * mstep + poffset + h , 255 - velo / 5, 255);
-      zeds( driftx + xangle * (-2 + MATRIX_WIDTH / 2 - RRaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale) , drifty + yangle * (-2 + MATRIX_HEIGHT / 2 - RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / mscale)) = CHSV(i * mstep + poffset + 128 + h, 255 - velo / 5, 255);
-    }
-    else//sometimes  but not stereo
-    {
-      zeds( driftx + xangle * ( MATRIX_WIDTH / 2 - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale) , drifty + yangle * (MATRIX_HEIGHT / 2 - LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale)) = CHSV(i * mstep + poffset , 255 - velo / 5, 255);
-      zeds( driftx + xangle * (-2 + MATRIX_WIDTH / 2 - RRaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale) , drifty + yangle * (-2 + MATRIX_HEIGHT / 2 - RRaudio[i * Wscale] * 64 / MATRIX_WIDTH / mscale)) = CHSV(i * mstep + poffset + 128 , 255 - velo / 5, 255);
-      ;
-    }
+
   }
+  for (int i = 0; i < 64 ; i += scalerW)
+    for (int j = 0; j < scalerW; j++) {
+      xangle =  (sin8((i + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i + j) * mstep  - h ) - 128.0) / 128.0;
+      if (flop[1] || flop[2] )//mostly stereo
+      {
+        zeds( driftx + xangle * ( MIDLX - LLaudio[i ] * MATRIX_WIDTH / 64 ) , drifty + yangle * (MIDLY - LLaudio[i ] * MATRIX_HEIGHT / 64 / mscale)) = CHSV(i * mstep + poffset + h , 255 - velo / 5, 255);
+        zeds( driftx + xangle * (-2 + MIDLX - RRaudio[i ] * MATRIX_WIDTH / 64 / mscale) , drifty + yangle * (-2 + MIDLY - RRaudio[i ] *  MATRIX_HEIGHT / 64)) = CHSV(i * mstep + poffset + 128 + h, 255 - velo / 5, 255);
+      }
+      else//sometimes  but not stereo
+      {
+        zeds( driftx + xangle * ( MIDLX - LLaudio[i ] * MATRIX_WIDTH / 64 / mscale) , drifty + yangle * (MIDLY - LLaudio[i ] * MATRIX_HEIGHT / 64 / mscale)) = CHSV(i * mstep + poffset , 255 - velo / 5, 255);
+        zeds( driftx + xangle * (-2 + MIDLX - RRaudio[i ] * MATRIX_WIDTH / 64 / mscale) , drifty + yangle * (-2 + MIDLY - RRaudio[i ] * MATRIX_HEIGHT / 64 / mscale)) = CHSV(i * mstep + poffset + 128 , 255 - velo / 5, 255);
+        ;
+      }
+    }
+
   audioprocess();
 }
-
 
 void Raudio7() // radiatng rotating planet pair stereo
 {
@@ -6225,13 +6354,15 @@ void Raudio7() // radiatng rotating planet pair stereo
 
   locusy = ((radius3 * (cos8(h ) - 128)) >> 7);
   locusx = ((radius3 * (sin8(h ) - 128)) >> 7);
-  for (int i = 0; i < MATRIX_WIDTH  ; i++) {
-    xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
-    DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CHSV(i * mstep / (dot3) + blender , 255 - velo / 5, 255));
-    DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CHSV(i * mstep / (dot3) + blender , 255 - velo / 5, 255));
+  for (int i = 0; i < 64 ; i += scalerW)
+    for (int j = 0; j < scalerW; j++) {
+      xangle =  (sin8((i + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i + j) * mstep  - h ) - 128.0) / 128.0;
 
-  }
+      DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i ] * MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * mstep / (dot3) + blender , 255 - velo / 5, 255));
+      DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i ] *  MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * mstep / (dot3) + blender , 255 - velo / 5, 255));
+
+    }
   audioprocess();
 }
 
@@ -6248,13 +6379,14 @@ void Raudio17() // radiatng rotating planet pair about rotating center that rota
   locusx = ((radius3 * (sin8(h ) - 128)) >> 7);
   drifty = MIDLX + ((radius2 * (cos8(h + poffset) - 128)) >> 7);
   driftx = MIDLX + ((radius2 * (sin8(h + poffset) - 128)) >> 7);
-  for (int i = 0; i < MATRIX_WIDTH; i++) {
-    xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep + h ) - 128.0) / 128.0;
-    DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CHSV(i * mstep / dot3 + poffset , 255 - velo / 5, 255));
-    DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CHSV(i * mstep / dot3 + poffset , 255 - velo / 5, 255));
+  for (int i = 0; i < 64 ; i += scalerW)
+    for (int j = 0; j < scalerW; j++) {
+      xangle =  (sin8((i + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i + j) * mstep  - h ) - 128.0) / 128.0;
+      DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i ] *  MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * mstep / dot3 + poffset , 255 - velo / 5, 255));
+      DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i ] *  MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * mstep / dot3 + poffset , 255 - velo / 5, 255));
 
-  }
+    }
   audioprocess();
 }
 
@@ -6267,48 +6399,49 @@ void Raudio8() // whiteness
 
   locusy = ((radius3 * (cos8(h ) - 128)) >> 7);
   locusx = ((radius3 * (sin8(h ) - 128)) >> 7);
-  for (int i = 0; i < MATRIX_WIDTH  ; i++) {
-    xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
-    yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
+  for (int i = 0; i < 64 ; i += scalerW)
+    for (int j = 0; j < scalerW; j++) {
+      xangle =  (sin8((i + j) * mstep  - h  ) - 128.0) / 128.0;
+      yangle =  (cos8((i + j) * mstep  - h ) - 128.0) / 128.0;
 
-    if (flop[4]) {
+      if (flop[4]) {
 
-      if (flop[3]) {
-        DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 64, 255 - velo / 5, 220));
-        DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h - 64, 255 - velo / 5, 220));
+        if (flop[3]) {
+          DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 64, 255 - velo / 5, 220));
+          DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h - 64, 255 - velo / 5, 220));
+        }
+        else
+        {
+          DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 85, 255 - velo / 5, 220));
+          DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h - 85, 255 - velo / 5, 220));
+        }
+        DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i ] * MATRIX_HEIGHT / 64 / (mscale)), CRGB::White);
+        DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64 / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i ] * MATRIX_HEIGHT / 64 / (mscale)), CRGB::White);
+
       }
       else
       {
-        DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 85, 255 - velo / 5, 220));
-        DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h - 85, 255 - velo / 5, 220));
-      }
-      DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CRGB::White);
-      DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CRGB::White);
 
+        if (flop[3]) {
+          DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 32, 255 - velo / 5, 220));
+          DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h + 64, 255 - velo / 5, 220));
+          DFCircle(driftx - locusx, drifty + locusy, MIDLY / 4, CHSV(h - 32, 255 - velo / 5, 220));
+          DFCircle(driftx + locusx, drifty - locusy, MIDLY / 4, CHSV(h - 64, 255 - velo / 5, 220));
+        }
+        else
+        {
+          DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 42, 255 - velo / 5, 220));
+          DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h + 84, 255 - velo / 5, 220));
+          DFCircle(driftx + locusx, drifty - locusy, MIDLY / 4, CHSV(h - 84, 255 - velo / 5, 220));
+          DFCircle(driftx - locusx, drifty + locusy, MIDLY / 4, CHSV(h - 42, 255 - velo / 5, 220));
+        }
+        DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64  / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i]*  MATRIX_HEIGHT / 64 / (mscale)), CRGB::White);
+        DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64  / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i]* MATRIX_HEIGHT / 64 / (mscale)), CRGB::White);
+        DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64  / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i]*  MATRIX_HEIGHT / 64 / (mscale)), CRGB::White);
+        DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i ] * MATRIX_WIDTH / 64  / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i]*  MATRIX_HEIGHT / 64 / (mscale)), CRGB::White);
+
+      }
     }
-    else
-    {
-
-      if (flop[3]) {
-        DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 32, 255 - velo / 5, 220));
-        DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h + 64, 255 - velo / 5, 220));
-        DFCircle(driftx - locusx, drifty + locusy, MIDLY / 4, CHSV(h - 32, 255 - velo / 5, 220));
-        DFCircle(driftx + locusx, drifty - locusy, MIDLY / 4, CHSV(h - 64, 255 - velo / 5, 220));
-      }
-      else
-      {
-        DFCircle(driftx + locusx, drifty + locusy, MIDLY / 4, CHSV(h + 42, 255 - velo / 5, 220));
-        DFCircle(driftx - locusx, drifty - locusy, MIDLY / 4, CHSV(h + 84, 255 - velo / 5, 220));
-        DFCircle(driftx + locusx, drifty - locusy, MIDLY / 4, CHSV(h - 84, 255 - velo / 5, 220));
-        DFCircle(driftx - locusx, drifty + locusy, MIDLY / 4, CHSV(h - 42, 255 - velo / 5, 220));
-      }
-      DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CRGB::White);
-      DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CRGB::White);
-      DLine(driftx - locusx + (MIDLX / 4) * xangle, drifty + locusy + (MIDLY / 4)* yangle, driftx + locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty + locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CRGB::White);
-      DLine(driftx + locusx + (MIDLX / 4) * xangle, drifty - locusy + (MIDLY / 4)* yangle, driftx - locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , drifty - locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CRGB::White);
-
-    }
-  }
 
   audioprocess();
 }
@@ -6324,7 +6457,7 @@ void RaudioRoger() // radiatng rotating centered in roger's hole
   for (int i = 0; i < MATRIX_WIDTH  ; i++) {
     xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
     yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
-    DLine(locusx + (MIDLX / 4) * xangle,  locusy + (MIDLY / 4)* yangle,  locusx + xangle * (MIDLX / 4 + RRaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , locusy + yangle * (MIDLY / 4 + RRaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CHSV(i * mstep + poffset , 128 + blender / 2, 255));
+    DLine(locusx + (MIDLX / 4) * xangle,  locusy + (MIDLY / 4)* yangle,  locusx + xangle * (MIDLX / 4 + RRaudio[i] *  MATRIX_WIDTH / 64 / (mscale)) , locusy + yangle * (MIDLY / 4 + RRaudio[i] *  MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * mstep + poffset , 1255- blender /8, 255));
 
   }
   audioprocess();
@@ -6338,7 +6471,7 @@ void LaudioRoger() // radiatng rotating centered in roger's hole
   for (int i = 0; i < MATRIX_WIDTH  ; i++) {
     xangle =  (sin8(i * mstep - h ) - 128.0) / 128.0;
     yangle =  (cos8(i * mstep - h ) - 128.0) / 128.0;
-    DLine(locusx + (MIDLX / 4) * xangle,  locusy + (MIDLY / 4)* yangle,  locusx + xangle * (MIDLX / 4 + LLaudio[i * Wscale] * 64 / MATRIX_WIDTH / (mscale)) , locusy + yangle * (MIDLY / 4 + LLaudio[i * Wscale] * 64 / MATRIX_HEIGHT / (mscale)), CHSV(i * mstep + poffset , 128 + blender / 2, 255));
+    DLine(locusx + (MIDLX / 4) * xangle,  locusy + (MIDLY / 4)* yangle,  locusx + xangle * (MIDLX / 4 + LLaudio[i] *  MATRIX_WIDTH / 64 / (mscale)) , locusy + yangle * (MIDLY / 4 + LLaudio[i] *  MATRIX_HEIGHT / 64 / (mscale)), CHSV(i * mstep + poffset , 255 - blender / 8, 255));
 
   }
   audioprocess();
@@ -6357,7 +6490,7 @@ void spin1()  // many fingers moving in arc to middle
   }
 
   if ((counter % (3 * BIGGER))  == 0) { //-5
-    dot = random(3, 6);
+    dot = BIGGER / 64 + random(4, 7);
     ccoolloorr =  random8();
     hhowmany = random(3, 9);
     raad = 256 / hhowmany;
@@ -6422,8 +6555,8 @@ void spin2()  // 4 meteriorw moving in ovals
     xangle =  (sin8(-2 * (h )) - 128.0) / 128.0;
     yangle =  (cos8(-2 * (h )) - 128.0) / 128.0;
   }
-  DFCircle(MIDLX + xangle * (MIDLX / 2), MIDLY + yangle * (MIDLY ) , dot + dot3, CHSV(h + 2 * ccoolloorr, velo / 4 + 106, 180));
-  DCircle(MIDLX + xangle * (MIDLX / 2), MIDLY + yangle * (MIDLY ) , dot + dot3, CHSV(h + 2 * ccoolloorr - 16, 255 - velo / 4, 255));
+  DFCircle(driftx + xangle * (MIDLX / 2), drifty + yangle * (MIDLY ) , 2 + dot + dot3, CHSV(h + 2 * ccoolloorr, velo / 4 + 106, 180));
+  DCircle(driftx + xangle * (MIDLX / 2), drifty + yangle * (MIDLY ) , 2 + dot + dot3, CHSV(h + 2 * ccoolloorr - 16, 255 - velo / 4, 255));
   if (!flop[8]) {
     xangle =  (sin8(2 * (h ) + 64) - 128.0) / 128.0;
     yangle =  (cos8(2 * (h ) + 64) - 128.0) / 128.0;
@@ -6432,8 +6565,8 @@ void spin2()  // 4 meteriorw moving in ovals
     xangle =  (sin8(-2 * (h ) + 64) - 128.0) / 128.0;
     yangle =  (cos8(-2 * (h ) + 64) - 128.0) / 128.0;
   }
-  DFCircle(MIDLX + xangle * (MIDLX ), MIDLY + yangle * (MIDLY / 2) , dot + dot3, CHSV(h , velo / 4 + 106, 180));
-  DCircle(MIDLX + xangle * (MIDLX ), MIDLY + yangle * (MIDLY / 2) , dot + dot3, CHSV(h - 16, 255 - velo / 4, 255));
+  DFCircle(driftx + xangle * (MIDLX ), drifty + yangle * (MIDLY / 2) , 2 + dot + dot3, CHSV(h , velo / 4 + 106, 180));
+  DCircle(driftx + xangle * (MIDLX ), drifty + yangle * (MIDLY / 2) , 2 + dot + dot3, CHSV(h - 16, 255 - velo / 4, 255));
   if (!flop[8]) {
     xangle =  (sin8(2 * (h ) + 128) - 128.0) / 128.0;
     yangle =  (cos8(2 * (h ) + 128) - 128.0) / 128.0;
@@ -6442,8 +6575,8 @@ void spin2()  // 4 meteriorw moving in ovals
     xangle =  (sin8(-2 * (h ) + 128) - 128.0) / 128.0;
     yangle =  (cos8(-2 * (h ) + 128) - 128.0) / 128.0;
   }
-  DFCircle(MIDLX + xangle * (MIDLX / 2), MIDLY + yangle * (MIDLY ) , dot + dot3, CHSV(h + ccoolloorr, velo / 4 + 106, 180));
-  DCircle(MIDLX + xangle * (MIDLX / 2), MIDLY + yangle * (MIDLY ) , dot + dot3, CHSV(h + ccoolloorr - 16, 255 - velo / 5, 255));
+  DFCircle(driftx + xangle * (MIDLX / 2), drifty + yangle * (MIDLY ) , 2 + dot + dot3, CHSV(h + ccoolloorr, velo / 4 + 106, 180));
+  DCircle(driftx + xangle * (MIDLX / 2), drifty + yangle * (MIDLY ) , 2 + dot + dot3, CHSV(h + ccoolloorr - 16, 255 - velo / 5, 255));
   if (!flop[8]) {
     xangle =  (sin8(2 * (h ) - 64) - 128.0) / 128.0;
     yangle =  (cos8(2 * (h ) - 64) - 128.0) / 128.0;
@@ -6453,8 +6586,8 @@ void spin2()  // 4 meteriorw moving in ovals
     yangle =  (cos8(-2 * (h ) - 64) - 128.0) / 128.0;
   }
 
-  DFCircle(MIDLX + xangle * (MIDLX ), MIDLY + yangle * (MIDLY / 2) , dot + dot3, CHSV(h - ccoolloorr, velo / 4 + 106, 180));
-  DCircle(MIDLX + xangle * (MIDLX ), MIDLY + yangle * (MIDLY / 2) , dot + dot3, CHSV(h - ccoolloorr - 16, 255 - velo / 5, 255));
+  DFCircle(driftx + xangle * (MIDLX ), drifty + yangle * (MIDLY / 2) , 2 + dot + dot3, CHSV(h - ccoolloorr, velo / 4 + 106, 180));
+  DCircle(driftx + xangle * (MIDLX ), drifty + yangle * (MIDLY / 2) , 2 + dot + dot3, CHSV(h - ccoolloorr - 16, 255 - velo / 5, 255));
 }
 
 void magictime()
@@ -6602,7 +6735,7 @@ void bouncey()
   {
     locusx = MIDLX;
     locusy = MIDLY;
-    raad =  random(BIGGER / 3,  3 + BIGGER / 2);
+    raad =  random(BIGGER / 4,   BIGGER / 3);
     yangle = random(10, 54);
     xangle = (sin8(yangle) - 128.0) / 128.0;
     yangle = (cos8(yangle) - 128.0) / 128.0;
@@ -6620,7 +6753,7 @@ void bouncey()
     yangle = 0 - yangle;
 
   }
-  for (int16_t gg = 0; gg < raad - 6; gg++)
+  for (int16_t gg = 0; gg < raad - 8; gg += 2)
     DFCircle(locusx, locusy , raad - gg, CHSV(h + xblender + gg * 8, 255 - velo / 8 , 255));
 
   DFCircle(locusx, locusy , 6, CRGB::Black);
@@ -6635,9 +6768,9 @@ void starbounce()
     locusx = driftx;
     locusy = drifty;
     raad =  BIGGER * 4 / 5; //size
-    howmany = random (6, 8);
-    dot = random(raad / 2 + 2, raad);
-    radius2 = random(16, 48);
+    howmany = random (3, 5);
+    dot = random(raad / 2 , raad);
+    radius2 = random(12, 52);// avoid vertical or horizontal
     xangle = (sin8(radius2) - 128.0) / 128.0;
     yangle = (cos8(radius2) - 128.0) / 128.0;
     ccoolloorr = random8();
@@ -6655,34 +6788,29 @@ void starbounce()
   }
   for (int16_t qq = 0; qq < dot; qq ++)  {
     if (flop[4]) {
-      drawstar(locusx, locusy, raad -  qq, raad / 2 -  qq / 2, howmany, h , ccoolloorr + qq * 8 +  h); // random multipoint star
-      drawstar(locusx, locusy, raad -  qq - 1, raad / 2 -  qq / 2 - 1, howmany - dot3, -h * 2, ccoolloorr +  h + qq * 8); // random multipoint star
+      drawstar(locusx, locusy, raad -  qq, raad / 2 -  qq / 2, howmany, h , ccoolloorr + qq * 4 +  h); // random multipoint star
+      drawstar(locusx, locusy, raad -  qq - 1, raad / 2 -  qq / 2 - 1, howmany , -h * 2, ccoolloorr +  h + qq * 4); // random multipoint star
     }
     else
     {
-      drawstar(locusx, locusy, raad -  qq, raad / 2 -  qq / 2, howmany - dot3, 2 * h , ccoolloorr + qq * 8 + 2 * h); // random multipoint star
-      drawstar(locusx, locusy, raad -  qq - 1, raad / 2 -  qq / 2 - 1, howmany, -h , ccoolloorr  +  h + qq * 8); // random multipoint star
+      drawstar(locusx, locusy, raad -  qq, raad / 2 -  qq / 2, howmany , 2 * h , ccoolloorr + qq * 4 + 2 * h); // random multipoint star
+      drawstar(locusx, locusy, raad -  qq - 1, raad / 2 -  qq / 2 - 1, howmany, -h , ccoolloorr  +  2 * h + qq * 4); // random multipoint star
     }
   }
 }
 
-void triforce() {
-  if (flop[0] &&  flop[2])
-    solid2();
-  else if (flop[0] && !flop[1])
-    solid();
-  if (flop[9])
-    for (int i = 0; i < MIDLX + 6 * dot; i ++ ) {
-      triangle(MIDLX, MIDLY,  8 + i, h,  h + 8 * i );
-      if (i % dot == 0)
-        triangle(MIDLX, MIDLY, 8 + i, h,  h + 8 * i + 128);
-    }
-  else
-    for (int i = 0; i < MIDLX + 6 * dot; i ++ ) {
-      triangle(driftx, drifty,  8 + i, 2 * h,  h + 8 * i );
-      if (i % dot == 0)
-        triangle(driftx, drifty, 8 + i, 2 * h,  h + 8 * i + 128);
-    }
+void triforce() {//88
+  dot = 5;
+  if (flop[9]) dot = 7;
+
+
+  for (int i = 0; i < BIGGER / 2 ; i ++ ) {
+    if (flop[5])
+      triangle(MIDLX, MIDLY,  10 + i, xblender + h + i, blender + h + dot * i );
+    else
+      triangle(MIDLX, MIDLY,  10 + i, xblender - h + i, blender + h - dot * i );
+  }
+
 
 }
 void seasick3()
@@ -6893,7 +7021,7 @@ void hypnoduck3()  // growing spirals
     quash = -12 - dot;
   }
 
-  for (int jj = 20; jj < beatsin16(6, 190, 850, 0); jj += 5)
+  for (int jj = 20; jj < beatsin16(6, 190, 1420, 0); jj += 3)
   {
     poffset = 0;
     if (flop[2] )
@@ -6910,22 +7038,15 @@ void hypnoduck3()  // growing spirals
   }
 }
 
-
 void hypnoduck2()
 // spirals with speckles of hyponic light random direction based on flop[1]
 {
   if (counter == 0) {
     dot = random8(2, 5);
-
     quash = -9;
   }
-  if (flop[2] || flop[5])
-    solid5();
-  else
 
-    solid2();
-
-  for (int jj = 0; jj < beatsin16(4, 220, 880, 400) ; jj += 5)
+  for (int jj = 0; jj < beatsin16(4, 199, 1750, 500) ; jj += 3)
   {
     poffset = 0;
     if (flop[2] )
@@ -6948,10 +7069,8 @@ void hypnoduck2()
 void hypnoduck4()
 // spiral inward with the hyponic light
 {
-
   if (counter == 0) {
     dot = random8(2, 5);
-
     quash = 9;
   }
 
@@ -6975,7 +7094,6 @@ void hypnoduck4()
     yangle =  (cos8(jj + quash * -h + 128) - 128.0) / 128.0;
     DFCircle(driftx + xangle * (jj /  22) , drifty + yangle * (jj / 22), dot, CHSV(poffset + h - 64, 255 - velo / 5, 255));
   }
-
 }
 
 //format drawstar(int16_t xlocl, int16_t ylocl, int16_t biggy, int16_t little, uint8_t points, uint8_t dangle, uint8_t koler);// random multipoint star
@@ -7160,20 +7278,36 @@ void nringer(int16_t i) {
   else
   {
     DFCircle(driftx, drifty , i , CRGB::Black);
-    DCircle(driftx, drifty , i, CHSV(h * dot, 255 - velo / 5, 255));
+    DCircle(driftx, drifty , i, CHSV(blender, 255 - velo / 5, 255));
+  }
+}
+
+void cringer(int16_t i) {
+
+  if (flop[0] && flop[1] && !flop[2])
+  {
+    DFCircle(driftx, drifty , i , CRGB::Black);
+    DCircle(driftx, drifty , i, CHSV(h , 255 , 255));
+
+  }
+  else
+  {
+    ADFCircle(driftx, drifty , i , CHSV(h + 128, 255, 54));
+    DCircle(driftx, drifty , i, CRGB::White);
 
   }
 }
 
 void drawtriangle()//solid triangle
 {
-  for (int i = 0; i < BIGGER / 2; i ++)
+  for (int i = 0; i < MATRIX_WIDTH / 2 + 1; i ++)
   {
     DLine(i, i, MATRIX_WIDTH - i, i, CHSV(h + i * 4, 255 - velo / 5, 255));
     DLine(i, i, MIDLX, MATRIX_HEIGHT - i, CHSV(h + i * 4, 255 - velo / 5, 255));
     DLine(MATRIX_WIDTH - i, i, MIDLX, MATRIX_HEIGHT - i, CHSV(h + i * 4, 255 - velo / 5, 255));
   }
 }
+
 
 void triangle(int16_t xloc, int16_t yloc, uint16_t bigg, uint8_t dangle, uint8_t kolor)
 {
@@ -7242,8 +7376,8 @@ void starz()//stars spin in a circle
       }
       else
       {
-        DALine(driftx + xcen + ((j * (sin8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
-        DALine(driftx + xcen + ((j * (sin8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
+        DLine(driftx + xcen + ((j * (sin8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
+        DLine(driftx + xcen + ((j * (sin8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
       }
 
   xcen = MIDLX  * (sin8(-2 * h + 85) - 128.0) / 128;
@@ -7257,8 +7391,8 @@ void starz()//stars spin in a circle
       }
       else
       {
-        DALine(driftx + xcen + ((j * (sin8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
-        DALine(driftx + xcen + ((j * (sin8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
+        DLine(driftx + xcen + ((j * (sin8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
+        DLine(driftx + xcen + ((j * (sin8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
       }
   xcen = MIDLX  * (sin8(-2 * h) - 128) / 128;
   ycen = MIDLY  * (cos8(-2 * h) - 128) / 128;
@@ -7272,8 +7406,8 @@ void starz()//stars spin in a circle
       }
       else
       {
-        DALine(driftx + xcen + ((j * (sin8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
-        DALine(driftx + xcen + ((j * (sin8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
+        DLine(driftx + xcen + ((j * (sin8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 + radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
+        DLine(driftx + xcen + ((j * (sin8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), drifty + ycen + ((j * (cos8(i * radius2 - radius2 / 2 +  h) - 128.0)) / 128), driftx + xcen + ((MIDLX * (sin8(i * radius2 +  h) - 128.0)) / 128), drifty + ycen + ((MIDLY * (cos8(i * radius2 +  h) - 128.0)) / 128), CHSV(h - 85 + dot  * j , 255 - velo / 8 , 255));
       }
 }
 
@@ -7556,16 +7690,15 @@ void wheelz3()// circles and stars filled circles in a circle
 void swirly() {//not round orbits
   if (counter == 0)
   {
-    howmany = random(BIGGER * 2 / 3, BIGGER * 3 / 2 );
+    howmany = random(BIGGER  / 4, BIGGER / 2 );
     blender = random8();
     for ( int16_t i = 0; i < howmany; i++)
     {
-      xfire[i] = random(4, MIDLX + 9); //xradius
-      yfire[i] =  random(xfire[i] - 2, xfire[i] + 2); //yradius
+      xfire[i] = random(5, MIDLX + 9); //xradius
+      yfire[i] =  xfire[i] - 4 + random(9); //yradius
 
-      //if (i % 5 == 0)// make some round
-      //yfire[i] = xfire[i];
-      fpeed[i] = random(1, 8); //speed
+
+      fpeed[i] = random(1, 5); //speed
       fcolor[i] = blender + random(84); //color
       fvelo[i] = random8();
       fcount[i] = random8(); //poffset
@@ -7573,15 +7706,19 @@ void swirly() {//not round orbits
   }
   for ( int16_t i = 0; i < howmany; i++) {
     zeds(driftx + xfire[i] * (sin8(h * fpeed[i] + fcount[i]) - 128.0) / 128 , drifty + yfire[i] * (cos8(h * fpeed[i] + fcount[i]) - 128.0) / 128) = CHSV(fcolor[i], fvelo[i] / 4 + 192, 255);
+    if (BIGGER > 64)
+      zeds(1 + driftx + xfire[i] * (sin8(h * fpeed[i] + fcount[i]) - 128.0) / 128 , 1 + drifty + yfire[i] * (cos8(h * fpeed[i] + fcount[i]) - 128.0) / 128) = CHSV(fcolor[i], fvelo[i] / 4 + 192, 255);
     if (i % 9 == 0)
-      zeds(driftx + xfire[i] * (sin8(-h * fpeed[i] + fcount[i]) - 128.0) / 128 , drifty + yfire[i] * (cos8(-h * fpeed[i] + fcount[i]) - 128.0) / 128) = CRGB::White;
+      zeds(driftx + xfire[i] * (sin8(-h * fpeed[i] + fcount[i]) - 128.0) / 128 , drifty + yfire[i] * (cos8(-h * fpeed[i] + fcount[i]) - 128.0) / 128 ) = CRGB::White;
+    if (BIGGER > 64)
+      zeds(1 + driftx + xfire[i] * (sin8(-h * fpeed[i] + fcount[i]) - 128.0) / 128 , 1 + drifty + yfire[i] * (cos8(-h * fpeed[i] + fcount[i]) - 128.0) / 128 ) = CRGB::White;
 
   }
   //make 4 of them fattys
-  zeds(driftx + 1 + xfire[howmany - 1] * (sin8(h * fpeed[howmany - 1] + fcount[howmany - 1]) - 128.0) / 128 , drifty + yfire[howmany - 1] * (cos8(h * fpeed[howmany - 1] + fcount[howmany - 1]) - 128.0) / 128) = CHSV(fcolor[howmany - 1], fvelo[howmany - 1] / 4 + 192, 255);
-  zeds(driftx - 1 + xfire[howmany - 2] * (sin8(h * fpeed[howmany - 2] + fcount[howmany - 2]) - 128.0) / 128 , drifty + yfire[howmany - 2] * (cos8(h * fpeed[howmany - 2] + fcount[howmany - 2]) - 128.0) / 128) = CHSV(fcolor[howmany - 2], fvelo[howmany - 1] / 4 + 192, 255);
-  zeds(driftx  + xfire[howmany - 3] * (sin8(h * fpeed[howmany - 3] + fcount[howmany - 3]) - 128.0) / 128 , drifty - 1 + yfire[howmany - 3] * (cos8(h * fpeed[howmany - 3] + fcount[howmany - 3]) - 128.0) / 128) = CHSV(fcolor[howmany - 3], fvelo[howmany - 1] / 4 + 192, 255);
-  zeds(driftx  + xfire[howmany - 4] * (sin8(h * fpeed[howmany - 4] + fcount[howmany - 4]) - 128.0) / 128 , drifty + 1 + yfire[howmany - 4] * (cos8(h * fpeed[howmany - 4] + fcount[howmany - 4]) - 128.0) / 128) = CHSV(fcolor[howmany - 4], fvelo[howmany - 1] / 4 + 192, 255);
+  zeds(driftx - 1 + xfire[howmany - 1] * (sin8(h * fpeed[howmany - 1] + fcount[howmany - 1]) - 128.0) / 128 , 1 + drifty + yfire[howmany - 1] * (cos8(h * fpeed[howmany - 1] + fcount[howmany - 1]) - 128.0) / 128) = CHSV(fcolor[howmany - 1] - 128, fvelo[howmany - 1] / 4 + 192, 255);
+  zeds(driftx - 1 + xfire[howmany - 2] * (sin8(h * fpeed[howmany - 2] + fcount[howmany - 2]) - 128.0) / 128 , 1 + drifty + yfire[howmany - 2] * (cos8(h * fpeed[howmany - 2] + fcount[howmany - 2]) - 128.0) / 128) = CHSV(fcolor[howmany - 2] - 128, fvelo[howmany - 2] / 4 + 192, 255);
+  zeds(1 + driftx  + xfire[howmany - 3] * (sin8(h * fpeed[howmany - 3] + fcount[howmany - 3]) - 128.0) / 128 , drifty - 1 + yfire[howmany - 3] * (cos8(h * fpeed[howmany - 3] + fcount[howmany - 3]) - 128.0) / 128) = CHSV(fcolor[howmany - 3] + 80, fvelo[howmany - 3] / 4 + 192, 255);
+  zeds(1 + driftx  + xfire[howmany - 4] * (sin8(h * fpeed[howmany - 4] + fcount[howmany - 4]) - 128.0) / 128 , drifty - 1 + yfire[howmany - 4] * (cos8(h * fpeed[howmany - 4] + fcount[howmany - 4]) - 128.0) / 128) = CHSV(fcolor[howmany - 4] - 80, fvelo[howmany - 4] / 4 + 192, 255);
 }
 
 void swirl2() {//round orbit backwards
@@ -7618,7 +7755,7 @@ void swirl3() {
     {
       xslope[i] = random(4, MIDLX * 3 / 2); //radius
       fpeed[i] = random(1, 6); //speed
-      xpoffset[i] = blender + random(64); //color
+      fcolor[i] = blender + random(64); //color
       fvelo[i] = random8();
       fcountr[i] = random8(); //position offset
     }
@@ -7631,11 +7768,11 @@ void swirl3() {
     if (xslope[i] == 1)
       xslope[i] = MIDLX * 3 / 2;
     if (i % 11 != 0 || i % 17 != 0)
-      zeds(driftx + xslope[i] * (sin8(h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], fvelo[i] / 4 + 192, 255);
+      zeds(driftx + xslope[i] * (sin8(h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(fcolor[i], fvelo[i] / 4 + 192, 255);
     if (i % 11 == 0)
       zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CRGB::White;
     if (i % 17 == 0)
-      zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i] - 85, 255 - fvelo[i]/dot, 255);
+      zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(fcolor[i] - 85, 255 - fvelo[i] / dot, 255);
   }
 }
 
@@ -7643,18 +7780,18 @@ void swirl4a() {// outer
   if (counter == 0)
   {
     flop[9] = true;
-    xhowmany = random(BIGGER * 1.5 , BIGGER * 2 );
+    xhowmany = random(BIGGER  , BIGGER * 2 );
 
     for ( int16_t i = 0; i < xhowmany; i++)
     {
-      xslope[i] = random(6, 18); //radius
-      fpeed[i] = random(2, 16); //speed
-      xpoffset[i] = blender + random(84); //color
+      xslope[i] = random(BIGGER / 9, BIGGER / 4); //radius
+      fpeed[i] = random(3, 20); //speed
+      fcolor[i] = blender + fpeed[i] * 8; //color
       fvelo[i] = random8();
       fcountr[i] = random8(); //position offset
     }
   }
-  EVERY_N_SECONDS(dot + 15) {
+  EVERY_N_SECONDS(20) {
     flop[9] = !flop[9];
     /* if (flop[9])
       DFCircle(driftx, drifty,MIDLX / 7, CHSV(blender - 30, 155, 255));
@@ -7664,25 +7801,22 @@ void swirl4a() {// outer
 
   for ( int16_t i = 0; i < xhowmany; i++) {
     if (flop[9]) {
-      if (counter % int( fpeed[i]  ) == 0  && xslope[i] < MIDLY + dot )
+      if (counter % int( fpeed[i]  ) == 0  && xslope[i] < BIGGER / 3 + 1 )
         xslope[i]++;
     }
-    else if (counter % int( fpeed[i] ) == 0  && xslope[i] > dot + 1)
+    else if (counter % int( fpeed[i] ) == 0  && xslope[i] > BIGGER / 10)
       xslope[i]--;
 
 
 
-    if (i % 27 != 0 || i % 24 != 0) {
-      zeds(driftx + xslope[i] * (sin8(h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], fvelo[i] / 4 + 192, 255);
-      zeds(driftx + 1 + xslope[i] * (sin8(h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], 255 - fvelo[i] / 4, 255);
+    if ( i % 24 != 0) {
+      zeds(driftx + xslope[i] * (sin8(h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128) = CHSV(fcolor[i] + h, 255 - fvelo[i] / 2 , 255);
+      zeds(driftx + 1 + xslope[i] * (sin8(h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128 , drifty - 1 + xslope[i] * (cos8(h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128) = CHSV(fcolor[i] + h, 255 - fvelo[i] / 4, 255);
     }
-    if (i % 27 == 0) {
-      zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CRGB::White;
-      zeds(driftx - 1 + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CRGB::White;
-    }
-    if (i % (24 - dot) == 0) {
-      zeds(driftx + 1 + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], fvelo[i] / 4 + 192, 255);
-      zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + 1 + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i] - 32, fvelo[i] / 4 + 192, 255);
+    else
+    {
+      zeds(driftx + 1 + xslope[i] * (sin8(-h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128) = CHSV(fcolor[i] + h, 255 - fvelo[i] / 4, 255);
+      zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128 , drifty - 1 + xslope[i] * (cos8(-h * fpeed[i] / 5 + fcountr[i]) - 128.0) / 128) = CHSV(fcolor[i] - 30 + h, 255 - fvelo[i] / 2, 255);
     }
   }
 }
@@ -7695,35 +7829,32 @@ void swirl4() {// outer
 
     for ( int16_t i = 0; i < xhowmany; i++)
     {
-      xslope[i] = random(6, 24); //radius
-      fpeed[i] = random(3, 20); //speed
+      xslope[i] = random(BIGGER / 9, BIGGER / 4); //radius
+      fpeed[i] = random(4, 20); //speed
       if (flop[5])
-        xpoffset[i] = blender + (fpeed[i] - 2) * 19; //color
+        xpoffset[i] = blender + (fpeed[i] ) * 8; //color
       else
         xpoffset[i] = blender + random(99); //color
       fcountr[i] = random8(); //position offset
       fvelo[i] = random8();
     }
   }
-  EVERY_N_SECONDS(20 + dot) {
+  EVERY_N_SECONDS(19 + dot) {
     flop[9] = !flop[9];
 
   }
 
   for ( int16_t i = 0; i < xhowmany; i++) {
     if (flop[9]) {
-      if (counter % int( fpeed[i]  ) == 0  && xslope[i] < MIDLX)
+      if (counter % int( fpeed[i]  ) == 0  && xslope[i] < BIGGER / 2)
         xslope[i]++;
     }
-    else if (counter % int( fpeed[i]) == 0  && xslope[i] > 6)
+    else if (counter % int( fpeed[i]) == 0  && xslope[i] > BIGGER / 10)
       xslope[i]--;
 
 
+    zeds(driftx + xslope[i] * (sin8(h * fpeed[i] / 4 + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] / 4 + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], 255 - fvelo[i] / 3, 255);
 
-
-    zeds(driftx + xslope[i] * (sin8(h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CHSV(xpoffset[i], 255 - fvelo[i] / 3, 255);
-    if (i % (13 + dot) == 0)
-      zeds(driftx + xslope[i] * (sin8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128 , drifty + xslope[i] * (cos8(-h * fpeed[i] + fcountr[i]) - 128.0) / 128) = CRGB::White;
 
   }
 }
@@ -8121,21 +8252,24 @@ void snow() {
 
 void VORTEX() {
   if (counter == 0) {// counter increments with each pass through the loop, so this runs the first time you call drops()
-    howmany = random(BIGGER / 2, BIGGER ); //how many dots,
+    dot3++;
+    howmany = random(BIGGER * 2 / 3, BIGGER * 3 / 2 ); //how many dots,
 
     for (int i = 0; i < howmany; i++) { //set up all the drops with initial values
 
       if (flop[5])
-        fcolor[i] = blender + random(80);
+        fcolor[i] = blender + random(128);
       else
         fcolor[i] = random8();
       fvelo[i] = random8();
       xslope[i] = random (MATRIX_WIDTH);//starting x location
       yslope[i] = random(MATRIX_HEIGHT); //starting y location
-      fcount[i] = random(2, 9);
+      fcount[i] = random(1, 11);
+
+
       if (xslope[i] < MIDLX && yslope[i] < MIDLY )//zone 4
       {
-        if (xslope[i] < yslope[i])//h
+        if (xslope[i] /  RATIO < yslope[i]) //h
         {
           xvort[i] = 0;
           yvort[i] = 1;
@@ -8143,12 +8277,11 @@ void VORTEX() {
         else {//g
           xvort[i] = -1;
           yvort[i] = 0;
-
         }
       }
       if (xslope[i] < MIDLX && yslope[i] >= MIDLY )//zone 3
       {
-        if (xslope[i] < MATRIX_HEIGHT - yslope[i] )//e
+        if (xslope[i] /  RATIO < MATRIX_HEIGHT - yslope[i] ) //e
         {
           xvort[i] = 0;
           yvort[i] = 1;
@@ -8161,7 +8294,7 @@ void VORTEX() {
 
       if (xslope[i] >= MIDLX && yslope[i] >= MIDLY )//zone 2
       {
-        if (xslope[i]  < yslope[i])//c
+        if (xslope[i] /  RATIO  < yslope[i]) //c
         {
           xvort[i] = 1;
           yvort[i] = 0;
@@ -8173,7 +8306,7 @@ void VORTEX() {
       }
       if (xslope[i] >= MIDLX && yslope[i] < MIDLY )//zone 1
       {
-        if (xslope[i] < MATRIX_HEIGHT - yslope[i]) //b
+        if (xslope[i] /  RATIO < MATRIX_HEIGHT - yslope[i]) //b
         {
           xvort[i] = -1;
           yvort[i] = 0;
@@ -8184,46 +8317,49 @@ void VORTEX() {
         }
       }
     }
-  }
-
+  }//counter =0
+  if (flop[9])
+    poffset = h;
+  else
+    poffset = 0;
 
   for (int i = 0 ; i < howmany; i++) {//draw all the drops
-    //it is always your turn...
+    //is it your turn??...
     if ( counter % fcount[i] == 0) {
       xslope[i] = xslope[i] + xvort[i];
       yslope[i] = yslope[i] + yvort[i];
     }
 
-    if (xslope[i] < MIDLX && yslope[i] < MIDLY )//zone 4
+    if (xslope[i] < MIDLX && yslope[i] < MIDLY ) //zone 4
     {
-      if (xslope[i] - 1 == yslope[i]) //b  turn early
+      if ((xslope[i] - 2) *  RATIO <= yslope[i]) //b  turn early
       {
         xvort[i] = 0;
         yvort[i] = 1;
       }
     }
 
-    if (xslope[i] < MIDLX && yslope[i] >= MIDLY )//z3
+    if (xslope[i] < MIDLX && yslope[i] >= MIDLY ) //z3
     {
-      if (xslope[i] == MATRIX_WIDTH - yslope[i] ) //d
+      if (xslope[i] *  RATIO >= MATRIX_HEIGHT - yslope[i] ) //d
       {
         xvort[i] = 1;
         yvort[i] = 0;
       }
     }
 
-    if (xslope[i] >= MIDLX && yslope[i] >= MIDLY )//2
+    if (xslope[i]  >= MIDLX && yslope[i] >= MIDLY ) //2
     {
-      if (xslope[i]  == yslope[i] )//e
+      if (xslope[i] * RATIO  >= yslope[i] )//e
       {
         xvort[i] = 0;
         yvort[i] = -1;
       }
     }
 
-    if (xslope[i] >= MIDLX && yslope[i] < MIDLY )//1
+    if (xslope[i]  >= MIDLX && yslope[i] < MIDLY ) //1
     {
-      if (xslope[i]  == MATRIX_HEIGHT - yslope[i]) //g
+      if (xslope[i] *  RATIO <= MATRIX_HEIGHT - yslope[i]) //g
       {
         xvort[i] = -1;
         yvort[i] = 0;
@@ -8231,12 +8367,14 @@ void VORTEX() {
     }
 
 
-    ADFCircle(xslope[i] , yslope[i], dot3 ,  CHSV(fcolor[i], 255 - fvelo[i] / 4, 255)); //
-    if (i % (23) == 0)
+    DFCircle(xslope[i] , yslope[i], dot3 ,  CHSV(fcolor[i] + poffset, 255 - fvelo[i] / 6, 255)); //
+    if (dot3 > 2)
+      DCircle(xslope[i] , yslope[i], dot3 ,  CHSV(fcolor[i] + poffset + 80, 255 - fvelo[i] / 2, 255)); //
+    if (i % (BIGGER / 2) == 0)
       DFCircle(xslope[i] , yslope[i], dot3 ,  CRGB::White);
 
 
-    if (abs(xslope[i] - MIDLX) < 2  && abs(yslope[i] - MIDLY ) < 1) {
+    if (abs(xslope[i] - MIDLX) < dot3  && abs(yslope[i] - MIDLY ) < dot3) {
       xslope[i] = 0;
       yslope[i] = 0;
       xvort[i] = 0;
@@ -8355,6 +8493,7 @@ void noisetest() {
     delay(1);
     digitalWrite(LATCH, HIGH);
   }
+
 #endif
   /*if (music.laudio[0] == 0) music.laudio[0] = music.laudio[1] ;*/
   if (music.peakL >= 8 || music.peakR >= 8)
@@ -8365,7 +8504,7 @@ void fakenoise() {
   if (counter == 0)
   {
     for (int16_t i = 0; i < 32; i++)
-      bpm[i] =   random8(4, 250);
+      bpm[i] =   random(20, 120);
   }
   for (int16_t i = 0; i <= 16; i++) {
     music.laudio[i] = beatsin8(bpm[i], 1, 63, 16);
@@ -8391,27 +8530,35 @@ void audioprocess()
     fakenoise();
   else if (ETin.receiveData() == false)
   { digitalWrite(LATCH, LOW);
-    delay(3);
+    delay(1);
     digitalWrite(LATCH, HIGH);
   }
   if (ETin.receiveData() == false)
   { digitalWrite(LATCH, LOW);
-    delay(3);
+    delay(1);
     digitalWrite(LATCH, HIGH);
   }
   /*if (music.laudio[0] == 0) music.laudio[0] = music.laudio[1] ;*/
 
   LLaudio[0] = music.laudio[0];
   RRaudio[0] = music.raudio[0];
-  LLaudio[BIGGER] = music.laudio[16];
-  RRaudio[BIGGER] = music.raudio[16];
-  int16_t musicstep = BIGGER / 16;
-  for (int16_t p = 0; p < 16; p ++)
-    for (int16_t q = 0; q < musicstep; q++)
-    {
-      LLaudio[p * musicstep + q] =  music.laudio[p] * (musicstep - q) / musicstep + music.laudio[p + 1] * (q) / musicstep;
-      RRaudio[p * musicstep + q] =  music.raudio[p] * (musicstep - q) / musicstep + music.raudio[p + 1] * (q) / musicstep;
-    }
+
+  for (byte ppp = 0; ppp < 16; ppp ++)
+  {
+
+    LLaudio[ppp * 4] =  music.laudio[ppp];
+    LLaudio[ppp * 4 + 1] =  music.laudio[ppp] * .75 + .25 * music.laudio[ppp + 1] ;
+    LLaudio[ppp * 4 + 2] = music.laudio[ppp] * 0.5 + music.laudio[ppp + 1] * 0.5 ;
+    LLaudio[ppp * 4 + 3] =  music.laudio[ppp] * 0.25 + music.laudio[ppp + 1] * 0.75;
+
+    RRaudio[ppp * 4] =  music.raudio[ppp];
+    RRaudio[ppp * 4 + 1] =  music.raudio[ppp] * .75 + .25 * music.raudio[ppp + 1] ;
+    RRaudio[ppp * 4 + 2] = music.raudio[ppp] * 0.5 + music.raudio[ppp + 1] * 0.5 ;
+    RRaudio[ppp * 4 + 3] =  music.raudio[ppp] * 0.25 + music.raudio[ppp + 1] * 0.75;
+  }
+
+  LLaudio[63] = music.laudio[16];
+  RRaudio[63] = music.raudio[16];
 
   quiet = mmax(music.peakL, music.peakR);
   maxiaud =  quiet / 4;
@@ -8430,10 +8577,12 @@ void audioprocess()
     nextsong = true;
     quietcount = 0;
   }
+
   //digitalWrite(LATCH, LOW);
 #else // TME_AUDIO
   fakenoise();
 #endif
+
 }
 
 void DFCircle(int16_t xc, int16_t yc, uint16_t r, CRGB Col)
