@@ -1083,7 +1083,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       bfade = random(1, 4);
       dwell = 3 * dwell;
       slowme = false;//no slowmo.
-      if (flop[1] && flop[2])
+      if (flop[1] && flop[2]) {
         if (square)
           adjunct = 12;
         else {
@@ -1094,6 +1094,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
             fancy = 62;
           }
         }
+      }
       Serial.print("RAudio7");
       targetfps = 80;
       break;
@@ -5601,7 +5602,7 @@ void warp() {
       }
     }
   }
-  for (int i = i; i < howmany; i++)
+  for (int i = 0; i < howmany; i++)
   {
     xfire[i] = xfire[i] + (fpeed[i] / 4.0) * (sin8(fcount[i] + poffset ) - 128.0) / 128.0;
     yfire[i] = yfire[i] + ( fpeed[i] / 4.0) * (cos8(fcount[i] + poffset ) - 128.0) / 128.0;
