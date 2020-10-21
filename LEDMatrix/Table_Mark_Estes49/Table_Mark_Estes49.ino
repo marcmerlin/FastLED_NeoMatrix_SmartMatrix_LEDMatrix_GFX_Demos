@@ -87,7 +87,7 @@ RECEIVE_DATA_STRUCTURE music;
 
 int16_t slowest = 2, fastest = 30, cool,  bpm[32], targetfps = 10, adjunct = 3, sizzer;
 int16_t sparky = 80, ccc, xxx, yyy, dot = 3, radius2, rr, gg, bb;
-int16_t  maxiaud, pointy,  hue, steper,  xblender, hhowmany, blender = 120, radius3,  quietcount, ccoolloorr,  h = 0;
+int16_t  maxiaud, pointy = 4,  hue, steper,  xblender, hhowmany, blender = 120, radius3,  quietcount, ccoolloorr,  h = 0;
 int16_t dot4 = 5, dot2 = 6,  dot3 = 1, phew, lender = 128, xsizer, ysizer, xx,  yy, flipme = 1, shifty = 4,  poffset, wind = 2, fancy , sinewidth;
 uint8_t mstep, LLaudio[MAXBIG], RRaudio[MAXBIG], inner, bfade = 3;
 
