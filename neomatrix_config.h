@@ -727,15 +727,19 @@ uint32_t tft_spi_speed;
         #undef gif_size
         #define gif_size 192
         #ifdef GFXDISPLAY_M384BY256
+            #pragma message "M384BY256 read from /root/NM/gfxdisplay"
             const uint16_t MATRIX_TILE_WIDTH = 384;
             const uint16_t MATRIX_TILE_HEIGHT= 256;
         #elif GFXDISPLAY_M192BY160
+            #pragma message "M192BY160 read from /root/NM/gfxdisplay"
             const uint16_t MATRIX_TILE_WIDTH = 192;
             const uint16_t MATRIX_TILE_HEIGHT= 160;
         #elif GFXDISPLAY_M128BY192
+            #pragma message "M128BY192 read from /root/NM/gfxdisplay"
             const uint16_t MATRIX_TILE_WIDTH = 128;
             const uint16_t MATRIX_TILE_HEIGHT= 192;
         #else
+            #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
             const uint16_t MATRIX_TILE_WIDTH = 128;
             const uint16_t MATRIX_TILE_HEIGHT= 192;
         #endif
@@ -772,15 +776,19 @@ uint32_t tft_spi_speed;
     
     uint8_t matrix_brightness = 255;
     #ifdef GFXDISPLAY_M384BY256
+        #pragma message "M384BY256 read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 384;
         const uint16_t MATRIX_TILE_HEIGHT= 256;
     #elif GFXDISPLAY_M192BY160
+        #pragma message "M192BY160 read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 192;
         const uint16_t MATRIX_TILE_HEIGHT= 160;
     #elif GFXDISPLAY_M128BY192
+        #pragma message "M128BY192 read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 128;
         const uint16_t MATRIX_TILE_HEIGHT= 192;
     #else
+        #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
         const uint16_t MATRIX_TILE_WIDTH = 128;
         const uint16_t MATRIX_TILE_HEIGHT= 192;
     #endif
