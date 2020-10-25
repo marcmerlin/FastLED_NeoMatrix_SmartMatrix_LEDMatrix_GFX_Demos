@@ -1082,6 +1082,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.panel_type = "FM6126A";
         #endif
 
+        rgb_matrix::RuntimeOptions ropt;
 	#ifdef RPI4
 	    ropt.gpio_slowdown = 2;
 	#else
