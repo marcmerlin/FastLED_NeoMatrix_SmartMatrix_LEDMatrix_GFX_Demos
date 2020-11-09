@@ -1066,6 +1066,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            defaults.pwm_dither_bits = 2;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
     	    defaults.pixel_mapper_config = "V-mapper";
@@ -1076,6 +1079,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 50;
             defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            defaults.pwm_dither_bits = 2;
             //defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
             defaults.pixel_mapper_config = "V-mapper:Z";
@@ -1086,6 +1092,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            defaults.pwm_dither_bits = 2;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
         #else
@@ -1095,6 +1104,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
+            defaults.pwm_dither_bits = 2;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
         #endif
