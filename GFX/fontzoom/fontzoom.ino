@@ -190,9 +190,6 @@ void loop() {
 
 
 void setup() {
-    delay(1000);
-    Serial.begin(115200);
-
     matrix_setup();
     matrix->setTextWrap(false);
     if (mw >= 48 && mh >=64) matrix->setTextSize(2);

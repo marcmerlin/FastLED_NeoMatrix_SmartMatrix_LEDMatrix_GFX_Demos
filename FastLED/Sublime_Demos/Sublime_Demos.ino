@@ -553,8 +553,6 @@ void ChangePattern(int8_t dir)
 }
 
 void setup() {
-  delay( 1000 ); //safety startup delay
-  Serial.begin(115200);
   matrix_setup();
   sublime_setup();
   sublime_reset();

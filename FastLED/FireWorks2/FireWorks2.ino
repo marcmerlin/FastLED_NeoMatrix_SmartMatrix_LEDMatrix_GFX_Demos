@@ -286,8 +286,6 @@ void fireworks()
 
 #ifndef FIREWORKS_INCLUDE
 void setup() {
-  delay( 1000 ); //safety startup delay
-  Serial.begin(115200);
   matrix_setup();
   fireworks_setup();
 }

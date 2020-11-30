@@ -352,8 +352,6 @@ void chooseNextColorPalette( CRGBPalette16& pal)
 #define SECONDS_PER_PALETTE  30
 
 void setup() {
-  delay( 1000 ); //safety startup delay
-  Serial.begin(115200);
   matrix_setup();
   Serial.println("Setup done");
 

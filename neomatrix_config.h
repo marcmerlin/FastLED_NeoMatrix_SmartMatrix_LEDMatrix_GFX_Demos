@@ -385,10 +385,20 @@ uint32_t tft_spi_speed;
     
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
-    // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
-    #define GPIOPINOUT 8 // if on ESP32, this selects which wiring is used. Teensy uses the define below
-    #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware on teensy
-    #include <SmartMatrix3.h>
+    // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
+    #define GPIOPINOUT 8
+    #ifdef SMARTMATRIXV3
+        #include <SmartLEDShieldV4.h>
+        #include <SmartMatrix3.h>
+    #else // As of 2020/11, SmartMatrix v4 has a new interface
+        // https://community.pixelmatix.com/t/smartmatrix-library-4-0-changes-to-matrixhardware-includes/709/9
+        #ifdef ESP32
+            #include <MatrixHardware_ESP32_V0.h> // ESP32
+        #else
+            #include <MatrixHardware_KitV4.h>    // Teensy shield v4
+        #endif
+        #include <SmartMatrix.h>
+    #endif
     #include <SmartMatrix_GFX.h>
     uint8_t matrix_brightness = 255;
     

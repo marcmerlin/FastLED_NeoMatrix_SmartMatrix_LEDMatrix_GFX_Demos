@@ -98,9 +98,6 @@ void loop() {
 
 
 void setup() {
-    delay(1000);
-    Serial.begin(115200);
-
     matrix_setup();
     effects.leds = matrixleds;
     effects.Setup();
