@@ -893,15 +893,19 @@ void die(const char *mesg) {
 }
 
 void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
+    // If varname starts with @, show debug for the allocation
+    void *mem;
+
 #ifndef BOARD_HAS_PSRAM
     psram = false;
 #endif
-    if (psram) Serial.print("PS");
-    Serial.print("Malloc ");
-    Serial.print(varname);
-    Serial.print(" . Requested bytes: ");
-    Serial.println(req);
-    void *mem;
+    if (varname[0] == '@') {
+        if (psram) Serial.print("PS");
+        Serial.print("Malloc ");
+        Serial.print(varname);
+        Serial.print(" . Requested bytes: ");
+        Serial.println(req);
+    }
 #ifdef ESP32
     if (psram) { 
         mem = ps_malloc(req);
