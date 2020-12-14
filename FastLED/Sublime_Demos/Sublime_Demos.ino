@@ -499,20 +499,13 @@ void sinelon()
 }
 
 void sublime_setup() {
-    Framebuffer_GFX::show_free_mem("before setup");
     // https://www.geeksforgeeks.org/dynamically-allocate-2d-array-c/
-    tempMatrix = (uint8_t **) malloc( (MATRIX_WIDTH+1) * sizeof(int *) );
-    while (tempMatrix == NULL) { Serial.println("tempMatrix malloc failed"); }
+    tempMatrix = (uint8_t **) mallocordie("Sublime tempMatrix", (MATRIX_WIDTH+1) * sizeof(int *) );
 
-    Framebuffer_GFX::show_free_mem("after tempMatrix[x]");
     for (uint16_t i=0; i < MATRIX_WIDTH+1; i++) {
-        tempMatrix[i] = (uint8_t *) malloc(MATRIX_HEIGHT+1);
-        while (tempMatrix[i] == NULL) { Serial.println("tempMatrix[i] malloc failed"); }
+        tempMatrix[i] = (uint8_t *) mallocordie("Sublime tempMatrix[i]", MATRIX_HEIGHT+1);
     }
-    Framebuffer_GFX::show_free_mem("after tempMatrix[x][y]");
-    splashArray = (uint8_t *) malloc(MATRIX_WIDTH);
-    while (splashArray == NULL) { Serial.println("splashArray malloc failed"); }
-    Framebuffer_GFX::show_free_mem("after splashArray");
+    splashArray = (uint8_t *) mallocordie("Sublime splashArray", MATRIX_WIDTH);
 }
 
 void sublime_reset() {

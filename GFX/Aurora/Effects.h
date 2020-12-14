@@ -116,8 +116,8 @@ uint8_t mapcos8(uint8_t theta, uint8_t lowest = 0, uint8_t highest = 255) {
 }
 
 // Array of temperature readings at each simulation cell
-// FIXME: convert to malloc?
-byte heat[NUM_LEDS];
+// convert to malloc? Unused in my more limited demos.
+// byte heat[NUM_LEDS];
 
 uint32_t noise_x;
 uint32_t noise_y;
@@ -133,8 +133,9 @@ uint8_t noisesmoothing;
 class Effects {
   public:
     CRGB *leds;
-    // FIXME: Sigh, 3rd array taking memory, convert to malloc?
-    CRGB leds2[NUM_LEDS];
+    // Sigh, 3rd array taking memory, convert to malloc?
+    //CRGB leds2[NUM_LEDS];
+    CRGB *leds2;
 
     void CircleStream(uint8_t value) {
       DimAll(value);
@@ -183,6 +184,7 @@ class Effects {
       currentPalette = RainbowColors_p;
       loadPalette(0);
       NoiseVariablesSetup();
+      leds2 = (CRGB *) mallocordie("Aurora leds2", NUM_LEDS);
     }
 
     void CyclePalette(int offset = 1) {

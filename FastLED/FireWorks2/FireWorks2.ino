@@ -193,11 +193,8 @@ Dot *gSparks;		// Creates an array object named gSparks of type Dot class
 //Dot gSparks[MAX_SHELLS*MAX_SPARKS];			//Creates an array object named gSparks of type Dot class
 
 void fireworks_setup() {
-    gDot    = (Dot *) calloc(sizeof(Dot), MAX_SHELLS);
-    gSparks = (Dot *) calloc(sizeof(Dot), MAX_SHELLS * MAX_SPARKS);
-    while (gDot == NULL || gSparks == NULL) {
-	Serial.println("fireworks_setup malloc failed");
-    }
+    gDot    = (Dot *) mallocordie("Fireworks gDot", sizeof(Dot) * MAX_SHELLS);
+    gSparks = (Dot *) mallocordie("Fireworks gSparks", sizeof(Dot) * MAX_SHELLS * MAX_SPARKS);
 }
 
 void fireworks() 
