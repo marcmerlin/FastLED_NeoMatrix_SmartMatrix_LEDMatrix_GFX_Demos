@@ -1,14 +1,6 @@
 #ifndef neomatrix_config_h
 #define neomatrix_config_h
 #define SMARTMATRIX//I added this per your instructions...
-//#define M64BY64// I added this per your instructions...only if one chunk
-
-
-
-// Teensy 3.6
-
-#define ILI9341
-#define ILI_ROTATE 1
 
 // min/max are complicated. Arduino and ESP32 layers try to be helpful by using
 // templates that take specific kinds of arguments, but those do not always work
@@ -28,10 +20,15 @@ bool init_done = 0;
 //============================================================================
 
 
-#define GPIOPINOUT 8
 #pragma message "Compiling for SMARTMATRIX"
-#include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware
-#include <SmartMatrix3.h>
+#if __IMXRT1062__ // Teensy 4.0/4.1
+    #include <MatrixHardware_Teensy4_ShieldV4Adapter.h> // Teensy 4 Adapter attached to SmartLED Shield for Teensy 3 (V4)
+    //#include <MatrixHardware_Teensy4_ShieldV5.h>        // SmartLED Shield for Teensy 4 (V5)
+#else
+    #include <MatrixHardware_Teensy3_ShieldV4.h>        // SmartLED Shield for Teensy 3 (V4)
+    //#include <MatrixHardware_Teensy3_ShieldV1toV3.h>    // SmartMatrix Shield for Teensy 3 V1-V3
+#endif
+#include <SmartMatrix4.h>
 #include <SmartMatrix_GFX.h>
 
 
