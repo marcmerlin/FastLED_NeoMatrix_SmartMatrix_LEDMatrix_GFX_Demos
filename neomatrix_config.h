@@ -11,7 +11,7 @@ but SmartMatrix is sufficiently different to need its own exceptions and handlin
 the other libraries define their own FastLED CRGB buffer (RGB888) ).
 
 Backends you should choose from (define 1):
-- SMARTMATRIX
+- SMARTMATRIX (if you are using the old SMARTMATRIX3, also define SMARTMATRIXV3)
 - ILI9341
 - ST7735_128b160
 - ST7735_128b128
@@ -69,6 +69,16 @@ to use, set the define before you include the file.
     #ifdef __MK66FX1M0__
     #define ILI9341
     #define ILI_ROTATE 1
+    // If instead you are using the old SmartMatrix V3, define those 2
+    //#define SMARTMATRIX3
+    // And with SmartMatrix (v4), only this define is needed.
+    //#define SMARTMATRIX
+    #endif
+
+    // Teensy v.4
+    #ifdef __IMXRT1062__ 
+    //#define SMARTMATRIX3
+    #define SMARTMATRIX
     #endif
 #endif
 
@@ -387,6 +397,7 @@ uint32_t tft_spi_speed;
 #elif defined(SMARTMATRIX)
     // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
     #define GPIOPINOUT 8
+    // This is defined by you before including this file if you are using the old SmartMatrixv3
     #ifdef SMARTMATRIXV3
         #include <SmartLEDShieldV4.h>
         #include <SmartMatrix3.h>
@@ -394,8 +405,12 @@ uint32_t tft_spi_speed;
         // https://community.pixelmatix.com/t/smartmatrix-library-4-0-changes-to-matrixhardware-includes/709/9
         #ifdef ESP32
             #include <MatrixHardware_ESP32_V0.h> // ESP32
+        #elif __IMXRT1062__ // Teensy 4.0/4.1
+            #include <MatrixHardware_Teensy4_ShieldV4Adapter.h> // Teensy 4 Adapter attached to SmartLED Shield for Teensy 3 (V4)
+            //#include <MatrixHardware_Teensy4_ShieldV5.h>        // SmartLED Shield for Teensy 4 (V5)
         #else
-            #include <MatrixHardware_KitV4.h>    // Teensy shield v4
+            #include <MatrixHardware_Teensy3_ShieldV4.h>        // SmartLED Shield for Teensy 3 (V4)
+            //#include <MatrixHardware_Teensy3_ShieldV1toV3.h>    // SmartMatrix Shield for Teensy 3 V1-V3
         #endif
         #include <SmartMatrix.h>
     #endif
@@ -413,8 +428,12 @@ uint32_t tft_spi_speed;
     const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
     const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
     const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
+    #elif defined(__IMXRT1062__) // teensy v.4
+    const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+    const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
+    const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
     #else
-    #error Unknown architecture (not ESP32 or teensy 3.5/6)
+    #error Unknown architecture (not ESP32 or teensy 3.5/6 or teensy 4.0, please write a panel config)
     #endif
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
@@ -946,8 +965,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     }
 
     // Teensy takes a while to initialize serial port.
-    // Teensy 3.0, 3.1/3.2, 3.5, 3.6
-    #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+    // Teensy 3.0, 3.1/3.2, 3.5, 3.6, 4.0+4.1
+    // https://docs.platformio.org/en/latest/platforms/teensy.html
+    #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__IMXRT1062__)
         delay(3000);
     #endif
     show_free_mem("Memory after setup() starts");
