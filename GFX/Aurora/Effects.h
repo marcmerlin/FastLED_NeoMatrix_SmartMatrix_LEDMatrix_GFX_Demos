@@ -116,7 +116,8 @@ uint8_t mapcos8(uint8_t theta, uint8_t lowest = 0, uint8_t highest = 255) {
 }
 
 // Array of temperature readings at each simulation cell
-// convert to malloc? Unused in my more limited demos.
+// convert to malloc?
+// heat is not used and sucks RAM, disable it
 // byte heat[NUM_LEDS];
 
 uint32_t noise_x;
@@ -125,14 +126,16 @@ uint32_t noise_z;
 uint32_t noise_scale_x;
 uint32_t noise_scale_y;
 
-// FIXME: 2nd array, convert to malloc?
-uint8_t noise[MATRIX_WIDTH][MATRIX_HEIGHT];
+// noise is not used and sucks RAM, disable it
+//uint8_t noise[MATRIX_WIDTH][MATRIX_HEIGHT];
 
 uint8_t noisesmoothing;
 
 class Effects {
   public:
     CRGB *leds;
+// leds2 is not used and sucks RAM, disable it
+#if 0
     // Sigh, 3rd array taking memory, convert to malloc?
     //CRGB leds2[NUM_LEDS];
     CRGB *leds2;
@@ -168,6 +171,7 @@ class Effects {
         }
       }
     }
+#endif
 
     // palettes
     static const int paletteCount = 10;
@@ -184,7 +188,7 @@ class Effects {
       currentPalette = RainbowColors_p;
       loadPalette(0);
       NoiseVariablesSetup();
-      leds2 = (CRGB *) mallocordie("Aurora leds2", NUM_LEDS);
+      //leds2 = (CRGB *) mallocordie("Aurora leds2", NUM_LEDS);
     }
 
     void CyclePalette(int offset = 1) {
@@ -730,6 +734,8 @@ class Effects {
       noise_scale_y = 6000;
     }
 
+    // unused in my limited demo list
+#if 0
     void FillNoise() {
       for (uint16_t i = 0; i < MATRIX_WIDTH; i++) {
         uint32_t ioffset = noise_scale_x * (i - MATRIX_CENTRE_Y);
@@ -870,6 +876,7 @@ class Effects {
       }
     }
 
+    // unused in my limited demo list
     void standardNoiseSmearing() {
       noise_x += 1000;
       noise_y += 1000;
@@ -883,6 +890,7 @@ class Effects {
       MoveY(3);
       MoveFractionalNoiseX(4);
     }
+#endif
 };
 
 #endif
