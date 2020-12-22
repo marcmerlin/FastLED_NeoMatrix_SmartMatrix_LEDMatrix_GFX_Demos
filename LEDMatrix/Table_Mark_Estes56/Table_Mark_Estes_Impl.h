@@ -8607,9 +8607,8 @@ void noisetest() {
     digitalWrite(LATCH, HIGH);
     acount++;
   }
-
-
 #endif
+
   /*if (music.laudio[0] == 0) music.laudio[0] = music.laudio[1] ;*/
   if (music.peakL >= 8 || music.peakR >= 8)
     gmusic = true;
@@ -8690,7 +8689,9 @@ void audioprocess()
       quietcount = 0;
     }
   }
+#ifdef TME_AUDIO
   digitalWrite(LATCH, LOW);
+#endif
 
 
 }

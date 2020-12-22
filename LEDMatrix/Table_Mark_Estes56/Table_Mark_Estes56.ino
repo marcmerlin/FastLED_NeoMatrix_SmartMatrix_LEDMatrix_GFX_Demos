@@ -6,11 +6,27 @@
 #define zeds ledmatrix
 
 #include "Table_Mark_Estes_config.h"
+
+// SHOW_PATTERN_NUM uses Adafruit GFX fonts
 #ifdef SHOW_PATTERN_NUM
 #include <Fonts/TomThumb.h>
 #endif
+
+// TME now uses LEDText from LEDMatrix (a competing library)
+#include <LEDText.h>
+// Not all fonts are used, but the compiler should keep the unused ones
+#include <FontRobotron.h>
 #include <FontMatrise.h>
 #include <Font12x16.h>
+cLEDText Mess1;
+cLEDText Mess2;
+cLEDText Mess3;
+
+// EXTMEM is only availble on teensy v4, turn it off elsewhere
+#ifndef __IMXRT1062__ 
+#define EXTMEM 
+#endif
+
 
 // Aurora includes
 #include "matrix.h"

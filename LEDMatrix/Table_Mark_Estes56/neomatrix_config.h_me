@@ -1,14 +1,7 @@
 #ifndef neomatrix_config_h
 #define neomatrix_config_h
 #define SMARTMATRIX//I added this per your instructions...
-//#define M64BY64// I added this per your instructions...only if one chunk
 
-
-
-// Teensy 3.6
-
-#define ILI9341
-#define ILI_ROTATE 1
 
 // min/max are complicated. Arduino and ESP32 layers try to be helpful by using
 // templates that take specific kinds of arguments, but those do not always work
@@ -26,7 +19,6 @@ bool init_done = 0;
 //============================================================================
 // Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
 //============================================================================
-#define USE_ADAFRUIT_GFX_LAYERS
 
 // uncomment one line to select your MatrixHardware configuration - configuration header needs to be included before <SmartMatrix.h>
 //#include <MatrixHardware_Teensy3_ShieldV4.h>        // SmartLED Shield for Teensy 3 (V4)
@@ -47,11 +39,6 @@ bool init_done = 0;
 
 #include <FastLED.h>
 #include <LEDMatrix.h>
-#include <LEDText.h>
-#include <FontRobotron.h>
-cLEDText Mess1;
-cLEDText Mess2;
-cLEDText Mess3;
 
 uint8_t matrix_brightness = 255;//this is the one that sets brightnessss
 

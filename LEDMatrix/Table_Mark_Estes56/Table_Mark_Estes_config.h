@@ -33,7 +33,7 @@ uint8_t bestpatterns[] = {
 // By default audio support is on for what's expected to be teensy.
 #define TME_AUDIO
 // But turn it off on ARDUINOONPC / Raspberry Pi and ESP32
-/*#ifdef ARDUINOONPC
+ifdef ARDUINOONPC
 #undef ARDUINOONPC
 #endif
 
@@ -44,13 +44,10 @@ uint8_t bestpatterns[] = {
 #undef TME_AUDIO
 #endif
 
+// Don't load non existent EasyTransfer for platforms without audio
 #ifdef TME_AUDIO
-
-
 #include <EasyTransfer.h>// used for exchange with 2nd arduino for audio processing
-
-#endif*/
-#include <EasyTransfer.h>// used for exchange with 2nd arduino for audio processing
+#endif
 
 #define TIMING              90
 //seconds per pattern
@@ -58,8 +55,3 @@ uint8_t bestpatterns[] = {
 
 int16_t pattern = 25;//this picks the pattern to start with...
 // --------------------------- Config End ----------------------------------
-
-
-
-
-//---------------------------------------------------------------------------

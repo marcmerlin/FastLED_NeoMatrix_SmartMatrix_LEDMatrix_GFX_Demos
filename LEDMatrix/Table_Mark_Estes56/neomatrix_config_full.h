@@ -1,8 +1,6 @@
 #ifndef neomatrix_config_h
 #define neomatrix_config_h
 
-#define SMARTMATRIX
-
 /* There are 2 major backends
 1) SmartMatrix (via SmartMatrix::GFX)
 2) Not SmartMatrix (via FastLED::NeoMatrix or FastLED_SPITFT::GFX)
@@ -13,7 +11,7 @@ but SmartMatrix is sufficiently different to need its own exceptions and handlin
 the other libraries define their own FastLED CRGB buffer (RGB888) ).
 
 Backends you should choose from (define 1):
-- SMARTMATRIX
+- SMARTMATRIX (if you are using the old SMARTMATRIX3, also define SMARTMATRIXV3)
 - ILI9341
 - ST7735_128b160
 - ST7735_128b128
@@ -71,6 +69,16 @@ to use, set the define before you include the file.
     #ifdef __MK66FX1M0__
     #define ILI9341
     #define ILI_ROTATE 1
+    // If instead you are using the old SmartMatrix V3, define those 2
+    //#define SMARTMATRIX3
+    // And with SmartMatrix (v4), only this define is needed.
+    //#define SMARTMATRIX
+    #endif
+
+    // Teensy v.4
+    #ifdef __IMXRT1062__ 
+    //#define SMARTMATRIX3
+    #define SMARTMATRIX
     #endif
 #endif
 
@@ -178,6 +186,7 @@ uint32_t tft_spi_speed;
 #elif defined(ARDUINOONPC)
     #define UNIXFS
     #define FS_PREFIX "/root/NM/"
+    #define GIF_DIRECTORY FS_PREFIX "gifs"
 #else
     #define FS_PREFIX ""
     #define FSO SD
@@ -386,14 +395,28 @@ uint32_t tft_spi_speed;
     
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
-    // CHANGEME, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
-    #define GPIOPINOUT 8 // if on ESP32, this selects which wiring is used. Teensy uses the define below
-    #include <SmartLEDShieldV4.h>  // if you're using SmartLED Shield V4 hardware on teensy
-    #include <SmartMatrix3.h>
+    // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
+    #define GPIOPINOUT 8
+    // This is defined by you before including this file if you are using the old SmartMatrixv3
+    #ifdef SMARTMATRIXV3
+        #include <SmartLEDShieldV4.h>
+        #include <SmartMatrix3.h>
+    #else // As of 2020/11, SmartMatrix v4 has a new interface
+        // https://community.pixelmatix.com/t/smartmatrix-library-4-0-changes-to-matrixhardware-includes/709/9
+        #ifdef ESP32
+            #include <MatrixHardware_ESP32_V0.h> // ESP32
+        #elif __IMXRT1062__ // Teensy 4.0/4.1
+            #include <MatrixHardware_Teensy4_ShieldV4Adapter.h> // Teensy 4 Adapter attached to SmartLED Shield for Teensy 3 (V4)
+            //#include <MatrixHardware_Teensy4_ShieldV5.h>        // SmartLED Shield for Teensy 4 (V5)
+        #else
+            #include <MatrixHardware_Teensy3_ShieldV4.h>        // SmartLED Shield for Teensy 3 (V4)
+            //#include <MatrixHardware_Teensy3_ShieldV1toV3.h>    // SmartMatrix Shield for Teensy 3 V1-V3
+        #endif
+        #include <SmartMatrix.h>
+    #endif
     #include <SmartMatrix_GFX.h>
     uint8_t matrix_brightness = 255;
     
-#if 0
     #ifdef ESP32
     #pragma message "SmartMatrix for ESP32 with 64x32 16 scan panel and 64x96 resolution"
     const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
@@ -405,20 +428,16 @@ uint32_t tft_spi_speed;
     const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
     const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
     const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
-    #else
-    #error Unknown architecture (not ESP32 or teensy 3.5/6)
-    #endif
-#endif
-
-    #pragma message "Compiling for Teensy with 64x64 2 64x32 panels"
-    const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
-    //const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+    #elif defined(__IMXRT1062__) // teensy v.4
+    const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
     const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
-    const uint16_t MATRIX_TILE_HEIGHT = 32; // height of each matrix
-
+    const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
+    #else
+    #error Unknown architecture (not ESP32 or teensy 3.5/6 or teensy 4.0, please write a panel config)
+    #endif
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 2;  // number of matrices arranged vertically
+    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
     
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
@@ -734,8 +753,29 @@ uint32_t tft_spi_speed;
 	const uint16_t MATRIX_TILE_WIDTH =  64; // width of EACH NEOPIXEL MATRIX (not total display)
 	const uint16_t MATRIX_TILE_HEIGHT=   1; // height of each matrix
     #else
-	const uint16_t MATRIX_TILE_WIDTH = 128; // width of EACH NEOPIXEL MATRIX (not total display)
-	const uint16_t MATRIX_TILE_HEIGHT= 192; // height of each matrix
+        #undef gif_size
+        #define gif_size 192
+        #ifdef GFXDISPLAY_M384BY256
+            #pragma message "M384BY256 read from /root/NM/gfxdisplay"
+            const uint16_t MATRIX_TILE_WIDTH = 384;
+            const uint16_t MATRIX_TILE_HEIGHT= 256;
+        #elif GFXDISPLAY_M192BY160
+            #pragma message "M192BY160 read from /root/NM/gfxdisplay"
+            const uint16_t MATRIX_TILE_WIDTH = 192;
+            const uint16_t MATRIX_TILE_HEIGHT= 160;
+        #elif GFXDISPLAY_M128BY192
+            #pragma message "M128BY192 read from /root/NM/gfxdisplay"
+            const uint16_t MATRIX_TILE_WIDTH = 128;
+            const uint16_t MATRIX_TILE_HEIGHT= 192;
+        #elif GFXDISPLAY_M64BY96
+            #pragma message "M64Y96 read from /root/NM/gfxdisplay"
+            const uint16_t MATRIX_TILE_WIDTH =  64;
+            const uint16_t MATRIX_TILE_HEIGHT=  96;
+        #else
+            #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
+            const uint16_t MATRIX_TILE_WIDTH = 128;
+            const uint16_t MATRIX_TILE_HEIGHT= 192;
+        #endif
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
@@ -764,14 +804,26 @@ uint32_t tft_spi_speed;
     #define min(a,b) ((a<b)?(a):(b))
     #define max(a,b) ((a>b)?(a):(b))
     #include <led-matrix.h>
+    #undef gif_size
+    #define gif_size 192
     
     uint8_t matrix_brightness = 255;
-    #ifdef RPI4
+    #ifdef GFXDISPLAY_M384BY256
+        #pragma message "M384BY256 read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 384;
         const uint16_t MATRIX_TILE_HEIGHT= 256;
+    #elif GFXDISPLAY_M192BY160
+        #pragma message "M192BY160 read from /root/NM/gfxdisplay"
+        const uint16_t MATRIX_TILE_WIDTH = 192;
+        const uint16_t MATRIX_TILE_HEIGHT= 160;
+    #elif GFXDISPLAY_M128BY192
+        #pragma message "M128BY192 read from /root/NM/gfxdisplay"
+        const uint16_t MATRIX_TILE_WIDTH = 128;
+        const uint16_t MATRIX_TILE_HEIGHT= 192;
     #else
-	const uint16_t MATRIX_TILE_WIDTH = 192;
-	const uint16_t MATRIX_TILE_HEIGHT= 160;
+        #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
+        const uint16_t MATRIX_TILE_WIDTH = 128;
+        const uint16_t MATRIX_TILE_HEIGHT= 192;
     #endif
     
     // Used by LEDMatrix
@@ -860,15 +912,19 @@ void die(const char *mesg) {
 }
 
 void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
+    // If varname starts with @, show debug for the allocation
+    void *mem;
+
 #ifndef BOARD_HAS_PSRAM
     psram = false;
 #endif
-    if (psram) Serial.print("PS");
-    Serial.print("Malloc ");
-    Serial.print(varname);
-    Serial.print(" . Requested bytes: ");
-    Serial.println(req);
-    void *mem;
+    if (varname[0] == '@') {
+        if (psram) Serial.print("PS");
+        Serial.print("Malloc ");
+        Serial.print(varname);
+        Serial.print(" . Requested bytes: ");
+        Serial.println(req);
+    }
 #ifdef ESP32
     if (psram) { 
         mem = ps_malloc(req);
@@ -909,8 +965,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     }
 
     // Teensy takes a while to initialize serial port.
-    // Teensy 3.0, 3.1/3.2, 3.5, 3.6
-    #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__)
+    // Teensy 3.0, 3.1/3.2, 3.5, 3.6, 4.0+4.1
+    // https://docs.platformio.org/en/latest/platforms/teensy.html
+    #if defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__IMXRT1062__)
         delay(3000);
     #endif
     show_free_mem("Memory after setup() starts");
@@ -1040,31 +1097,60 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     
         rgb_matrix::RGBMatrix::Options defaults;
         defaults.hardware_mapping = "regular"; // or e.g. "adafruit-hat"
-	#ifdef RPI4
+        #ifdef GFXDISPLAY_M384BY256
             defaults.rows = 64;
             defaults.cols = 128;
             defaults.chain_length = 4;
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            defaults.pwm_dither_bits = 2;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
     	    defaults.pixel_mapper_config = "V-mapper";
-        
-            rgb_matrix::RuntimeOptions ropt;
-	    ropt.gpio_slowdown = 2;
-	#else
+        #elif GFXDISPLAY_M192BY160
             defaults.rows = 32;
             defaults.cols = 64;
             defaults.chain_length = 5;
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 50;
             defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            defaults.pwm_dither_bits = 2;
             //defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
             defaults.pixel_mapper_config = "V-mapper:Z";
-    
-            rgb_matrix::RuntimeOptions ropt;
+        #elif GFXDISPLAY_M128BY192
+            defaults.rows = 64;
+            defaults.cols = 128;
+            defaults.chain_length = 1;
+            defaults.parallel = 3;
+            defaults.pwm_lsb_nanoseconds = 100;
+            defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            defaults.pwm_dither_bits = 2;
+            defaults.led_rgb_sequence = "RBG";
+            defaults.panel_type = "FM6126A";
+        #else
+            defaults.rows = 64;
+            defaults.cols = 128;
+            defaults.chain_length = 1;
+            defaults.parallel = 3;
+            defaults.pwm_lsb_nanoseconds = 100;
+            defaults.pwm_bits = 7;
+            defaults.pwm_dither_bits = 2;
+            defaults.led_rgb_sequence = "RBG";
+            defaults.panel_type = "FM6126A";
+        #endif
+
+        rgb_matrix::RuntimeOptions ropt;
+	#ifdef RPI4
+	    ropt.gpio_slowdown = 2;
+	#else
             ropt.gpio_slowdown = 1;
 	#endif
 
