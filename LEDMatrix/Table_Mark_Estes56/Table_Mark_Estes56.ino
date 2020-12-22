@@ -303,7 +303,6 @@ void setup()
   lastmilly = millis();
   lasttest = millis();
 #ifdef TME_AUDIO
-
   digitalWrite(LATCH, HIGH);
 #endif
   hue = random8();//get a starting point for the color progressions
