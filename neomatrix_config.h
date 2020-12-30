@@ -404,6 +404,8 @@ uint32_t tft_spi_speed;
     #else // As of 2020/11, SmartMatrix v4 has a new interface
         // https://community.pixelmatix.com/t/smartmatrix-library-4-0-changes-to-matrixhardware-includes/709/9
         #ifdef ESP32
+            // This saves RAM but could make your code unstable if you do Flash + Wifi + PSRAM
+            //#define SMARTMATRIX_USE_PSRAM
             #include <MatrixHardware_ESP32_V0.h> // ESP32
         #elif __IMXRT1062__ // Teensy 4.0/4.1
             #include <MatrixHardware_Teensy4_ShieldV4Adapter.h> // Teensy 4 Adapter attached to SmartLED Shield for Teensy 3 (V4)
