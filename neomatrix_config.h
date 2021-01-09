@@ -83,6 +83,7 @@ to use, set the define before you include the file.
 #endif
 
 #if defined(ARDUINOONPC)
+    // Those defines (including RPIRGBPANEL) come from makeNativeArduino.mk
     #if defined(RPI4)
 	#pragma message "Detected ARDUINOONPC on rPi4, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
     #elif defined(RPI3)
@@ -1156,10 +1157,10 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             ropt.gpio_slowdown = 1;
 	#endif
 
-        rgb_matrix::Canvas *canvas = rgb_matrix::CreateMatrixFromOptions(defaults, ropt);
-        while (canvas == NULL) Serial.println("Canvas did not initialize");
-        matrix->setCanvas(canvas);
-        Serial.println("RGBPanel Canvas initialized");
+        RGBMatrix *rgbmatrix = rgb_matrix::CreateMatrixFromOptions(defaults, ropt);
+        while (rgbmatrix == NULL) Serial.println("RGBMatrix did not initialize");
+        matrix->setMatrix(rgbmatrix);
+        Serial.println("RGBPanel RGBMatrix initialized");
     
     //============================================================================================
     #elif defined(M5STACK)
