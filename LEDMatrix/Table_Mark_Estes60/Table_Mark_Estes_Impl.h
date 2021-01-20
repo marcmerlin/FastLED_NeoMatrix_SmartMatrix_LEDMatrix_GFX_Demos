@@ -634,28 +634,28 @@ void checkfancy()
 
     case 28:
       wind = 0;
-      targetfps = max (targetfps, 30);
+      targetfps = mmax (targetfps, 30);
       bfade = 15;
       slowme = false;
       adjunct = 0;
       break;
     case 29:
       wind = 0;
-      targetfps = max (targetfps, 30);
+      targetfps = mmax (targetfps, 30);
       bfade = 15;
       slowme = false;
       adjunct = 0;
       break;
     case 30:
       wind = 0;
-      targetfps = max (targetfps, 30);
+      targetfps = mmax (targetfps, 30);
       bfade = 15;
       slowme = false;
       adjunct = 0;
       break;
     case 31:
       wind = 0;
-      targetfps = max (targetfps, 30);
+      targetfps = mmax (targetfps, 30);
       bfade = 15;
       slowme = false;
       adjunct = 0;
