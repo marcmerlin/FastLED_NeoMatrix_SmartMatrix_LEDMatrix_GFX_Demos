@@ -174,6 +174,7 @@ uint32_t tft_spi_speed;
 #elif defined(ESP32)
     #define FS_PREFIX ""
     //#include <SPIFFS.h>
+    //#define FSOSPIFFS
     //#define FSO SPIFFS
     #include "FFat.h"
     #define FSO FFat
