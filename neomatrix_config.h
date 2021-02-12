@@ -633,9 +633,9 @@ uint32_t tft_spi_speed;
     */
     
     #ifdef ESP32
-    #define TFT_RST       26
-    #define TFT_DC        25
-    #define TFT_CS        27 // this can also be wired to ground
+    #define TFT_RST       26 // Grey
+    #define TFT_DC        25 // Purple
+    #define TFT_CS        27 // White can be writed to ground
     #elif defined(ESP8266)
     #define TFT_RST       15
     #define TFT_DC         5
@@ -694,13 +694,14 @@ uint32_t tft_spi_speed;
     */
     
     #ifdef ESP32
-        #define TFT_RST  26
-        #define TFT_DC   25
-        #define TFT_CS   27 // this can also be wired to ground
+        #define TFT_RST  26 // Grey
+        #define TFT_DC   25 // Purple
+        #define TFT_CS   27 // White can be writed to ground
 
-        #define TFT_MOSI 23
-        #define TFT_MISO 19
-        #define TFT_CLK  18
+        #define TFT_MOSI 23 // Blue
+        #define TFT_MISO 19 // Green
+        #define TFT_CLK  18 // Yellow
+
         // Option 1: use any pins but a little slower
         #pragma message "Using SWSPI"
         Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST);
