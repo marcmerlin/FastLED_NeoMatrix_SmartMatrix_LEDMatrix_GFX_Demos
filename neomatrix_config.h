@@ -76,7 +76,7 @@ to use, set the define before you include the file.
     #endif
 
     // Teensy v.4
-    #ifdef __IMXRT1062__ 
+    #ifdef __IMXRT1062__
     //#define SMARTMATRIX3
     #define SMARTMATRIX
     #endif
@@ -208,7 +208,7 @@ uint32_t tft_spi_speed;
     #elif defined (SPARK)
         #define SD_CS SS
     #endif
-    
+
     // Teensy SD Library requires a trailing slash in the directory name
     #if gif_size == 64
         #define GIF_DIRECTORY FS_PREFIX "/gifs64/"
@@ -226,20 +226,20 @@ uint32_t tft_spi_speed;
 #if defined(M24BY24)
     #include <FastLED_NeoMatrix.h>
     #define FASTLED_NEOMATRIX
-    
+
     const uint8_t MATRIXPIN = 13;
-    
+
     uint8_t matrix_brightness = 64;
     // Used by LEDMatrix
     const uint16_t MATRIX_TILE_WIDTH = 24; // width of EACH NEOPIXEL MATRIX (not total display)
     const uint16_t MATRIX_TILE_HEIGHT= 24; // height of each matrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     CRGB *matrixleds;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -247,7 +247,7 @@ uint32_t tft_spi_speed;
     // and easy to use. Look for examples if you need to setup a matrix of matrices.
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmatrix(false);
     #endif
-    
+
     // MATRIX DECLARATION:
     // Parameter 1 = width of EACH NEOPIXEL MATRIX (not total display)
     // Parameter 2 = height of each matrix
@@ -279,30 +279,30 @@ uint32_t tft_spi_speed;
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
         NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
-    
+
 //----------------------------------------------------------------------------
 #elif defined(M32BY8X3)
     #include <FastLED_NeoMatrix.h>
     #define FASTLED_NEOMATRIX
-    
+
     uint8_t matrix_brightness = 64;
     // Used by LEDMatrix
     const uint16_t MATRIX_TILE_WIDTH = 8; // width of EACH NEOPIXEL MATRIX (not total display)
     const uint16_t MATRIX_TILE_HEIGHT= 32; // height of each matrix
     const uint8_t MATRIX_TILE_H     = 3;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     // MATRIX DECLARATION:
     // Parameter 1 = width of EACH NEOPIXEL MATRIX (not total display)
     // Parameter 2 = height of each matrix
@@ -335,42 +335,42 @@ uint32_t tft_spi_speed;
       NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
         NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG +
         NEO_TILE_TOP + NEO_TILE_LEFT +  NEO_TILE_PROGRESSIVE);
-    
+
 //----------------------------------------------------------------------------
 #elif defined(M16BY16T4)
     #include <FastLED_NeoMatrix.h>
     #define FASTLED_NEOMATRIX
-    
+
     uint8_t matrix_brightness = 64;
-    
+
     const uint16_t MATRIX_TILE_WIDTH = 16; // width of EACH NEOPIXEL MATRIX (not total display)
     const uint16_t MATRIX_TILE_HEIGHT= 16; // height of each matrix
     const uint8_t MATRIX_TILE_H     = 2; // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 2; // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, VERTICAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V,
       NEO_MATRIX_BOTTOM     + NEO_MATRIX_RIGHT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG +
         NEO_TILE_TOP + NEO_TILE_RIGHT +  NEO_TILE_PROGRESSIVE);
-    
+
     const uint8_t MATRIXPIN = 13;
-    
+
 //----------------------------------------------------------------------------
 #elif defined(M64BY64) // 64x64 straight connection (no matrices)
     #include <FastLED_NeoMatrix.h>
     #define FASTLED_NEOMATRIX
-    
+
     // http://marc.merlins.org/perso/arduino/post_2018-07-30_Building-a-64x64-Neopixel-Neomatrix-_4096-pixels_-running-NeoMatrix-FastLED-IR.html
     uint8_t matrix_brightness = 128;
     //
@@ -381,11 +381,11 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
     #define NUM_STRIPS 16
     #define NUM_LEDS_PER_STRIP 256
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     CRGB *matrixleds;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -394,7 +394,7 @@ uint32_t tft_spi_speed;
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
         NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
-    
+
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
     // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
@@ -420,7 +420,7 @@ uint32_t tft_spi_speed;
     #endif
     #include <SmartMatrix_GFX.h>
     uint8_t matrix_brightness = 255;
-    
+
     #ifdef ESP32
     #pragma message "SmartMatrix for ESP32 with 64x32 16 scan panel and 64x96 resolution"
     const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
@@ -442,11 +442,11 @@ uint32_t tft_spi_speed;
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     /// SmartMatrix Defines
     #define COLOR_DEPTH 24         // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
     const uint8_t kMatrixWidth = mw;
@@ -456,20 +456,20 @@ uint32_t tft_spi_speed;
     const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_FM6126A_RESET_AT_START);      // see http://docs.pixelmatix.com/SmartMatrix for options
     //const uint8_t kMatrixOptions = 0;
     const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
-    
+
     SMARTMATRIX_ALLOCATE_BUFFERS(matrixLayer, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
     SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     void show_callback();
     SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, show_callback);
-    
+
     // Sadly this callback function must be copied around with this init code
     void show_callback() {
     //    memcpy(backgroundLayer.backBuffer(), matrixleds, kMatrixHeight*kMatrixWidth*3);
@@ -483,14 +483,14 @@ uint32_t tft_spi_speed;
     #endif
         matrix->showfps();
     }
-    
+
 //----------------------------------------------------------------------------
 #elif defined(M5STACK)
     #define HASTFT
-    
+
     #include <M5Stack.h>
     #include <FastLED_SPITFT_GFX.h>
-    
+
     uint8_t matrix_brightness = 255;
     const uint16_t MATRIX_TILE_WIDTH = 320;
     const uint16_t MATRIX_TILE_HEIGHT= 240;
@@ -498,21 +498,21 @@ uint32_t tft_spi_speed;
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     // M5 gets defined in M5Stack
     FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, &M5.lcd, 100);
-    
+
 //----------------------------------------------------------------------------
 #elif defined(ILI9341)
     #ifdef ESP32
@@ -525,10 +525,10 @@ uint32_t tft_spi_speed;
 	#pragma message "Compiling for ILI9341. Most chips except teensy 3.6 and better, won't have enough RAM"
     #endif
     #define HASTFT
-    
+
     #include "Adafruit_ILI9341.h"
     #include <FastLED_SPITFT_GFX.h>
-    
+
     uint8_t matrix_brightness = 255;
     #if ILI_ROTATE == 0
     const uint16_t MATRIX_TILE_WIDTH = 320;
@@ -541,11 +541,11 @@ uint32_t tft_spi_speed;
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
@@ -553,19 +553,29 @@ uint32_t tft_spi_speed;
     #endif
     CRGB *matrixleds;
 
-    /*
-    			Arduino	ESP8266		ESP32	ESP32	rPi     rPi
-    						VSPI    HSPI	SPI0    SPI1
-      VCC
-      SCL/SCK/CLK/D0	13	GPIO14/D5	18	14	BC11/22	BC21/40
-      SDA/SDI/MOSI/D1	11	GPIO13/D7	23	13	BC10/19	BC20/38
-      RES/RST		9	GPIO15/D8	26	26	BC24
-      DC/A0/RS (data)	8	GPIO05/D1	25	25	BC23
-      CS		10	GPIO04/D2	27	27	BC08
-    
-      MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35	
+    /*  https://pinout.xyz/pinout/spi
+    SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
+    1 GND                                       VSPI    HSPI	SPI0    SPI1
+    2 VCC
+    3 SCL/SCK/CLK/D0	13	GPIO14/D5	18	14	BC11/22	BC21/40
+    4 SDA/SDI/MOSI/D1	11	GPIO13/D7	23	13	BC10/19	BC20/38
+    ---- 2 pins above and MISO are HWSPI, pins below are anything
+    ---- RST is not part of SPI, it's an out of band signal to reset a TFT
+    ---- This could be wired to the ESP32 EN(reset) pin
+    5 RES/RST		9	GPIO15/D8	26	26	BC24
+    ---- Data/Command pin is not part of SPI but used to tell the TFT if incoming SPI
+    ---- data is actually a command, or pixel data.
+    6 DC/A0/RS (data)	8	GPIO05/D1	25	25	BC23
+    ---- Cable select chooses which SPI device we're talking to, if there is only
+    ---- one, it can be tied to ground. Any pin is fine
+    7 CS/SS => GND	10	GPIO04/D2	0	2	BC08
+
+    CS2: 2 => if you have 2 different screens, need 2 CS pins
+
+    ---- MISO is not used to talk to TFTs, but is one of the 3 SPI hardware pins
+      MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35
     */
-    
+
     #if defined(__MK66FX1M0__)
         #define TFT_RST  23
         #define TFT_DC   10
@@ -577,25 +587,25 @@ uint32_t tft_spi_speed;
     #else
         #define TFT_RST  26
         #define TFT_DC   25
-        #define TFT_CS   27 // this can also be wired to ground
+        #define TFT_CS    0 // this can also be wired to ground
 
         #define TFT_MOSI 23
         #define TFT_MISO 19
         #define TFT_CLK  18
     #endif
-    
+
     //Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-    Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
-    
+    Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS, TFT_DC, TFT_RST);
+
     FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
-    
+
 //----------------------------------------------------------------------------
-#elif defined(ST7735_128b128) || defined(ST7735_128b160) 
+#elif defined(ST7735_128b128) || defined(ST7735_128b160)
     #define HASTFT
-    
+
     #include <Adafruit_ST7735.h>
     #include <FastLED_SPITFT_GFX.h>
-    
+
     uint8_t matrix_brightness = 255;
     const uint16_t MATRIX_TILE_WIDTH = 128;
     #ifdef ST7735_128b128
@@ -603,39 +613,49 @@ uint32_t tft_spi_speed;
     #else
     const uint16_t MATRIX_TILE_HEIGHT= 160;
     #endif
-    
+
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
-    /*
-    			Arduino	ESP8266		ESP32	ESP32	rPi     rPi
-    						VSPI    HSPI	SPI0    SPI1
-      VCC
-      SCL/SCK/CLK/D0	13	GPIO14/D5	18	14	BC11/22	BC21/40
-      SDA/SDI/MOSI/D1	11	GPIO13/D7	23	13	BC10/19	BC20/38
-      RES/RST		9	GPIO15/D8	26	26	BC24
-      DC/A0/RS (data)	8	GPIO05/D1	25	25	BC23
-      CS		10	GPIO04/D2	27	27	BC08
-    
-      MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35	
+
+    /*  https://pinout.xyz/pinout/spi
+    SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
+    1 GND                                       VSPI    HSPI	SPI0    SPI1
+    2 VCC
+    3 SCL/SCK/CLK/D0	13	GPIO14/D5	18	14	BC11/22	BC21/40
+    4 SDA/SDI/MOSI/D1	11	GPIO13/D7	23	13	BC10/19	BC20/38
+    ---- 2 pins above and MISO are HWSPI, pins below are anything
+    ---- RST is not part of SPI, it's an out of band signal to reset a TFT
+    ---- This could be wired to the ESP32 EN(reset) pin
+    5 RES/RST		9	GPIO15/D8	26	26	BC24
+    ---- Data/Command pin is not part of SPI but used to tell the TFT if incoming SPI
+    ---- data is actually a command, or pixel data.
+    6 DC/A0/RS (data)	8	GPIO05/D1	25	25	BC23
+    ---- Cable select chooses which SPI device we're talking to, if there is only
+    ---- one, it can be tied to ground. Any pin is fine
+    7 CS/SS => GND	10	GPIO04/D2	0	2	BC08
+
+    CS2: 2 => if you have 2 different screens, need 2 CS pins
+
+    ---- MISO is not used to talk to TFTs, but is one of the 3 SPI hardware pins
+      MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35
     */
-    
+
     #ifdef ESP32
     #define TFT_RST       26 // Grey
     #define TFT_DC        25 // Purple
-    #define TFT_CS        27 // White can be writed to ground
+    #define TFT_CS         0 // White can be wired to ground
     #elif defined(ESP8266)
     #define TFT_RST       15
     #define TFT_DC         5
@@ -646,16 +666,16 @@ uint32_t tft_spi_speed;
     #define TFT_CS        10 // this can also be wired to ground
     #endif
     Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
-    
+
     FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
-    
+
 //----------------------------------------------------------------------------
 #elif defined(SSD1331)
     #define HASTFT
-    
+
     #include <Adafruit_SSD1331.h>
     #include <FastLED_SPITFT_GFX.h>
-    
+
     uint8_t matrix_brightness = 255;
     #if SSD1331_ROTATE == 0
     const uint16_t MATRIX_TILE_WIDTH = 96;
@@ -668,35 +688,45 @@ uint32_t tft_spi_speed;
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     /*  https://pinout.xyz/pinout/spi
     SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
     1 GND                                       VSPI    HSPI	SPI0    SPI1
     2 VCC
     3 SCL/SCK/CLK/D0	13	GPIO14/D5	18	14	BC11/22	BC21/40
     4 SDA/SDI/MOSI/D1	11	GPIO13/D7	23	13	BC10/19	BC20/38
-    5 RES/RST		9	GPIO15/D8	26	26	BC24				
-    6 DC/A0/RS (data)	8	GPIO05/D1	25	25	BC23				
-    7 CS		10	GPIO04/D2	27	27	BC08			
-    
-      MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35	
+    ---- 2 pins above and MISO are HWSPI, pins below are anything
+    ---- RST is not part of SPI, it's an out of band signal to reset a TFT
+    ---- This could be wired to the ESP32 EN(reset) pin
+    5 RES/RST		9	GPIO15/D8	26	26	BC24
+    ---- Data/Command pin is not part of SPI but used to tell the TFT if incoming SPI
+    ---- data is actually a command, or pixel data.
+    6 DC/A0/RS (data)	8	GPIO05/D1	25	25	BC23
+    ---- Cable select chooses which SPI device we're talking to, if there is only
+    ---- one, it can be tied to ground. Any pin is fine
+    7 CS/SS => GND	10	GPIO04/D2	0	2	BC08
+
+    CS2: 2 => if you have 2 different screens, need 2 CS pins
+
+    ---- MISO is not used to talk to TFTs, but is one of the 3 SPI hardware pins
+      MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35
     */
-    
+
     #ifdef ESP32
         #define TFT_RST  26 // Grey
         #define TFT_DC   25 // Purple
-        #define TFT_CS   27 // White can be writed to ground
+        #define TFT_CS    0 // White can be wired to ground
 
         #define TFT_MOSI 23 // Blue
         #define TFT_MISO 19 // Green
@@ -721,19 +751,19 @@ uint32_t tft_spi_speed;
         #pragma message "Using HWSPI"
         Adafruit_SSD1331 *tft = new Adafruit_SSD1331(&SPI, TFT_CS, TFT_DC, TFT_RST);
     #endif
-    
+
     #if SSD1331_ROTATE == 0
     FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 0);
     #else
     FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 1);
     #endif
-    
+
 //----------------------------------------------------------------------------
 #elif defined(LINUX_RENDERER_X11)
-    
+
     #include "TFT_LinuxWrapper.h"
     #include <FastLED_TFTWrapper_GFX.h>
-    
+
     uint8_t matrix_brightness = 255;
     const uint16_t MATRIX_TILE_WIDTH = 64;
     const uint16_t MATRIX_TILE_HEIGHT= 96;
@@ -741,25 +771,25 @@ uint32_t tft_spi_speed;
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT);
     FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, tft);
 
 //----------------------------------------------------------------------------
 #elif defined(LINUX_RENDERER_SDL)
     #include <FastLED_NeoMatrix.h>
-    
+
     uint8_t matrix_brightness = 128;
     //
     // Used by LEDMatrix
@@ -795,11 +825,11 @@ uint32_t tft_spi_speed;
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     CRGB *matrixleds;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -808,10 +838,10 @@ uint32_t tft_spi_speed;
     #endif
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
         NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
-    
+
 //----------------------------------------------------------------------------
 #elif defined(RPIRGBPANEL)
-    
+
     #include <FastLED_RPIRGBPanel_GFX.h>
     // https://github.com/hzeller/rpi-rgb-led-matrix
     // Arduino min/max conflict with g++ math min/max
@@ -822,7 +852,7 @@ uint32_t tft_spi_speed;
     #include <led-matrix.h>
     #undef gif_size
     #define gif_size 192
-    
+
     uint8_t matrix_brightness = 255;
     #ifdef GFXDISPLAY_M384BY256
         #pragma message "M384BY256 read from /root/NM/gfxdisplay"
@@ -841,25 +871,25 @@ uint32_t tft_spi_speed;
         const uint16_t MATRIX_TILE_WIDTH = 128;
         const uint16_t MATRIX_TILE_HEIGHT= 192;
     #endif
-    
+
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-    
+
     // Used by NeoMatrix
     const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
     const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-    
+
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;
-    
+
     FastLED_RPIRGBPanel_GFX *matrix = new FastLED_RPIRGBPanel_GFX(matrixleds, mw, mh);
-    
-    
+
+
 //============================================================================
 #else
     #error "Please write a matrix config or choose one of the definitions above. If you have a FastLED matrix, define M24BY24 at the top of this file"
@@ -942,7 +972,7 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
         Serial.println(req);
     }
 #ifdef ESP32
-    if (psram) { 
+    if (psram) {
         mem = ps_malloc(req);
     } else {
         mem = malloc(req);
@@ -987,8 +1017,8 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         delay(3000);
     #endif
     show_free_mem("Memory after setup() starts");
-    
-    // Smartmatrix defines the framebuffers itself. Other methods make their own allocation here  
+
+    // Smartmatrix defines the framebuffers itself. Other methods make their own allocation here
     #if !defined(SMARTMATRIX)
         // ESP32 has more memory available for allocation in setup than in global
         // (if this were a global array), so we use malloc here.
@@ -1001,7 +1031,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             ledmatrix.SetLEDArray(matrixleds);
         #endif
     #endif
-   
+
 
     //============================================================================================
     // Matrix Init Start
@@ -1012,7 +1042,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         Serial.print(NUMMATRIX);
         Serial.print(" running on pin: ");
         Serial.println(MATRIXPIN);
-    
+
     //============================================================================================
     // Example of parallel output
     #elif defined(M32BY8X3)
@@ -1030,7 +1060,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #endif
         Serial.print("Neomatrix parallel output, total LEDs: ");
         Serial.println(NUMMATRIX);
-    
+
     //============================================================================================
     // Serialized (slow-ish) output
     #elif defined(M16BY16T4)
@@ -1039,34 +1069,34 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         Serial.print(NUMMATRIX);
         Serial.print(" running on pin: ");
         Serial.println(MATRIXPIN);
-    
+
     //============================================================================================
     #elif defined(M64BY64) // 64x64 straight connection (no matrices)
         // https://github.com/FastLED/FastLED/wiki/Multiple-Controller-Examples
         FastLED.addLeds<WS2812B,23, GRB>(matrixleds, 0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
         #ifdef ESP32
-            FastLED.addLeds<WS2812B,22, GRB>(matrixleds, 1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
+            FastLED.addLeds<WS2812B,22, GRB>(matrixleds, 1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
             FastLED.addLeds<WS2812B,27, GRB>(matrixleds, 2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);   // was 3
             FastLED.addLeds<WS2812B,21, GRB>(matrixleds, 3*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
             FastLED.addLeds<WS2812B,19, GRB>(matrixleds, 4*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
-            FastLED.addLeds<WS2812B,18, GRB>(matrixleds, 5*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B, 5, GRB>(matrixleds, 6*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B, 4, GRB>(matrixleds, 7*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
+            FastLED.addLeds<WS2812B,18, GRB>(matrixleds, 5*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B, 5, GRB>(matrixleds, 6*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B, 4, GRB>(matrixleds, 7*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
 
-            FastLED.addLeds<WS2812B, 0, GRB>(matrixleds, 8*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B, 2, GRB>(matrixleds, 9*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B,15, GRB>(matrixleds,10*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B,25, GRB>(matrixleds,11*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B,26, GRB>(matrixleds,12*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B,14, GRB>(matrixleds,13*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
-            FastLED.addLeds<WS2812B,12, GRB>(matrixleds,14*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP); 
+            FastLED.addLeds<WS2812B, 0, GRB>(matrixleds, 8*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B, 2, GRB>(matrixleds, 9*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B,15, GRB>(matrixleds,10*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B,25, GRB>(matrixleds,11*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B,26, GRB>(matrixleds,12*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B,14, GRB>(matrixleds,13*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
+            FastLED.addLeds<WS2812B,12, GRB>(matrixleds,14*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
             FastLED.addLeds<WS2812B,13, GRB>(matrixleds,15*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP);
 
             Serial.print("Neomatrix 16 pin via RMT/I2S 16 way parallel output, total LEDs: ");
             Serial.println(NUMMATRIX);
         #endif // ESP32
         matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
-    
+
     //============================================================================================
     #elif defined(SMARTMATRIX)
         matrix_gamma = 1; // SmartMatrix should be good by default.
@@ -1093,24 +1123,24 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             delay(1000);
         #endif
         Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
-    
+
     //============================================================================================
     #elif defined(LINUX_RENDERER_X11)
         // Need to init the underlying TFT SPI engine
         Serial.println("ARDUINOONPC LINUX_RENDERER_X11 tft begin");
         tft->begin();
         matrix->fillScreen(LTDC_BLACK);
-    
+
     //============================================================================================
     #elif defined(LINUX_RENDERER_SDL)
         FastLED.addLeds<SDL, mw, mh>(matrixleds, NUMMATRIX);
         Serial.print("Neomatrix on top of SDL. Please use '+' on numeric keypad for brighter, total LEDs: ");
         Serial.println(NUMMATRIX);
-    
+
     //============================================================================================
     #elif defined(RPIRGBPANEL)
         Serial.println("Using rpi-rgb-led-matrix");
-    
+
         rgb_matrix::RGBMatrix::Options defaults;
         defaults.hardware_mapping = "regular"; // or e.g. "adafruit-hat"
         #ifdef GFXDISPLAY_M384BY256
@@ -1178,7 +1208,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         while (rgbmatrix == NULL) Serial.println("RGBMatrix did not initialize");
         matrix->setMatrix(rgbmatrix);
         Serial.println("RGBPanel RGBMatrix initialized");
-    
+
     //============================================================================================
     #elif defined(M5STACK)
         // Need to init the underlying TFT SPI engine
@@ -1186,11 +1216,11 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         M5.begin();
         M5.Power.begin();
         M5.Lcd.fillScreen(BLUE);
-    
+
     //============================================================================================
     #elif defined(ILI9341)
         // Adafruit ILI9341 1.5.4 or better is actually quite fast at 80Mhz: 40fps full frame refresh
-        // however it is not stable for the display to work every time. Anything over 24Mhz is not very 
+        // however it is not stable for the display to work every time. Anything over 24Mhz is not very
         // stable, so I'm accepting the slower resulting fps (unfortunately 14fps at 24Mhz).
         // See 'ESP32 speed tests' lower down in the file for performance details.
         tft_spi_speed = 24 * 1000 * 1000;
@@ -1212,7 +1242,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #endif
         // Seems that filllscreen further initializes the tft so that it works
         tft->fillScreen(ILI9341_DARKGREY);
-    
+
     //============================================================================================
     #elif defined(ST7735_128b160)
         tft_spi_speed = 60 * 1000 * 1000;
@@ -1227,7 +1257,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         //tft->setAddrWindow(0, 0, 128, 160);
         // This is required for the screen to work
         tft->fillScreen(ST77XX_GREEN);
-    
+
     //============================================================================================
     #elif defined(ST7735_128b128)
         tft_spi_speed = 32 * 1000 * 1000;
@@ -1240,7 +1270,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         tft->setSPISpeed(tft_spi_speed);
         // This is required for the screen to work
         tft->fillScreen(ST77XX_GREEN);
-    
+
     //============================================================================================
     #elif defined(SSD1331)
         // Need to init the underlying TFT SPI engine
@@ -1254,7 +1284,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         // This is very important, or FastLED_SPITFT_GFX::show will not work.
         // Size is hardcoded by TFT size.
         tft->setAddrWindow(0, 0, 96, 64);
-    
+
     //============================================================================================
     #else
         #error "Undefined Matrix"
@@ -1287,7 +1317,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             ledmatrix.DrawLine (0, 0, ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 255, 0));
             ledmatrix.DrawPixel(0, 0, CRGB(255, 0, 0));
             ledmatrix.DrawPixel(ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 0, 255));
-        
+
             ledmatrix.DrawLine (ledmatrix.Width() - 5, 4, 4, ledmatrix.Height() - 5, CRGB(128, 128, 128));
             ledmatrix.DrawPixel(ledmatrix.Width() - 5, 4,  CRGB(255, 64, 64));
             ledmatrix.DrawPixel(4, ledmatrix.Height() - 5, CRGB(64, 64, 255));
@@ -1299,7 +1329,6 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     Serial.println("matrix_setup done");
 
     // ESP32 speed tests
-    // - Adafruit::ILI9341 speed at 80Mhz is 
     // - WROVER at 24Mhz is 25fps, doesn't seem to work any faster
     // - https://github.com/loboris/ESP32_TFT_lib (DMA) at 24Mhz is only 7fps?
     //
