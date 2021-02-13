@@ -739,7 +739,7 @@ uint32_t tft_spi_speed;
         // https://github.com/adafruit/Adafruit-SSD1331-OLED-Driver-Library-for-Arduino/issues/27
         //Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(TFT_CS, TFT_DC, TFT_RST);
     #else
-        // Teensy Pins?
+        // ESP8266 + Teensy?
         #define TFT_RST  15
         #define TFT_DC   5
         #define TFT_CS   4
