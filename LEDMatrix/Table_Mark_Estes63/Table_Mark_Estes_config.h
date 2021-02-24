@@ -32,6 +32,9 @@ uint8_t bestpatterns[] = {3, 22, 28, 30, 31, 45, 51, 87, 4, 5, 9, 10, 11, 12, 13
 #define TME_AUDIO
 // But turn it off on ARDUINOONPC / Raspberry Pi and ESP32
 
+#ifdef ARDUINOONPC
+#undef ARDUINOONPC
+#endif
 
 #ifdef ESP32
 #undef TME_AUDIO

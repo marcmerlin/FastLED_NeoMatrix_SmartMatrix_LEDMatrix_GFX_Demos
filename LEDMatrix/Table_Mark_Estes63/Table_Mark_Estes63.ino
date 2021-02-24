@@ -152,10 +152,10 @@ void setup()
   if (MATRIX_WIDTH == MATRIX_HEIGHT)
     square = true;
   delay(1500);
-  Serial.begin(57600);
+  Serial.begin(115200);
 #ifdef TME_AUDIO
 
-  Serial1.begin(115200);
+  Serial1.begin(57600);
 
   ETin.begin(details(music), &Serial1);
   randomSeed(analogRead(1) - analogRead(2) + analogRead(5));
