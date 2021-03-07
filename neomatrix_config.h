@@ -45,6 +45,9 @@ to use, set the define before you include the file.
 // or use one of the other ones if they are closer ot your setup (M32BY8X3 M16BY16T4 M64BY64)
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //#define M24BY24
+// For TFTs, there is original support from adafruit, but https://github.com/moononournation/Arduino_GFX/
+// has better and faster support for many TFTs.
+// define ADAFRUIT_TFT if you'd rather have the Adafruit drivers
 
 #if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC)
     #ifdef ESP8266
@@ -68,7 +71,6 @@ to use, set the define before you include the file.
     // Teensy 3.6
     #ifdef __MK66FX1M0__
     #define ILI9341
-    #define ILI_ROTATE 1
     // If instead you are using the old SmartMatrix V3, define those 2
     //#define SMARTMATRIX3
     // And with SmartMatrix (v4), only this define is needed.
@@ -486,7 +488,7 @@ uint32_t tft_spi_speed;
 
 //----------------------------------------------------------------------------
 #elif defined(M5STACK)
-    #define HASTFT
+    #define HAS_TFT
 
     #include <M5Stack.h>
     #include <FastLED_SPITFT_GFX.h>
@@ -515,43 +517,14 @@ uint32_t tft_spi_speed;
 
 //----------------------------------------------------------------------------
 #elif defined(ILI9341)
-    #ifdef ESP32
-	#ifdef BOARD_HAS_PSRAM
-	    #pragma message "Compiling for ILI9341 on ESP32 with PSRAM"
-	#else
-	    #error "Cannot compile for ILI9341 WITHOUT PSRAM on ESP32, not enough RAM"
-	#endif
+    #define HAS_TFT
+
+    #ifdef ADAFRUIT_TFT
+        #include "Adafruit_ILI9341.h"
+        #include <FastLED_SPITFT_GFX.h>
     #else
-	#pragma message "Compiling for ILI9341. Most chips except teensy 3.6 and better, won't have enough RAM"
+        #include <FastLED_ArduinoGFX_TFT.h>
     #endif
-    #define HASTFT
-
-    #include "Adafruit_ILI9341.h"
-    #include <FastLED_SPITFT_GFX.h>
-
-    uint8_t matrix_brightness = 255;
-    #if ILI_ROTATE == 0
-    const uint16_t MATRIX_TILE_WIDTH = 320;
-    const uint16_t MATRIX_TILE_HEIGHT= 240;
-    #else
-    const uint16_t MATRIX_TILE_WIDTH = 240;
-    const uint16_t MATRIX_TILE_HEIGHT= 320;
-    #endif
-    //
-    // Used by LEDMatrix
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
-    #ifdef LEDMATRIX
-    // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
-        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
-    #endif
-    CRGB *matrixleds;
 
     /*  https://pinout.xyz/pinout/spi
     SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
@@ -576,32 +549,96 @@ uint32_t tft_spi_speed;
       MISO		12	GPIO12/D6	19	12	BM11/23	BC19/35
     */
 
-    #if defined(__MK66FX1M0__)
-        #define TFT_RST  23
-        #define TFT_DC   10
-        #define TFT_CS   22 // this can also be wired to ground
+    // this is the TFT reset pin. Some boards may have an auto-reset
+    // circuitry on the breakout so this pin might not required but it can
+    // be helpful sometimes to reset the TFT if your setup is not always
+    // resetting cleanly. Connect to ground to reset the TFT
+    #define TFT_RST 26 // Grey
+    //#define TFT_RST -1 // Grey, can be wired to ESP32 EN to save a pin
+    #define TFT_DC  25 // Purple
+    //#define TFT_CS -1 // for display without CS pin
+    #define TFT_CS  0 // White can be wired to ground
+    #define TFT_CS2 2 // Orange can be wired to ground
+    
+    #define TFT_MOSI 23 // Blue
+    #define TFT_CLK  18 // Green
+    #define TFT_MISO 19 // Yellow
+    #define TFT_BL 15
+    #define TFT_SCK TFT_CLK
 
-        #define TFT_MOSI 11
-        #define TFT_MISO 12
-        #define TFT_CLK  13
+    #ifdef ADAFRUIT_TFT
+        //Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+        Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS, TFT_DC, TFT_RST);
     #else
-        #define TFT_RST  26
-        #define TFT_DC   25
-        #define TFT_CS    0 // this can also be wired to ground
+        #ifdef ESP32
+            // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
+            Arduino_DataBus *bus2 = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
+            // Arduino_DataBus *bus2 = new Arduino_ESP32SPI(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
+        #else
+            Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
+        #endif
+        Arduino_ILI9341 *tft = new Arduino_ILI9341(bus2, TFT_RST, 1 /* rotation */);
+    #endif
+    // It would be great if we could do this, but many programs use size related variables to
+    // define static arrays, which required constants
+    //uint16_t tftw = tft->width();
+    //uint16_t tfth = tft->height();
+    const uint16_t tftw = 320;
+    const uint16_t tfth = 240;
+    const uint16_t mw =   tftw;
 
-        #define TFT_MOSI 23
-        #define TFT_MISO 19
-        #define TFT_CLK  18
+
+    // if you are using ILI9341 on ESP32, the framebuffer does not fit in memory (224KB)
+    // If PSRAM is available, it will get used. If not, you need to make the framebuffer
+    // smaller than the TFT. One simple way is to have the framebuffer be half the screen
+    // size, render what you need in one half, display it, render the other half and then
+    // render that.
+    // Before you ask "why would I do this, in that case I can just render to the TFT directly"
+    // the answer is "yes, you can as long as you are using GFX directly, you can indeed skip
+    // the framebuffer, but if you use FastLED/LEDMatrix code that requires a CRGB 24bpp buffer
+    // and does transformations like reading the framebuffer and flipping parts of it, you do
+    // need the framebuffer and therefore it could make sense to split the screen in two and
+    // render each half separately.
+    // In my case, I can use LEDText for fancy font rendering not supported by Adafruit's GFX
+    // and then display the 24bpp framebuffer on the 16bpp TFT
+
+    #ifdef ESP32
+        #ifdef BOARD_HAS_PSRAM
+            #pragma message "Compiling for ILI9341 on ESP32 with PSRAM"
+            const uint16_t mh = tfth;
+        #else
+            #pragma message "Compiling for ILI9341 on ESP32 without PSRAM, framebuffer will only be half height"
+            const uint16_t mh = tfth/2;
+        #endif
+    #else
+        #pragma message "Compiling for ILI9341. Most chips except teensy 3.6 and better, won't have enough RAM"
+        const uint16_t mh = tfth;
     #endif
 
-    //Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-    Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS, TFT_DC, TFT_RST);
+    // templates prevents being able to get the screen size at runtime. This is why templates must die
+    const uint16_t MATRIX_WIDTH =  mw;
+    const uint16_t MATRIX_HEIGHT = mh;
+    // if mw is based on tft->width(), then those need to be hardcoded
+    //const uint16_t MATRIX_WIDTH =  320;
+    //const uint16_t MATRIX_HEIGHT = 240;
+    #ifdef LEDMATRIX
+    cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, HORIZONTAL_MATRIX, 1, 1, HORIZONTAL_BLOCKS> ledmatrix(false);
+    #endif
 
-    FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
+    // matrixleds is malloced at runtime as there is more memory available once setup runs
+    CRGB *matrixleds;
+    uint8_t matrix_brightness = 255;
+
+    // create the matrix object, and reset the matrixleds pointer in matrix_setup
+    #ifdef ADAFRUIT_TFT
+        FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
+    #else
+        FastLED_ArduinoGFX_TFT *matrix = new FastLED_ArduinoGFX_TFT(matrixleds, mw, mh, tft);;
+    #endif
 
 //----------------------------------------------------------------------------
 #elif defined(ST7735_128b128) || defined(ST7735_128b160)
-    #define HASTFT
+    #define HAS_TFT
 
     #include <Adafruit_ST7735.h>
     #include <FastLED_SPITFT_GFX.h>
@@ -653,25 +690,39 @@ uint32_t tft_spi_speed;
     */
 
     #ifdef ESP32
-    #define TFT_RST       26 // Grey
-    #define TFT_DC        25 // Purple
-    #define TFT_CS         0 // White can be wired to ground
+        #define TFT_RST       26 // Grey
+        #define TFT_DC        25 // Purple
+        #define TFT_CS         0 // White with 2 devices
+        #define TFT_CS2        2 // Orange with 2 deices
     #elif defined(ESP8266)
-    #define TFT_RST       15
-    #define TFT_DC         5
-    #define TFT_CS         4 // this can also be wired to ground
+        #define TFT_RST       15
+        #define TFT_DC         5
+        #define TFT_CS         4 // this can be wired to ground if you have one device
+        #define TFT_CS2        4
     #else
-    #define TFT_RST        9 // Or set to -1 and connect to Arduino RESET pin
-    #define TFT_DC         8
-    #define TFT_CS        10 // this can also be wired to ground
+        #define TFT_RST        9 // Or set to -1 and connect to Arduino RESET pin
+        #define TFT_DC         8
+        #define TFT_CS         4 // this can be wired to ground if you have one device
+        #define TFT_CS2        4
     #endif
-    Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
-    FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
+    #ifdef ADAFRUIT_TFT
+        Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+        FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
+    #else
+        #ifdef ESP32
+            // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
+            Arduino_DataBus *bus2 = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
+            // Arduino_DataBus *bus2 = new Arduino_ESP32SPI(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
+        #else
+            Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
+        #endif
+        Arduino_ILI9341 *gfx = new Arduino_ILI9341(bus2, TFT_RST, 0 /* rotation */);
+    #endif
 
 //----------------------------------------------------------------------------
 #elif defined(SSD1331)
-    #define HASTFT
+    #define HAS_TFT
 
     #include <Adafruit_SSD1331.h>
     #include <FastLED_SPITFT_GFX.h>
@@ -899,11 +950,15 @@ uint32_t tft_spi_speed;
 // End Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
 //============================================================================
 
+#ifdef HAS_TFT
+uint8_t gfx_scale = (tftw*tfth)/(mw*mh);
+#endif
+
 // Compat for some other demos
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 const uint32_t NUMMATRIX = mw*mh;
 const uint32_t NUM_LEDS = NUMMATRIX;
-const uint16_t MATRIX_HEIGHT = mh;
-const uint16_t MATRIX_WIDTH = mw;
 
 // Compat with SmartMatrix code that uses those variables
 // (but don't redefine for SmartMatrix backend)
@@ -911,6 +966,7 @@ const uint16_t MATRIX_WIDTH = mw;
 const uint16_t kMatrixWidth = mw;
 const uint16_t kMatrixHeight = mh;
 #endif
+#pragma GCC diagnostic pop
 
 #ifdef ESP8266
 // Turn off Wifi in setup()
@@ -984,14 +1040,22 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
     if (mem) {
         return mem;
     } else {
+        show_free_mem();
+        Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
         Serial.print("FATAL: ");
         if (psram) Serial.print("ps_");
         Serial.print("malloc failed for ");
-        Serial.println(varname);
-        show_free_mem();
+        Serial.print(varname);
+        Serial.print(" . Requested bytes: ");
+        Serial.println(req);
+        Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         while (1); // delay(1);  Adding this seems to cause an ESP32 bug
     }
     return NULL;
+}
+
+uint32_t millisdiff(uint32_t before) {
+    return((millis()-before) ? (millis()-before): 1);
 }
 
 void matrix_setup(bool initserial=true, int reservemem = 40000) {
@@ -1028,6 +1092,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         matrix->newLedsPtr(matrixleds);
         show_free_mem("After matrixleds malloc");
         #ifdef LEDMATRIX
+            Serial.println("ledmatrix.SetLEDArray");
             ledmatrix.SetLEDArray(matrixleds);
         #endif
     #endif
@@ -1219,29 +1284,17 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
     //============================================================================================
     #elif defined(ILI9341)
-        // Adafruit ILI9341 1.5.4 or better is actually quite fast at 80Mhz: 40fps full frame refresh
-        // however it is not stable for the display to work every time. Anything over 24Mhz is not very
-        // stable, so I'm accepting the slower resulting fps (unfortunately 14fps at 24Mhz).
-        // See 'ESP32 speed tests' lower down in the file for performance details.
-        tft_spi_speed = 24 * 1000 * 1000;
+        // On my test bench, my ILI9341 doesn't like more than 24Mhz, although when wired properly
+        // it should run at 80Mhz
+        tft_spi_speed = 20 * 1000 * 1000;
         Serial.println("");
         Serial.println("ILI9341 tft begin");
-        Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
-        Serial.println("");
         // Need to init the underlying TFT SPI engine
         tft->begin(tft_spi_speed);
-        #if ILI_ROTATE == 0
-            tft->setRotation(1);
-            // This is very important, or FastLED_SPITFT_GFX::show will not work.
-            // Size is hardcoded by TFT size.
-            // Doesn't seem to work, but fillscreen below takes care of it
-            //tft->setAddrWindow(0, 0, 320, 240);
-        #else
-            tft->setRotation(0);
-            //tft->setAddrWindow(0, 0, 240, 320);
+        #ifdef ADAFRUIT_TFT
+            // Seems that filllscreen initializes the tft so that it works (setAddrWindow)
+            tft->fillScreen(ILI9341_DARKGREY);
         #endif
-        // Seems that filllscreen further initializes the tft so that it works
-        tft->fillScreen(ILI9341_DARKGREY);
 
     //============================================================================================
     #elif defined(ST7735_128b160)
@@ -1293,6 +1346,22 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     // Matrix Init End
     //============================================================================================
 
+    #ifdef HAS_TFT
+    Serial.print("TFT configured, resolution: ");
+    Serial.print(tftw);
+    Serial.print("x");
+    Serial.print(tfth);
+    Serial.print(". GFX size:");
+    Serial.print(mw);
+    Serial.print("x");
+    Serial.print(mh);
+    Serial.print(". GFX Size Ratio: ");
+    Serial.print(gfx_scale);
+    Serial.print(". Speed: ");
+    Serial.print(tft_spi_speed);
+    Serial.println(" (80Mhz is fastest but sometimes unstable)");
+    #endif
+
     show_free_mem("Before matrix->begin");
     matrix->begin();
     //show_free_mem("After matrix->begin");
@@ -1326,66 +1395,98 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #endif
     #endif
 
-    Serial.println("matrix_setup done");
-
-    // ESP32 speed tests
-    // - WROVER at 24Mhz is 25fps, doesn't seem to work any faster
-    // - https://github.com/loboris/ESP32_TFT_lib (DMA) at 24Mhz is only 7fps?
-    //
-    // ILI9314: 80Mhz: TFT 40fps, NO PSRAM: 32fps, PSRAM show: 12ps  => unstable, no display
-    // ILI9314: 40Mhz: TFT 25fps, NO PSRAM: 21fps, PSRAM show: 10fps => unstable, no display
-    // ILI9314: 39Mhz: TFT 18fps, NO PSRAM: 16fps, PSRAM show:  9fps => unstable, garbled
-    // ILI9314: 30Mhz: TFT 18fps, NO PSRAM: 16fps, PSRAM show:  9fps => still a bit unstabled, garbled
-    // ILI9314: 24Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps => stable
-    // ILI9314: 20Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps
-    //
-    // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps => unstable, no display
-    // ST7735_128b160: 60Mhz: TFT 93fps, NO PSRAM: 73fps, PSRAM show: 38fps
-    // ST7735_128b160: 60Mhz: TFT 96fps, NO PSRAM: 52fps
-    // ST7735_128b160: 40Mhz: TFT 68fps, NO PSRAM: 56fps, PSRAM show: 32fps
-    // ST7735_128b160: 20Mhz: TFT 53fps, NO PSRAM: 45fps, PSRAM show: 29fps
-    //
-    // ST7735_128b128: 60Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
-    // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
-    // ST7735_128b128: 32Mhz: TFT 84fps, NO PSRAM: 70fps, PSRAM show: 41fps => stable
-    // ST7735_128b128: 20Mhz: TFT 66fps, NO PSRAM: 56fps, PSRAM show: 36fps
-    //
-    // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps => stable
-    uint32_t before;
-    #ifdef HASTFT
+    #ifdef HAS_TFT
+        uint32_t before;
+        Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvv Speed vvvvvvvvvvvvvvvvvvvvvvvvvv");
         before = millis();
-        for (uint8_t i=0; i<3; i++) {
+        for (uint8_t i=0; i<5; i++) {
             tft->fillScreen(0);
             tft->fillScreen(0xFFFF);
         }
         Serial.print("TFT SPI Speed: ");
         Serial.print(tft_spi_speed/1000000);
-        Serial.print("Mhz. Resulting fps: ");
-        Serial.println((6* 1000/(millis() - before)));
-    #endif
-    #if defined(BOARD_HAS_PSRAM) && defined(HASTFT)
+        Serial.print("Mhz (");
+        Serial.print(millisdiff(before));
+        Serial.print("ms) Resulting fps: ");
+        Serial.println(10*1000 / millisdiff(before));
+
         before = millis();
-        for (uint8_t i=0; i<5; i++) {
-            matrix->show(1);
+        for (uint8_t i=0; i<10; i++) {
+          matrix->show(0, 0);
+          if (gfx_scale != 1) matrix->show(0, mh);
         }
-        Serial.print("Matrix->show() PSRAM BYPASS Speed Test fps: ");
-        Serial.println((5* 1000/(millis() - before)));
+        Serial.print("Matrix->show() Speed Test: ");
+        Serial.print(millisdiff(before));
+        Serial.print("ms, fps: ");
+        Serial.println(10*1000 / (millisdiff(before)));
+        // if only one show() command is run and the whole screen 
+        // isn't covered, adjust the scale
+        //Serial.println(10*1000 / (millisdiff(before)*gfx_scale));
+
+        before = millis();
+        for (uint8_t i=0; i<10; i++) {
+          matrix->show(0, 0, true);
+          if (gfx_scale != 1) matrix->show(0, mh, true);
+        }
+        // this bypasses accessing PSRAM but also converting, reading, and
+        // writing data in the no PSRAM case.
+        Serial.print("Matrix->show() BYPASS Speed Test: ");
+        Serial.print(millisdiff(before));
+        Serial.print("ms, fps: ");
+        Serial.println(10*1000 / (millisdiff(before)));
+
+        before = millis();
+        for (uint16_t i=0; i<5; i++) { 
+            matrix->fillScreen(0xFC00);
+            matrix->show(0, 0);
+            if (gfx_scale != 1) matrix->show(0, mh);
+            matrix->fillScreen(0x003F);
+            matrix->show(0, 0);
+            if (gfx_scale != 1) matrix->show(0, mh);
+        }
+        Serial.print("Framebuffer::GFX end to end speed test: ");
+        Serial.print(millisdiff(before));
+        Serial.print("ms, fps: ");
+        Serial.println(10*1000 / (millisdiff(before)));
+        // Arduino::GFX ILI9314
+        //                     tft/gfx/bypass/copy
+        // 24Mhz, fps no PSRAM: 14/10/13/ 9       PSRAM: 14/ 8/13/6 (Arduino_HWSPI)
+        // 24Mhz, fps no PSRAM: 15/10/13/10  Arduino_ESP32SPI
+        // 24Mhz, fps no PSRAM: 21/12/16/12  Arduino_ESP32SPI_DMA
+        // 40fhz, fps no PSRAM: 25/15/22/14       PSRAM: 25/11/21/8
+        // 80fhz, fps no PSRAM: 42/19/33/18       PSRAM: 40/14/32/9 (Arduino_HWSPI)
+        // 80fhz, fps no PSRAM: 53/21/38/20 Arduino_ESP32SPI
+        // 80fhz, fps no PSRAM: 60/20/34/18 Arduino_ESP32SPI_DMA
+        //
+        // Adafruit ILI9314
+        // 80Mhz: TFT 40fps, NO PSRAM: 32fps, PSRAM show: 12fps
+        // 24Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps
+        //
+        // Old Adafruit numbers:
+        // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps => unstable, no display
+        // ST7735_128b160: 60Mhz: TFT 93fps, NO PSRAM: 73fps, PSRAM show: 38fps
+        // ST7735_128b160: 60Mhz: TFT 96fps, NO PSRAM: 52fps
+        // ST7735_128b160: 40Mhz: TFT 68fps, NO PSRAM: 56fps, PSRAM show: 32fps
+        // ST7735_128b160: 20Mhz: TFT 53fps, NO PSRAM: 45fps, PSRAM show: 29fps
+        //
+        // ST7735_128b128: 60Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
+        // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
+        // ST7735_128b128: 32Mhz: TFT 84fps, NO PSRAM: 70fps, PSRAM show: 41fps => stable
+        // ST7735_128b128: 20Mhz: TFT 66fps, NO PSRAM: 56fps, PSRAM show: 36fps
+        //
+        // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps => stable
+        Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^ Speed ^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        matrix->fillScreen(0x0000);
+        matrix->show(0, 0);
+        if (gfx_scale != 1) matrix->show(0, mh);
     #endif
-    before = millis();
-    for (uint8_t i=0; i<5; i++) {
-        #if defined(BOARD_HAS_PSRAM) && defined(HASTFT)
-            matrix->show(0);
-        #else
-            matrix->show();
-        #endif
-    }
-    Serial.print("Matrix->show() Speed Test fps: ");
-    Serial.println((5* 1000/(millis() - before)));
+
 
     // At least on teensy, due to some framework bug it seems, early
     // serial output gets looped back into serial input
     // Hence, flush input.
     while(Serial.available() > 0) { char t = Serial.read(); t = t; }
+    Serial.println("matrix_setup done");
 }
 #endif // neomatrix_config_h
 // vim:sts=4:sw=4:et
