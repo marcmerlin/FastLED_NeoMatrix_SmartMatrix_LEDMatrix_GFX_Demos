@@ -238,16 +238,13 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
     CRGB *matrixleds;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     // Unfortunately LEDMatrix has its own matrix definition that isn't as well documented
     // and easy to use. Look for examples if you need to setup a matrix of matrices.
-    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmatrix(false);
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
 
     // MATRIX DECLARATION:
@@ -293,10 +290,6 @@ uint32_t tft_spi_speed;
     const uint16_t MATRIX_TILE_HEIGHT= 32; // height of each matrix
     const uint8_t MATRIX_TILE_H     = 3;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -350,10 +343,6 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 2; // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 2; // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
@@ -381,12 +370,9 @@ uint32_t tft_spi_speed;
     const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
     #define NUM_STRIPS 16
     #define NUM_LEDS_PER_STRIP 256
-
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 
     CRGB *matrixleds;
     #ifdef LEDMATRIX
@@ -441,18 +427,15 @@ uint32_t tft_spi_speed;
     #else
     #error Unknown architecture (not ESP32 or teensy 3.5/6 or teensy 4.0, please write a panel config)
     #endif
+
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
     /// SmartMatrix Defines
     #define COLOR_DEPTH 24         // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
-    const uint8_t kMatrixWidth = mw;
-    const uint8_t kMatrixHeight = mh;
+    const uint8_t kMatrixWidth =  MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+    const uint8_t kMatrixHeight = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
     const uint8_t kRefreshDepth = 24;       // known working: 24, 36, 48
     const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
     const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_FM6126A_RESET_AT_START);      // see http://docs.pixelmatix.com/SmartMatrix for options
@@ -500,10 +483,6 @@ uint32_t tft_spi_speed;
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -615,14 +594,14 @@ uint32_t tft_spi_speed;
         const uint16_t mh = tfth;
     #endif
 
+    // Used by LEDMatrix
     // templates prevents being able to get the screen size at runtime. This is why templates must die
-    const uint16_t MATRIX_WIDTH =  mw;
-    const uint16_t MATRIX_HEIGHT = mh;
-    // if mw is based on tft->width(), then those need to be hardcoded
-    //const uint16_t MATRIX_WIDTH =  320;
-    //const uint16_t MATRIX_HEIGHT = 240;
+    const uint16_t MATRIX_TILE_WIDTH =  mw;
+    const uint16_t MATRIX_TILE_HEIGHT = mh;
+    const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
     #ifdef LEDMATRIX
-    cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, HORIZONTAL_MATRIX, 1, 1, HORIZONTAL_BLOCKS> ledmatrix(false);
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,  MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
 
     // matrixleds is malloced at runtime as there is more memory available once setup runs
@@ -644,20 +623,20 @@ uint32_t tft_spi_speed;
     #include <FastLED_SPITFT_GFX.h>
 
     uint8_t matrix_brightness = 255;
-    const uint16_t MATRIX_TILE_WIDTH = 128;
+    const uint16_t mw = 128;
     #ifdef ST7735_128b128
-    const uint16_t MATRIX_TILE_HEIGHT= 128;
+    const uint16_t mh = 128;
     #else
-    const uint16_t MATRIX_TILE_HEIGHT= 160;
+    const uint16_t mh = 160;
     #endif
 
     // Used by LEDMatrix
+    // templates prevents being able to get the screen size at runtime. This is why templates must die
+    const uint16_t MATRIX_TILE_WIDTH =  mw;
+    const uint16_t MATRIX_TILE_HEIGHT = mh;
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -729,20 +708,20 @@ uint32_t tft_spi_speed;
 
     uint8_t matrix_brightness = 255;
     #if SSD1331_ROTATE == 0
-    const uint16_t MATRIX_TILE_WIDTH = 96;
-    const uint16_t MATRIX_TILE_HEIGHT= 64;
+    const uint16_t mw = 96;
+    const uint16_t mh = 64;
     #else
-    const uint16_t MATRIX_TILE_WIDTH = 64;
-    const uint16_t MATRIX_TILE_HEIGHT= 96;
+    const uint16_t mw = 64;
+    const uint16_t mh = 96;
     #endif
-    //
+    
     // Used by LEDMatrix
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+    // templates prevents being able to get the screen size at runtime. This is why templates must die
+    const uint16_t MATRIX_TILE_WIDTH =  mw;
+    const uint16_t MATRIX_TILE_HEIGHT = mh;
+    const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -823,10 +802,6 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
@@ -877,10 +852,6 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
     CRGB *matrixleds;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -927,10 +898,6 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    // Used by NeoMatrix
-    const uint16_t mw = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
-    const uint16_t mh = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
-
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
@@ -938,7 +905,7 @@ uint32_t tft_spi_speed;
     #endif
     CRGB *matrixleds;
 
-    FastLED_RPIRGBPanel_GFX *matrix = new FastLED_RPIRGBPanel_GFX(matrixleds, mw, mh);
+    FastLED_RPIRGBPanel_GFX *matrix = new FastLED_RPIRGBPanel_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT);
 
 
 //============================================================================
@@ -950,13 +917,21 @@ uint32_t tft_spi_speed;
 // End Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
 //============================================================================
 
-#ifdef HAS_TFT
-uint8_t gfx_scale = (tftw*tfth)/(mw*mh);
-#endif
-
 // Compat for some other demos
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
+const uint16_t MATRIX_WIDTH  = MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint16_t MATRIX_HEIGHT = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+
+#ifdef HAS_TFT
+uint8_t gfx_scale = (tftw*tfth)/(mw*mh);
+#else
+// Used by NeoMatrix
+const uint16_t mw = MATRIX_WIDTH;
+const uint16_t mh = MATRIX_HEIGHT;
+#endif
+
+// Used by some demos
 const uint32_t NUMMATRIX = mw*mh;
 const uint32_t NUM_LEDS = NUMMATRIX;
 
