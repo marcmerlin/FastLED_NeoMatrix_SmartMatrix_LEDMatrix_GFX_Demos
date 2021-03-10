@@ -1372,91 +1372,93 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #endif
     #endif
 
-    uint32_t before;
-    Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvv Speed vvvvvvvvvvvvvvvvvvvvvvvvvv");
-    #ifdef HAS_TFT
-        before = millis();
-        for (uint8_t i=0; i<5; i++) {
-            tft->fillScreen(0);
-            tft->fillScreen(0xFFFF);
-        }
-        Serial.print("TFT SPI Speed: ");
-        Serial.print(tft_spi_speed/1000000);
-        Serial.print("Mhz (");
-        Serial.print(millisdiff(before));
-        Serial.print("ms) Resulting fps: ");
-        Serial.println(10*1000 / millisdiff(before));
+    #ifndef DISABLE_SPEED_TEST
+        uint32_t before;
+        Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvv Speed vvvvvvvvvvvvvvvvvvvvvvvvvv");
+        #ifdef HAS_TFT
+            before = millis();
+            for (uint8_t i=0; i<5; i++) {
+                tft->fillScreen(0);
+                tft->fillScreen(0xFFFF);
+            }
+            Serial.print("TFT SPI Speed: ");
+            Serial.print(tft_spi_speed/1000000);
+            Serial.print("Mhz (");
+            Serial.print(millisdiff(before));
+            Serial.print("ms) Resulting fps: ");
+            Serial.println(10*1000 / millisdiff(before));
 
+            before = millis();
+            for (uint8_t i=0; i<10; i++) {
+              matrix->show(0, 0);
+              if (gfx_scale != 1) matrix->show(0, mh);
+            }
+            Serial.print("Matrix->show() Speed Test: ");
+            Serial.print(millisdiff(before));
+            Serial.print("ms, fps: ");
+            Serial.println(10*1000 / (millisdiff(before)));
+            // if only one show() command is run and the whole screen 
+            // isn't covered, adjust the scale
+            //Serial.println(10*1000 / (millisdiff(before)*gfx_scale));
+
+            before = millis();
+            for (uint8_t i=0; i<10; i++) {
+              matrix->show(0, 0, true);
+              if (gfx_scale != 1) matrix->show(0, mh, true);
+            }
+            // this bypasses accessing PSRAM but also converting, reading, and
+            // writing data in the no PSRAM case.
+            Serial.print("Matrix->show() BYPASS Speed Test: ");
+            Serial.print(millisdiff(before));
+            Serial.print("ms, fps: ");
+            Serial.println(10*1000 / (millisdiff(before)));
+        #endif // HAS_TFT
         before = millis();
-        for (uint8_t i=0; i<10; i++) {
-          matrix->show(0, 0);
-          if (gfx_scale != 1) matrix->show(0, mh);
+        for (uint16_t i=0; i<5; i++) { 
+            matrix->fillScreen(0xFC00);
+            matrix->show();
+            #ifdef HAS_TFT
+                if (gfx_scale != 1) matrix->show(0, mh);
+            #endif
+            matrix->fillScreen(0x003F);
+            matrix->show();
+            #ifdef HAS_TFT
+                if (gfx_scale != 1) matrix->show(0, mh);
+            #endif
         }
-        Serial.print("Matrix->show() Speed Test: ");
+        Serial.print("Framebuffer::GFX end to end speed test: ");
         Serial.print(millisdiff(before));
         Serial.print("ms, fps: ");
         Serial.println(10*1000 / (millisdiff(before)));
-        // if only one show() command is run and the whole screen 
-        // isn't covered, adjust the scale
-        //Serial.println(10*1000 / (millisdiff(before)*gfx_scale));
-
-        before = millis();
-        for (uint8_t i=0; i<10; i++) {
-          matrix->show(0, 0, true);
-          if (gfx_scale != 1) matrix->show(0, mh, true);
-        }
-        // this bypasses accessing PSRAM but also converting, reading, and
-        // writing data in the no PSRAM case.
-        Serial.print("Matrix->show() BYPASS Speed Test: ");
-        Serial.print(millisdiff(before));
-        Serial.print("ms, fps: ");
-        Serial.println(10*1000 / (millisdiff(before)));
-    #endif // HAS_TFT
-    before = millis();
-    for (uint16_t i=0; i<5; i++) { 
-        matrix->fillScreen(0xFC00);
-        matrix->show();
-        #ifdef HAS_TFT
-            if (gfx_scale != 1) matrix->show(0, mh);
-        #endif
-        matrix->fillScreen(0x003F);
-        matrix->show();
-        #ifdef HAS_TFT
-            if (gfx_scale != 1) matrix->show(0, mh);
-        #endif
-    }
-    Serial.print("Framebuffer::GFX end to end speed test: ");
-    Serial.print(millisdiff(before));
-    Serial.print("ms, fps: ");
-    Serial.println(10*1000 / (millisdiff(before)));
-    // Arduino::GFX ILI9314
-    //                     tft/gfx/bypass/copy
-    // 24Mhz, fps no PSRAM: 14/10/13/ 9       PSRAM: 14/ 8/13/6 (Arduino_HWSPI)
-    // 24Mhz, fps no PSRAM: 15/10/13/10  Arduino_ESP32SPI
-    // 24Mhz, fps no PSRAM: 21/12/16/12  Arduino_ESP32SPI_DMA
-    // 40fhz, fps no PSRAM: 25/15/22/14       PSRAM: 25/11/21/8
-    // 80fhz, fps no PSRAM: 42/19/33/18       PSRAM: 40/14/32/9 (Arduino_HWSPI)
-    // 80fhz, fps no PSRAM: 53/21/38/20 Arduino_ESP32SPI
-    // 80fhz, fps no PSRAM: 60/20/34/18 Arduino_ESP32SPI_DMA
-    //
-    // Adafruit ILI9314
-    // 80Mhz: TFT 40fps, NO PSRAM: 32fps, PSRAM show: 12fps
-    // 24Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps
-    //
-    // Old Adafruit numbers:
-    // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps => unstable, no display
-    // ST7735_128b160: 60Mhz: TFT 93fps, NO PSRAM: 73fps, PSRAM show: 38fps
-    // ST7735_128b160: 60Mhz: TFT 96fps, NO PSRAM: 52fps
-    // ST7735_128b160: 40Mhz: TFT 68fps, NO PSRAM: 56fps, PSRAM show: 32fps
-    // ST7735_128b160: 20Mhz: TFT 53fps, NO PSRAM: 45fps, PSRAM show: 29fps
-    //
-    // ST7735_128b128: 60Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
-    // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
-    // ST7735_128b128: 32Mhz: TFT 84fps, NO PSRAM: 70fps, PSRAM show: 41fps => stable
-    // ST7735_128b128: 20Mhz: TFT 66fps, NO PSRAM: 56fps, PSRAM show: 36fps
-    //
-    // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps => stable
-    Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^ Speed ^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        // Arduino::GFX ILI9314
+        //                     tft/gfx/bypass/copy
+        // 24Mhz, fps no PSRAM: 14/10/13/ 9       PSRAM: 14/ 8/13/6 (Arduino_HWSPI)
+        // 24Mhz, fps no PSRAM: 15/10/13/10  Arduino_ESP32SPI
+        // 24Mhz, fps no PSRAM: 21/12/16/12  Arduino_ESP32SPI_DMA
+        // 40fhz, fps no PSRAM: 25/15/22/14       PSRAM: 25/11/21/8
+        // 80fhz, fps no PSRAM: 42/19/33/18       PSRAM: 40/14/32/9 (Arduino_HWSPI)
+        // 80fhz, fps no PSRAM: 53/21/38/20 Arduino_ESP32SPI
+        // 80fhz, fps no PSRAM: 60/20/34/18 Arduino_ESP32SPI_DMA
+        //
+        // Adafruit ILI9314
+        // 80Mhz: TFT 40fps, NO PSRAM: 32fps, PSRAM show: 12fps
+        // 24Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps
+        //
+        // Old Adafruit numbers:
+        // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps => unstable, no display
+        // ST7735_128b160: 60Mhz: TFT 93fps, NO PSRAM: 73fps, PSRAM show: 38fps
+        // ST7735_128b160: 60Mhz: TFT 96fps, NO PSRAM: 52fps
+        // ST7735_128b160: 40Mhz: TFT 68fps, NO PSRAM: 56fps, PSRAM show: 32fps
+        // ST7735_128b160: 20Mhz: TFT 53fps, NO PSRAM: 45fps, PSRAM show: 29fps
+        //
+        // ST7735_128b128: 60Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
+        // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
+        // ST7735_128b128: 32Mhz: TFT 84fps, NO PSRAM: 70fps, PSRAM show: 41fps => stable
+        // ST7735_128b128: 20Mhz: TFT 66fps, NO PSRAM: 56fps, PSRAM show: 36fps
+        //
+        // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps => stable
+        Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^ Speed ^^^^^^^^^^^^^^^^^^^^^^^^^^");
+    #endif // DISABLE_SPEED_TEST
     matrix->fillScreen(0x0000);
     matrix->show();
     #ifdef HAS_TFT
