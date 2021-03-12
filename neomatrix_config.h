@@ -453,7 +453,7 @@ uint32_t tft_spi_speed;
     CRGB *matrixleds;
 
     void show_callback();
-    SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, mw, mh, show_callback);
+    SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, kMatrixWidth, kMatrixHeight, show_callback);
 
     // Sadly this callback function must be copied around with this init code
     void show_callback() {
