@@ -1118,7 +1118,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 64;
             defaults.chain_length = 5;
             defaults.parallel = 3;
-            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
@@ -1132,7 +1132,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.chain_length = 1;
             defaults.parallel = 3;
 	    // 100->50: 180Hz to 333Hz refresh
-            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
