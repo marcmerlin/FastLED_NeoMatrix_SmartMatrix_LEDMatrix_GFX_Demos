@@ -112,9 +112,6 @@ void loop() {
 }
 
 void setup() {
-    delay(1000);
-    Serial.begin(115200);
-
     matrix_setup();
     // Mix in an init of LEDMatrix
     ledmatrix_setup();
