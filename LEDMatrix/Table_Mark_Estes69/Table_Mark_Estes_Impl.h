@@ -9660,6 +9660,7 @@ void ChangePaletteAndSettingsPeriodically()
     case 11:
       currentPalette = CloudColors_p;
       colorLoop = 1;
+      break;
 
     case 12:
       SetupPurpleAndGreenPalette();

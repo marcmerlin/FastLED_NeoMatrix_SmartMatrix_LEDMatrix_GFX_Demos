@@ -158,8 +158,10 @@ uint8_t print_width = 3;
 void setup()
 {
   if (BIGGER <= 128){
+#ifdef BESTPATTERNS
     bestpatterns[3] = 168;
     bestpatterns[7]=175;
+#endif
     }
   x = random16();
   y = random16();

@@ -2660,6 +2660,7 @@ void whatami()// set some parameters specific to the pattern and send some data 
       wind = wind * 2 + 1;
       fancy = 0;
       bfade = random(3, 6);
+      // force spiral
       flop[1] = true;
       flop[7] = false;
       break;
