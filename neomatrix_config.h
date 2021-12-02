@@ -397,7 +397,7 @@ uint32_t tft_spi_speed;
             // This saves RAM but could make your code unstable if you do Flash + Wifi + PSRAM
             //#define SMARTMATRIX_USE_PSRAM
             #include <MatrixHardware_ESP32_V0.h> // ESP32
-        #elif __IMXRT1062__ // Teensy 4.0/4.1
+        #elif defined( __IMXRT1062__) // Teensy 4.0/4.1
             #include <MatrixHardware_Teensy4_ShieldV4Adapter.h> // Teensy 4 Adapter attached to SmartLED Shield for Teensy 3 (V4)
             //#include <MatrixHardware_Teensy4_ShieldV5.h>        // SmartLED Shield for Teensy 4 (V5)
         #else
