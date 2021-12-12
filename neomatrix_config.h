@@ -616,7 +616,7 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
     #ifdef LEDMATRIX
-    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,  MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+    cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,  MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
 
     // matrixleds is malloced at runtime as there is more memory available once setup runs
@@ -720,7 +720,7 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
 
@@ -842,7 +842,7 @@ uint32_t tft_spi_speed;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+    cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
     CRGB *matrixleds;

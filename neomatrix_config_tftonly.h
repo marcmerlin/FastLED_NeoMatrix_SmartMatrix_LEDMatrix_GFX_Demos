@@ -144,7 +144,7 @@ const uint16_t MATRIX_TILE_HEIGHT = mh;
 const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
 const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
 #ifdef LEDMATRIX
-cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,  MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,  MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
 #endif
 
 // matrixleds is malloced at runtime as there is more memory available once setup runs
