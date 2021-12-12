@@ -25,6 +25,10 @@ Backends you should choose from (define 1):
     - LINUX_RENDERER_X11 is the default with ArduinoOnPc-FastLED-GFX-LEDMatrix
     - LINUX_RENDERER_SDL can be defined in ArduinoOnPc-FastLED-GFX-LEDMatrix's Makefile
 
+// For TFTs, there is original support from adafruit, but https://github.com/moononournation/Arduino_GFX/
+// has better and faster support for many TFTs (ILI9341, ST7735*, SSD1331, etc...)
+// define ADAFRUIT_TFT if you'd rather have the Adafruit drivers. I don't recommend them anymore.
+
 LEDMATRIX is a separate define you'd set before including this file and
 adds the LEDMatrix API if you need it.
 The TL;DR is you shouldn't bother with it if you already have the GFX
@@ -45,9 +49,11 @@ to use, set the define before you include the file.
 // or use one of the other ones if they are closer ot your setup (M32BY8X3 M16BY16T4 M64BY64)
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //#define M24BY24
-// For TFTs, there is original support from adafruit, but https://github.com/moononournation/Arduino_GFX/
-// has better and faster support for many TFTs.
-// define ADAFRUIT_TFT if you'd rather have the Adafruit drivers
+
+// If you did not define something above, right here ^^^ the code blow will look at the
+// chip and do a hardcoded define that works for me, but is unlikely to be what you are also
+// using, so really you want to define your driver above, or one will be picked for you and
+// it'll probably be the wrong one :)
 
 #if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC)
     #ifdef ESP8266
@@ -536,8 +542,8 @@ uint32_t tft_spi_speed;
     //#define TFT_RST -1 // Grey, can be wired to ESP32 EN to save a pin
     #define TFT_DC  25 // Purple
     //#define TFT_CS -1 // for display without CS pin
-    #define TFT_CS  0 // White can be wired to ground
-    #define TFT_CS2 2 // Orange can be wired to ground
+    #define TFT_CS  0 // White can be wired to ground if you only have one device
+    #define TFT_CS2 2 // Orange if you have 2 different screens
     
     #define TFT_MOSI 23 // Blue
     #define TFT_CLK  18 // Green
@@ -547,7 +553,7 @@ uint32_t tft_spi_speed;
 
     #ifdef ADAFRUIT_TFT
         //Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
-        Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS, TFT_DC, TFT_RST);
+        Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS2, TFT_DC, TFT_RST);
     #else
         #ifdef ESP32
             // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
@@ -619,31 +625,12 @@ uint32_t tft_spi_speed;
 #elif defined(ST7735_128b128) || defined(ST7735_128b160)
     #define HAS_TFT
 
-    #include <Adafruit_ST7735.h>
-    #include <FastLED_SPITFT_GFX.h>
-
-    uint8_t matrix_brightness = 255;
-    const uint16_t mw = 128;
-    #ifdef ST7735_128b128
-    const uint16_t mh = 128;
+    #ifdef ADAFRUIT_TFT
+        #include <Adafruit_ST7735.h>
+        #include <FastLED_SPITFT_GFX.h>
     #else
-    const uint16_t mh = 160;
+        #include <FastLED_ArduinoGFX_TFT.h>
     #endif
-
-    // Used by LEDMatrix
-    // templates prevents being able to get the screen size at runtime. This is why templates must die
-    const uint16_t MATRIX_TILE_WIDTH =  mw;
-    const uint16_t MATRIX_TILE_HEIGHT = mh;
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
-
-
-    #ifdef LEDMATRIX
-    // cLEDMatrix defines
-    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
-        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
-    #endif
-    CRGB *matrixleds;
 
     /*  https://pinout.xyz/pinout/spi
     SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
@@ -671,8 +658,8 @@ uint32_t tft_spi_speed;
     #ifdef ESP32
         #define TFT_RST       26 // Grey
         #define TFT_DC        25 // Purple
-        #define TFT_CS         0 // White with 2 devices
-        #define TFT_CS2        2 // Orange with 2 deices
+        #define TFT_CS         0 // White can be wired to ground if you only have one device
+        #define TFT_CS2        2 // Orange if you have 2 different screens
     #elif defined(ESP8266)
         #define TFT_RST       15
         #define TFT_DC         5
@@ -684,6 +671,12 @@ uint32_t tft_spi_speed;
         #define TFT_CS         4 // this can be wired to ground if you have one device
         #define TFT_CS2        4
     #endif
+    
+    #define TFT_MOSI 23 // Blue
+    #define TFT_CLK  18 // Green
+    #define TFT_MISO 19 // Yellow
+    #define TFT_BL 15
+    #define TFT_SCK TFT_CLK
 
     #ifdef ADAFRUIT_TFT
         Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
@@ -691,44 +684,58 @@ uint32_t tft_spi_speed;
     #else
         #ifdef ESP32
             // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
-            Arduino_DataBus *bus2 = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
-            // Arduino_DataBus *bus2 = new Arduino_ESP32SPI(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
+            Arduino_DataBus *bus = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
+            // Arduino_DataBus *bus = new Arduino_ESP32SPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
         #else
-            Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
+            Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);  // 42fps ILI9341 at 80Mhz
         #endif
-        Arduino_ILI9341 *gfx = new Arduino_ILI9341(bus2, TFT_RST, 0 /* rotation */);
+        Arduino_ILI9341 *tft = new Arduino_ILI9341(bus, TFT_RST, 0 /* rotation */);
     #endif
 
-//----------------------------------------------------------------------------
-#elif defined(SSD1331)
-    #define HAS_TFT
-
-    #include <Adafruit_SSD1331.h>
-    #include <FastLED_SPITFT_GFX.h>
-
-    uint8_t matrix_brightness = 255;
-    #if SSD1331_ROTATE == 0
-    const uint16_t mw = 96;
-    const uint16_t mh = 64;
+    // It would be great if we could do this, but many programs use size related variables to
+    // define static arrays, which required constants
+    const uint16_t mw = 128;
+    #ifdef ST7735_128b128
+    const uint16_t mh = 128;
     #else
-    const uint16_t mw = 64;
-    const uint16_t mh = 96;
+    const uint16_t mh = 160;
     #endif
-    
+    const uint16_t tftw = mw;
+    const uint16_t tfth = mh;
+
     // Used by LEDMatrix
     // templates prevents being able to get the screen size at runtime. This is why templates must die
     const uint16_t MATRIX_TILE_WIDTH =  mw;
     const uint16_t MATRIX_TILE_HEIGHT = mh;
-    const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
-
-
+    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
+
+    // create the matrix object, and reset the matrixleds pointer in matrix_setup
     CRGB *matrixleds;
+    uint8_t matrix_brightness = 255;
+
+    #ifdef ADAFRUIT_TFT
+        FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
+    #else
+        FastLED_ArduinoGFX_TFT *matrix = new FastLED_ArduinoGFX_TFT(matrixleds, mw, mh, tft);
+    #endif
+
+
+//----------------------------------------------------------------------------
+#elif defined(SSD1331)
+    #define HAS_TFT
+
+    #ifdef ADAFRUIT_TFT
+        #include <Adafruit_SSD1331.h>
+        #include <FastLED_SPITFT_GFX.h>
+    #else
+        #include <FastLED_ArduinoGFX_TFT.h>
+    #endif
 
     /*  https://pinout.xyz/pinout/spi
     SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
@@ -756,18 +763,13 @@ uint32_t tft_spi_speed;
     #ifdef ESP32
         #define TFT_RST  26 // Grey
         #define TFT_DC   25 // Purple
-        #define TFT_CS    0 // White can be wired to ground
+        #define TFT_CS    0 // White can be wired to ground if you only have one device
+        #define TFT_CS2   2 // Orange if you have 2 different screens
 
         #define TFT_MOSI 23 // Blue
-        #define TFT_MISO 19 // Green
         #define TFT_CLK  18 // Yellow
+        #define TFT_MISO 19 // Green
 
-        // Option 1: use any pins but a little slower
-        #pragma message "Using SWSPI"
-        Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST);
-        // HWSPI hangs on ESP32 the moment it is run
-        // https://github.com/adafruit/Adafruit-SSD1331-OLED-Driver-Library-for-Arduino/issues/27
-        //Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(TFT_CS, TFT_DC, TFT_RST);
     #else
         // ESP8266 + Teensy?
         #define TFT_RST  15
@@ -778,14 +780,73 @@ uint32_t tft_spi_speed;
         // hwspi hardcodes those pins, no need to redefine them
         #define TFT_MOSI 13
         #define TFT_CLK  14
-        #pragma message "Using HWSPI"
-        Adafruit_SSD1331 *tft = new Adafruit_SSD1331(&SPI, TFT_CS, TFT_DC, TFT_RST);
+    #endif
+    #define TFT_SCK TFT_CLK
+
+    #ifdef ADAFRUIT_TFT
+        #ifdef ESP32
+            // Option 1: use any pins but a little slower
+            #pragma message "Using SWSPI"
+            Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST);
+            // HWSPI hangs on ESP32 the moment it is run
+            // https://github.com/adafruit/Adafruit-SSD1331-OLED-Driver-Library-for-Arduino/issues/27
+            //Adafruit_SSD1331 *tft  = new Adafruit_SSD1331(TFT_CS, TFT_DC, TFT_RST);
+        #else
+            #pragma message "Using HWSPI"
+            Adafruit_SSD1331 *tft = new Adafruit_SSD1331(&SPI, TFT_CS, TFT_DC, TFT_RST);
+        #endif
+    #else
+        #ifdef ESP32
+            // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
+            Arduino_DataBus *bus = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
+            // Arduino_DataBus *bus = new Arduino_ESP32SPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
+        #else
+            Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
+        #endif
+        // do not add 4th IPS argument, even FALSE. On the multi-board, it is sensitive to
+        // tft_spi_speed, maybe 80Mhz only (24 seems unstable)
+        #if SSD1331_ROTATE == 0
+        Arduino_SSD1331 *tft = new Arduino_SSD1331(bus, TFT_RST, 0 /* rotation */);
+        #else
+        Arduino_SSD1331 *tft = new Arduino_SSD1331(bus, TFT_RST, 1 /* rotation */);
+        #endif
     #endif
 
+    uint8_t matrix_brightness = 255;
     #if SSD1331_ROTATE == 0
-    FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 0);
+    const uint16_t mw = 96;
+    const uint16_t mh = 64;
     #else
-    FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 1);
+    const uint16_t mw = 64;
+    const uint16_t mh = 96;
+    #endif
+    const uint16_t tftw = mw;
+    const uint16_t tfth = mh;
+    
+    // Used by LEDMatrix
+    // templates prevents being able to get the screen size at runtime. This is why templates must die
+    const uint16_t MATRIX_TILE_WIDTH =  mw;
+    const uint16_t MATRIX_TILE_HEIGHT = mh;
+    const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
+
+
+    #ifdef LEDMATRIX
+    // cLEDMatrix defines
+    cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+    #endif
+    CRGB *matrixleds;
+
+
+    #ifdef ADAFRUIT_TFT
+        #if SSD1331_ROTATE == 0
+        FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 0);
+        #else
+        FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, 96, 64, tft, 1);
+        #endif
+    #else
+        FastLED_ArduinoGFX_TFT *matrix = new FastLED_ArduinoGFX_TFT(matrixleds, mw, mh, tft);
     #endif
 
 //----------------------------------------------------------------------------
@@ -1277,31 +1338,39 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
     //============================================================================================
     #elif defined(ST7735_128b160)
-        tft_spi_speed = 60 * 1000 * 1000;
+        tft_spi_speed = 40 * 1000 * 1000;
         Serial.println("");
         Serial.println("ST7735_128b160 tft begin");
         Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
         Serial.println("");
-        // initR calls begin for us but does not allow setting SPI speed (hardcoded in the file)
-        tft->initR(INITR_BLACKTAB);
-        tft->setSPISpeed(tft_spi_speed);
-        // fillScreen below does the job
-        //tft->setAddrWindow(0, 0, 128, 160);
-        // This is required for the screen to work
-        tft->fillScreen(ST77XX_GREEN);
+        #ifdef ADAFRUIT_TFT
+            // initR calls begin for us but does not allow setting SPI speed (hardcoded in the file)
+            tft->initR(INITR_BLACKTAB);
+            tft->setSPISpeed(tft_spi_speed);
+            // fillScreen below does the job
+            //tft->setAddrWindow(0, 0, 128, 160);
+            // This is required for the screen to work
+            tft->fillScreen(ST77XX_GREEN);
+        #else
+            tft->begin(tft_spi_speed);
+        #endif
 
     //============================================================================================
     #elif defined(ST7735_128b128)
-        tft_spi_speed = 32 * 1000 * 1000;
+        tft_spi_speed = 40 * 1000 * 1000;
         Serial.println("");
         Serial.println("ST7735_128b128 tft begin");
         Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
         Serial.println("");
-        // initR calls begin for us but does not allow setting SPI speed (hardcoded in the file)
-        tft->initR(INITR_144GREENTAB);
-        tft->setSPISpeed(tft_spi_speed);
-        // This is required for the screen to work
-        tft->fillScreen(ST77XX_GREEN);
+        #ifdef ADAFRUIT_TFT
+            // initR calls begin for us but does not allow setting SPI speed (hardcoded in the file)
+            tft->initR(INITR_144GREENTAB);
+            tft->setSPISpeed(tft_spi_speed);
+            // This is required for the screen to work
+            tft->fillScreen(ST77XX_GREEN);
+        #else
+            tft->begin(tft_spi_speed);
+        #endif
 
     //============================================================================================
     #elif defined(SSD1331)
@@ -1312,10 +1381,12 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
         Serial.println("");
         tft->begin(tft_spi_speed);
-        tft->setSPISpeed(tft_spi_speed);
-        // This is very important, or FastLED_SPITFT_GFX::show will not work.
-        // Size is hardcoded by TFT size.
-        tft->setAddrWindow(0, 0, 96, 64);
+        #ifdef ADAFRUIT_TFT
+            tft->setSPISpeed(tft_spi_speed);
+            // This is very important, or FastLED_SPITFT_GFX::show will not work.
+            // Size is hardcoded by TFT size.
+            tft->setAddrWindow(0, 0, 96, 64);
+        #endif
 
     //============================================================================================
     #else
