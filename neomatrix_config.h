@@ -1,9 +1,15 @@
 #ifndef neomatrix_config_h
 #define neomatrix_config_h
 
-/* There are 2 major backends
-1) SmartMatrix (via SmartMatrix::GFX)
-2) Not SmartMatrix (via FastLED::NeoMatrix or FastLED_SPITFT::GFX)
+/* 
+Yes, this file is a bit complicated looking, that's because it supports lots
+of different hardware backends (listed below). A single define will let you
+switch from one backend to another one without changing your code.
+If you'd like to see this file (likely out of date somewhat) with a bunch of
+defines removed, so it looks more flat, see neomatrix_config_tftonly.h
+But this big file is the one I'll maintain instead of maintaining 5 or more
+separate files, one per backend, when most of the code/init can be shared
+between them.
 
 All backends end up using the same Framebuffer::GFX as the base class
 but SmartMatrix is sufficiently different to need its own exceptions and handling
@@ -45,16 +51,19 @@ to use, set the define before you include the file.
 // If you have never used FastLED::NeoMatrix before, please try these 2 examples first
 // https://github.com/marcmerlin/FastLED_NeoMatrix/tree/master/examples/matrixtest
 // https://github.com/marcmerlin/FastLED_NeoMatrix/tree/master/examples/MatrixGFXDemo
-// Then just uncomment this line below (define M24BY24) and fix the matrix definition
-// or use one of the other ones if they are closer ot your setup (M32BY8X3 M16BY16T4 M64BY64)
+// For FastLED just uncomment this line below (define M24BY24) and fix the matrix definition
+// or use one of the other ones if they are closer ot your setup (M32BY8X3 M16BY16T4 M64BY64.
+// For SmartMatrix, just use "#define SMARTMATRIX"
+//
+// Are all those defines confusing? Then look at neomatrix_config_tftonly.h with all the defines
+// taken out and a single backend hardcoded.
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //#define M24BY24
 
-// If you did not define something above, right here ^^^ the code blow will look at the
+// If you did not define something above, right here ^^^ the code below will look at the
 // chip and do a hardcoded define that works for me, but is unlikely to be what you are also
 // using, so really you want to define your driver above, or one will be picked for you and
 // it'll probably be the wrong one :)
-
 #if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC)
     #ifdef ESP8266
     //#define SSD1331
@@ -138,7 +147,7 @@ uint32_t tft_spi_speed;
 #include <FastLED.h>
 
 #ifdef LEDMATRIX
-// Please use https://github.com/marcmerlin/LEDMatrix/ at lesat as recent as
+// Please use https://github.com/marcmerlin/LEDMatrix/ at least as recent as
 // https://github.com/marcmerlin/LEDMatrix/commit/597ce703e924d45b2e676d6558c4c74a8ebc6991
 // or https://github.com/Jorgen-VikingGod/LEDMatrix/commit/a11e74c8cd5b933021b6e15eb067280a52691449
 // zero copy/no malloc code to work.

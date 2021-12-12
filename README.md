@@ -36,7 +36,7 @@ neomatrix_config.h controls which hardware backend to run all demos on
 -----------------------------------------------------------------------
 For the demos to run, you need to edit 
 https://github.com/marcmerlin/FastLED_NeoMatrix_SmartMatrix_LEDMatrix_GFX_Demos/blob/master/neomatrix_config.h
-and #define the correct backend for your display.
+and #define the correct backend for your display (SMARTMATRIX for instance)
 
 Assuming you are running FastLED::NeoMatrix, you may want to try uncommmenting '#define M24BY24'
 and modifying the 2 code sections relevant to this define to put the correct data for your array.  
@@ -52,6 +52,7 @@ As of this writing, you can run on top of
 - https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix (which itself supports 3 more drivers)
 
 If you are using some of the other backends, I'll assume that you can set the correct define in neomatrix_config
+For instance for //#define M24BY24 and replace with #define SMARTMATRIX if that's the backend you want.
 
 History
 -------
