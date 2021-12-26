@@ -114,6 +114,9 @@ bool init_done = 0;
     #endif
 #endif
 
+// The library now defines default TFT pins, but we override them
+#define NO_TFT_SPI_PIN_DEFAULTS
+#include <FastLED_ArduinoGFX_TFT.h>
 
 /*  https://pinout.xyz/pinout/spi
 SD1331 Pin	    Arduino	ESP8266		ESP32	ESP32	rPi     rPi
@@ -156,8 +159,7 @@ CS2: 2 => if you have 2 different screens, need 2 CS pins
 #define TFT_SCK TFT_CLK
 
 #define HAS_TFT
-#include <FastLED_ArduinoGFX_TFT.h>
-uint8_t matrix_brightness = 255;
+#include <Arduino_GFX_Library.h>
 
 #define TFTCNT 2
 Arduino_DataBus *bus_[TFTCNT];
@@ -376,9 +378,6 @@ void tft_init(uint8_t tftidx) {
     show_free_mem("Before matrix->begin");
     matrix->begin();
 
-    Serial.print("Setting Brightness: ");
-    Serial.println(matrix_brightness);
-    matrix->setBrightness(matrix_brightness);
     Serial.print("Gamma Correction: ");
     Serial.println(matrix_gamma);
     // Gamma is used by AnimatedGIFs and others, as such:
@@ -389,8 +388,17 @@ void tft_init(uint8_t tftidx) {
     // to assign them to another variable for templates with different parameters.
     #ifndef DISABLE_MATRIX_TEST
         #ifdef LEDMATRIX
-        if (tftidx == 1) {
-            Serial.println("LEDMatrix Test");
+        if (tftidx == 0) {
+            Serial.println("LEDMatrix1 Test");
+            ledmatrix1.DrawLine (0, 0, ledmatrix1.Width() - 1, ledmatrix1.Height() - 1, CRGB(0, 255, 0));
+            ledmatrix1.DrawPixel(0, 0, CRGB(255, 0, 0));
+            ledmatrix1.DrawPixel(ledmatrix1.Width() - 1, ledmatrix1.Height() - 1, CRGB(0, 0, 255));
+
+            ledmatrix1.DrawLine (ledmatrix1.Width() - 5, 4, 4, ledmatrix1.Height() - 5, CRGB(128, 128, 128));
+            ledmatrix1.DrawPixel(ledmatrix1.Width() - 5, 4,  CRGB(255, 64, 64));
+            ledmatrix1.DrawPixel(4, ledmatrix1.Height() - 5, CRGB(64, 64, 255));
+        } else {
+            Serial.println("LEDMatrix2 Test");
             ledmatrix2.DrawLine (0, 0, ledmatrix2.Width() - 1, ledmatrix2.Height() - 1, CRGB(0, 255, 0));
             ledmatrix2.DrawPixel(0, 0, CRGB(255, 0, 0));
             ledmatrix2.DrawPixel(ledmatrix2.Width() - 1, ledmatrix2.Height() - 1, CRGB(0, 0, 255));
@@ -398,17 +406,19 @@ void tft_init(uint8_t tftidx) {
             ledmatrix2.DrawLine (ledmatrix2.Width() - 5, 4, 4, ledmatrix2.Height() - 5, CRGB(128, 128, 128));
             ledmatrix2.DrawPixel(ledmatrix2.Width() - 5, 4,  CRGB(255, 64, 64));
             ledmatrix2.DrawPixel(4, ledmatrix2.Height() - 5, CRGB(64, 64, 255));
-            matrix->show();
-            delay(1000);
         }
+        matrix->show();
+        delay(1000);
         #endif
     #endif
 
     #ifndef DISABLE_SPEED_TEST
         uint32_t before;
-        Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvv Speed vvvvvvvvvvvvvvvvvvvvvvvvvv");
+        Serial.print(tftidx);
+        Serial.println(" vvvvvvvvvvvvvvvvvvvvvvvvvv Speed vvvvvvvvvvvvvvvvvvvvvvvvvv");
         #ifdef HAS_TFT
             before = millis();
+            // Bypass GFX, write directly to TFT
             for (uint8_t i=0; i<5; i++) {
                 tft_[tftidx]->fillScreen(0);
                 tft_[tftidx]->fillScreen(0xFFFF);
@@ -529,13 +539,20 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
     tftname_[tftidx] = "ILI9341";
 
-#ifdef ESP32
-        // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
-        bus_[tftidx] = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
-        // bus_[tftidx] = new Arduino_ESP32SPI(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
-#else
-        bus_[tftidx] = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
-#endif
+    // Older Arduino::GFX had faster SPI and DMA methods that have been removed now.
+    // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
+    // 60fps ILI9341 at 80Mhz
+    // 40Mhz 31fps, 15 show, 22 bypass, 14 GFX fps
+    //bus_[tftidx] = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
+
+    // 53fps ILI9341 at 80Mhz
+    // 40Mhz 29fps, 16 show, 24 bypass, 15 GFX fps
+    //bus_[tftidx] = new Arduino_ESP32SPI(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
+
+    // 42fps ILI9341 at 80Mhz
+    // 40Mhz 25fps, 15 show, 22 bypass, 14 GFX fps
+    // new code: 40Mhz 28fps, 15 show, 23 bypass, 15 GFX fps
+    bus_[tftidx] = new Arduino_HWSPI(TFT_DC, TFT_CS2);  
     tft_[tftidx] = new Arduino_ILI9341(bus_[tftidx], TFT_RST, 1 /* rotation */);
 
     mw_[tftidx] = mw1;
@@ -555,17 +572,11 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
     tftname_[tftidx] = "SSD1331";
 
-#ifdef ESP32
-        // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
-        bus_[tftidx] = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
-        // Arduino_DataBus *bus_ = new Arduino_ESP32SPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
-#else
-        bus_[tftidx] = new Arduino_HWSPI(TFT_DC, TFT_CS);
-#endif
+    bus_[tftidx] = new Arduino_HWSPI(TFT_DC, TFT_CS);
     // do not add 4th IPS argument, even FALSE. On the multi-board, it is sensitive to
     // tft_spi_speed, maybe 80Mhz only (24 seems unstable)
 #if SSD1331_ROTATE == 0
-        tft_[tftidx] = new Arduino_SSD1331(bus_[tftidx], TFT_RST, 0 /* rotation */);
+        tft_[tftidx] = new Arduino_SSD1331(bus_[tftidx], TFT_RST, 2 /* rotation */);
 #else
         tft_[tftidx] = new Arduino_SSD1331(bus_[tftidx], TFT_RST, 1 /* rotation */);
 #endif
