@@ -564,13 +564,7 @@ uint32_t tft_spi_speed;
         //Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
         Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS2, TFT_DC, TFT_RST);
     #else
-        #ifdef ESP32
-            // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
-            Arduino_DataBus *bus2 = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
-            // Arduino_DataBus *bus2 = new Arduino_ESP32SPI(TFT_DC, TFT_CS2, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
-        #else
-            Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
-        #endif
+        Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
         Arduino_ILI9341 *tft = new Arduino_ILI9341(bus2, TFT_RST, 1 /* rotation */);
     #endif
     // It would be great if we could do this, but many programs use size related variables to
@@ -691,13 +685,7 @@ uint32_t tft_spi_speed;
         Adafruit_ST7735 *tft = new Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
         FastLED_SPITFT_GFX *matrix = new FastLED_SPITFT_GFX(matrixleds, mw, mh, mw, mh, tft, 0);
     #else
-        #ifdef ESP32
-            // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
-            Arduino_DataBus *bus = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);//60fps ILI9341 at 80Mhz
-            // Arduino_DataBus *bus = new Arduino_ESP32SPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI); // 53fps ILI9341 at 80Mhz
-        #else
-            Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);  // 42fps ILI9341 at 80Mhz
-        #endif
+        Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);  // 42fps ILI9341 at 80Mhz
         Arduino_ILI9341 *tft = new Arduino_ILI9341(bus, TFT_RST, 0 /* rotation */);
     #endif
 
@@ -805,13 +793,7 @@ uint32_t tft_spi_speed;
             Adafruit_SSD1331 *tft = new Adafruit_SSD1331(&SPI, TFT_CS, TFT_DC, TFT_RST);
         #endif
     #else
-        #ifdef ESP32
-            // Arduino_ESP32SPI_DMA is faster than Arduino_ESP32SPI, but makes framebuffer::gfx slower at 80Mhz
-            Arduino_DataBus *bus = new Arduino_ESP32SPI_DMA(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
-            // Arduino_DataBus *bus = new Arduino_ESP32SPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO, VSPI);
-        #else
-            Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
-        #endif
+        Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
         // do not add 4th IPS argument, even FALSE. On the multi-board, it is sensitive to
         // tft_spi_speed, maybe 80Mhz only (24 seems unstable)
         #if SSD1331_ROTATE == 0
@@ -1386,11 +1368,11 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         // Need to init the underlying TFT SPI engine
         tft_spi_speed = 40 * 1000 * 1000;
         Serial.println("");
-        Serial.println("SSD1331 tft begin (HWSPI broken on ESP32)");
         Serial.println(">>> If you get no display, try resetting, and removing cross talk between wires or decreasing SPI speed <<<<");
         Serial.println("");
         tft->begin(tft_spi_speed);
         #ifdef ADAFRUIT_TFT
+            Serial.println("SSD1331 tft begin (HWSPI broken on ESP32)");
             tft->setSPISpeed(tft_spi_speed);
             // This is very important, or FastLED_SPITFT_GFX::show will not work.
             // Size is hardcoded by TFT size.
