@@ -434,31 +434,22 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         Serial.println(10*1000 / (millisdiff(before)));
         // Arduino::GFX ILI9314
         //                     tft/gfx/bypass/copy
-        // 24Mhz, fps no PSRAM: 14/10/13/ 9       PSRAM: 14/ 8/13/6 (Arduino_HWSPI)
-        // 24Mhz, fps no PSRAM: 15/10/13/10  Arduino_ESP32SPI
-        // 24Mhz, fps no PSRAM: 21/12/16/12  Arduino_ESP32SPI_DMA
         // 40fhz, fps no PSRAM: 25/15/22/14       PSRAM: 25/11/21/8
         // 80fhz, fps no PSRAM: 42/19/33/18       PSRAM: 40/14/32/9 (Arduino_HWSPI)
         // 80fhz, fps no PSRAM: 53/21/38/20 Arduino_ESP32SPI
         // 80fhz, fps no PSRAM: 60/20/34/18 Arduino_ESP32SPI_DMA
         //
-        // Adafruit ILI9314
+        // Adafruit ILI9314 (much slower)
         // 80Mhz: TFT 40fps, NO PSRAM: 32fps, PSRAM show: 12fps
-        // 24Mhz: TFT 14fps, NO PSRAM: 12fps, PSRAM show:  8fps
         //
         // Old Adafruit numbers:
-        // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps => unstable, no display
-        // ST7735_128b160: 60Mhz: TFT 93fps, NO PSRAM: 73fps, PSRAM show: 38fps
-        // ST7735_128b160: 60Mhz: TFT 96fps, NO PSRAM: 52fps
+        // ST7735_128b160: 80Mhz: TFT153fps, NO PSRAM:104fps, PSRAM show: 45fps
         // ST7735_128b160: 40Mhz: TFT 68fps, NO PSRAM: 56fps, PSRAM show: 32fps
         // ST7735_128b160: 20Mhz: TFT 53fps, NO PSRAM: 45fps, PSRAM show: 29fps
+        // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps
         //
-        // ST7735_128b128: 60Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
-        // ST7735_128b128: 40Mhz: TFT117fps, NO PSRAM: 90fps, PSRAM show: 48fps => unstable, garbled
-        // ST7735_128b128: 32Mhz: TFT 84fps, NO PSRAM: 70fps, PSRAM show: 41fps => stable
-        // ST7735_128b128: 20Mhz: TFT 66fps, NO PSRAM: 56fps, PSRAM show: 36fps
-        //
-        // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps => stable
+        // Arduino::GFX is a lot faster (over 100fps)
+        // SSD1331: SWSPI: TFT  9fps, NO PSRAM:  9fps, PSRAM show:  8fps
         Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^ Speed ^^^^^^^^^^^^^^^^^^^^^^^^^^");
     #endif // DISABLE_SPEED_TEST
     matrix->fillScreen(0x0000);
