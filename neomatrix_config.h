@@ -517,6 +517,7 @@ uint32_t tft_spi_speed;
         #include "Adafruit_ILI9341.h"
         #include <FastLED_SPITFT_GFX.h>
     #else
+        #define NO_TFT_SPI_PIN_DEFAULTS
         #include <FastLED_ArduinoGFX_TFT.h>
     #endif
 
@@ -632,6 +633,7 @@ uint32_t tft_spi_speed;
         #include <Adafruit_ST7735.h>
         #include <FastLED_SPITFT_GFX.h>
     #else
+        #define NO_TFT_SPI_PIN_DEFAULTS
         #include <FastLED_ArduinoGFX_TFT.h>
     #endif
 
@@ -731,6 +733,7 @@ uint32_t tft_spi_speed;
         #include <Adafruit_SSD1331.h>
         #include <FastLED_SPITFT_GFX.h>
     #else
+        #define NO_TFT_SPI_PIN_DEFAULTS
         #include <FastLED_ArduinoGFX_TFT.h>
     #endif
 
