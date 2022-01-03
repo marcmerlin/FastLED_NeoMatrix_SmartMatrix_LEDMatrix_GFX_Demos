@@ -565,8 +565,10 @@ uint32_t tft_spi_speed;
         //Adafruit_ILI9341 *tft = new Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
         Adafruit_ILI9341 *tft = new Adafruit_ILI9341((int8_t) TFT_CS2, TFT_DC, TFT_RST);
     #else
+        // There used to be support for DMA and ESP32 DMA, but it was removed
+        // https://github.com/moononournation/Arduino_GFX/commit/3461afcc4288892cea54da1a82ffdfafd68eeac9
         Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
-        Arduino_ILI9341 *tft = new Arduino_ILI9341(bus2, TFT_RST, 1 /* rotation */);
+        Arduino_ILI9341 *tft = new Arduino_ILI9341(bus2, TFT_RST, 3 /* rotation */);
     #endif
     // It would be great if we could do this, but many programs use size related variables to
     // define static arrays, which required constants
@@ -1320,7 +1322,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     #elif defined(ILI9341)
         // On my test bench, my ILI9341 doesn't like more than 24Mhz, although when wired properly
         // it should run at 80Mhz
-        tft_spi_speed = 20 * 1000 * 1000;
+        tft_spi_speed = 60 * 1000 * 1000;
         Serial.println("");
         Serial.println("ILI9341 tft begin");
         // Need to init the underlying TFT SPI engine

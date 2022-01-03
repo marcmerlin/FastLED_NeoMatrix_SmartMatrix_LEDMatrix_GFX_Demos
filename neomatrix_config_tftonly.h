@@ -89,10 +89,11 @@ CS2: 2 => if you have 2 different screens, need 2 CS pins
 //----------------------------------------------------------------------------
 // ILI0341 
 #define HAS_TFT
-
 #define NO_TFT_SPI_PIN_DEFAULTS
 #include <FastLED_ArduinoGFX_TFT.h>
 
+// There used to be support for DMA and ESP32 DMA, but it was removed
+// https://github.com/moononournation/Arduino_GFX/commit/3461afcc4288892cea54da1a82ffdfafd68eeac9
 Arduino_DataBus *bus2 = new Arduino_HWSPI(TFT_DC, TFT_CS2);  // 42fps ILI9341 at 80Mhz
 Arduino_ILI9341 *tft = new Arduino_ILI9341(bus2, TFT_RST, 1 /* rotation */);
 // It would be great if we could do this, but many programs use size related variables to
