@@ -161,13 +161,6 @@ uint32_t tft_spi_speed;
 // here (NeoMatrix-FastLED-IR actually also uses this to read a config file)
 //============================================================================
 
-// control if we decode in 32x32 or 64x64, or something else
-#ifdef ESP8266
-#define gif_size 32
-#else
-#define gif_size 64
-#endif
-
 // Note, you can use an sdcard on ESP32 or ESP8266 if you really want,
 // but if your data fits in built in flash, why not use it?
 // Use built in flash via SPIFFS/FATFS
@@ -190,17 +183,23 @@ uint32_t tft_spi_speed;
     }
 #elif defined(ESP32)
     #define FS_PREFIX ""
-    //#include <SPIFFS.h>
-    //#define FSOSPIFFS
-    //#define FSO SPIFFS
-    #include "FFat.h"
-    #define FSO FFat
-    #define FSOFAT
-    // Do NOT add a trailing slash, or things will fail
+    #if ESP32FATFS
+        #include "FFat.h"
+        #define FSO FFat
+        #define FSOFAT
+    #else
+        // LittleFS is more memory efficient than FatFS
+        #include "FS.h"
+        #include <LITTLEFS.h>
+        #define FSO LITTLEFS
+        #define FSOLITTLEFS
+    #endif
     #if gif_size == 64
         #define GIF_DIRECTORY FS_PREFIX "/gifs64"
-    #else
+    #elif gif_size == 32
         #define GIF_DIRECTORY FS_PREFIX "/gifs"
+    #else
+        #define GIF_DIRECTORY FS_PREFIX "/"
     #endif
 #elif defined(ARDUINOONPC)
     #define UNIXFS
