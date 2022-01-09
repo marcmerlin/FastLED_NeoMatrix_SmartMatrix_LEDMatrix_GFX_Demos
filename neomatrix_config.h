@@ -1091,6 +1091,20 @@ uint32_t millisdiff(uint32_t before) {
     return((millis()-before) ? (millis()-before): 1);
 }
 
+uint16_t text_width(char *text, Adafruit_GFX *gfx = NULL) {
+    if (!gfx) gfx = matrix;
+    int16_t dummy;
+    uint16_t w, h;
+
+    gfx->getTextBounds(text, 0, 0, &dummy, &dummy, &w, &h);
+    return(w);
+}
+
+uint16_t text_xcenter(char *text, Adafruit_GFX *gfx = NULL) {
+    if (!gfx) gfx = matrix;
+    return((gfx->width() - text_width(text, gfx)) / 2);
+}
+
 void matrix_setup(bool initserial=true, int reservemem = 40000) {
     reservemem = reservemem; // squelch compiler warning if var is unused.
 
