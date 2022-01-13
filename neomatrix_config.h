@@ -183,7 +183,7 @@ uint32_t tft_spi_speed;
     }
 #elif defined(ESP32)
     #define FS_PREFIX ""
-    #if ESP32FATFS
+    #ifdef ESP32FATFS
         #include "FFat.h"
         #define FSO FFat
         #define FSOFAT
