@@ -190,8 +190,8 @@ uint32_t tft_spi_speed;
     #else
         // LittleFS is more memory efficient than FatFS
         #include "FS.h"
-        #include <LITTLEFS.h>
-        #define FSO LITTLEFS
+        #include <LittleFS.h>
+        #define FSO LittleFS
         #define FSOLITTLEFS
     #endif
     #if gif_size == 64
