@@ -17,6 +17,7 @@ but SmartMatrix is sufficiently different to need its own exceptions and handlin
 the other libraries define their own FastLED CRGB buffer (RGB888) ).
 
 Backends you should choose from (define 1):
+- FRAMEBUFFER (dumb framebuffer that doens't display anywhere)
 - SMARTMATRIX (if you are using the old SMARTMATRIX3, also define SMARTMATRIXV3)
 - ILI9341
 - ST7735_128b160
@@ -64,7 +65,7 @@ to use, set the define before you include the file.
 // chip and do a hardcoded define that works for me, but is unlikely to be what you are also
 // using, so really you want to define your driver above, or one will be picked for you and
 // it'll probably be the wrong one :)
-#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC)
+#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC) && !defined(FRAMEBUFFER)
     #ifdef ESP8266
     //#define SSD1331
     //#define SSD1331_ROTATE 1
@@ -183,16 +184,23 @@ uint32_t tft_spi_speed;
     }
 #elif defined(ESP32)
     #define FS_PREFIX ""
+    //#define ESP32LITTLEFS
+    #define ESP32FATFS
     #ifdef ESP32FATFS
         #include "FFat.h"
         #define FSO FFat
         #define FSOFAT
-    #else
-        // LittleFS is more memory efficient than FatFS
+    #elif defined(ESP32LITTLEFS) // Out of tree LITTLEFS for older ESP32 core
         #include "FS.h"
         #include <LittleFS.h>
         #define FSO LittleFS
         #define FSOLITTLEFS
+    #else // default LittleFS in newer ESP32 core
+        // LittleFS is more memory efficient than FatFS
+        #include "FS.h"
+        #include <LittleFS.h>
+        #define FSO LittleFS
+        #define FSOLittleFS
     #endif
     #if gif_size == 64
         #define GIF_DIRECTORY FS_PREFIX "/gifs64"
@@ -397,6 +405,31 @@ uint32_t tft_spi_speed;
         NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
 
+//----------------------------------------------------------------------------
+#elif defined(FRAMEBUFFER)
+    #include <Framebuffer_GFX.h>
+    uint8_t matrix_brightness = 255;
+
+    #pragma message "Dumb Framebuffer for ESP32 with 64x96 resolution"
+    const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
+    const uint16_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
+
+    // Used by LEDMatrix
+    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+    #ifdef LEDMATRIX
+    // cLEDMatrix defines
+    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+    #endif
+    CRGB *matrixleds;
+
+    void show_callback() {};
+    Framebuffer_GFX *matrix = new Framebuffer_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, show_callback);
+
+
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
     // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
@@ -1218,9 +1251,16 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
 
     //============================================================================================
+    #elif defined(FRAMEBUFFER)
+        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Framebuffer GFX output, total LEDs: ");
+        Serial.println(NUMMATRIX);
+
+    //============================================================================================
     #elif defined(SMARTMATRIX)
         matrix_gamma = 1; // SmartMatrix should be good by default.
         matrixLayer.addLayer(&backgroundLayer);
+        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix GFX output, total LEDs: ");
+        Serial.println(NUMMATRIX);
         // SmartMatrix takes all the RAM it can get its hands on. Get it to leave some
         // free RAM so that other libraries can work too.
         #ifdef ESP32
@@ -1228,21 +1268,17 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #else
             matrixLayer.begin();
         #endif
-        // This sets the neomatrix and LEDMatrix pointers
-        show_callback();
         matrixLayer.setRefreshRate(240);
         backgroundLayer.enableColorCorrection(true);
-        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix GFX output, total LEDs: ");
-        Serial.println(NUMMATRIX);
         // Quick hello world test
         #ifndef DISABLE_MATRIX_TEST
             Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Grey Demo");
             backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
             // backgroundLayer.swapBuffers();
-            show_callback();
             delay(1000);
         #endif
-        Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
+        // This sets the neomatrix and LEDMatrix pointers
+        show_callback();
 
     //============================================================================================
     #elif defined(LINUX_RENDERER_X11)
