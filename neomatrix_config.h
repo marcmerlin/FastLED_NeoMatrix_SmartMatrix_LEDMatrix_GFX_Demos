@@ -142,7 +142,13 @@ uint32_t tft_spi_speed;
     #define FASTLED_ALLOW_INTERRUPTS 1
     // Newer Samguyver ESP32 FastLED has a new I2S implementation that can be
     // better (or worse) than then default RMT which only supports 8 channels.
-    #define FASTLED_ESP32_I2S
+    // I'm getting brightness issues on LED strips with I2S when outputting to a matrix too
+    //#define FASTLED_ESP32_I2S
+
+    // https://github.com/FastLED/FastLED/blob/master/src/platforms/esp/32/clockless_rmt_esp32.h
+    // Trying random options to see if they help with my dual output setup on ESP32
+    #define FASTLED_RMT_MAX_CHANNELS 4
+    #define FASTLED_ESP32_FLASH_LOCK 1
     #pragma message "Please use https://github.com/samguyer/FastLED.git if stock FastLED is unstable with ESP32"
 #endif
 #include <FastLED.h>
@@ -305,6 +311,8 @@ uint32_t tft_spi_speed;
 #elif defined(M32BY8X3)
     #include <FastLED_NeoMatrix.h>
     #define FASTLED_NEOMATRIX
+
+    #define NUM_LEDS_PER_STRIP 256
 
     uint8_t matrix_brightness = 64;
     // Used by LEDMatrix
@@ -1209,7 +1217,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #ifdef ESP8266
         FastLED.addLeds<WS2811_PORTA,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
         #else
-        FastLED.addLeds<WS2811_PORTD,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
+            FastLED.addLeds<WS2812B,14, GRB>(matrixleds,0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
+            FastLED.addLeds<WS2812B,12, GRB>(matrixleds,1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
+            FastLED.addLeds<WS2812B,15, GRB>(matrixleds,2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
         #endif
         Serial.print("Neomatrix parallel output, total LEDs: ");
         Serial.println(NUMMATRIX);
