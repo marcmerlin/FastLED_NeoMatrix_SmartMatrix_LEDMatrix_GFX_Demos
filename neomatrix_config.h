@@ -1150,8 +1150,17 @@ uint16_t text_width(char *text, Adafruit_GFX *gfx = NULL) {
 }
 
 uint16_t text_xcenter(char *text, Adafruit_GFX *gfx = NULL) {
+    uint8_t fudge = 0;
+
     if (!gfx) gfx = matrix;
-    return((gfx->width() - text_width(text, gfx)) / 2);
+    // workaround for bug in adafruit::gfx that returns a width too large?
+    if (gfx->width() == 24) fudge = 2;
+    //Serial.print(gfx->width() );
+    //Serial.print(" ");
+    //Serial.print(text_width(text, gfx));
+    //Serial.print(" ");
+    //Serial.println((gfx->width() - text_width(text, gfx)) / 2);
+    return(fudge + (gfx->width() - text_width(text, gfx)) / 2);
 }
 
 void matrix_setup(bool initserial=true, int reservemem = 40000) {
