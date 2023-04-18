@@ -1113,10 +1113,10 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
     if (psram) {
         mem = ps_malloc(req);
     } else {
-        mem = malloc(req);
+        mem = calloc(1, req);
     }
 #else
-    mem = malloc(req);
+    mem = calloc(1, req);
 #endif
 
     if (mem) {
