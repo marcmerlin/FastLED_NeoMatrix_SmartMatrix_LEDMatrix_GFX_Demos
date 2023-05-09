@@ -897,8 +897,8 @@ uint32_t tft_spi_speed;
             const uint16_t MATRIX_TILE_HEIGHT=  96;
         #else
             #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
-            const uint16_t MATRIX_TILE_WIDTH = 128;
-            const uint16_t MATRIX_TILE_HEIGHT= 192;
+            const uint16_t MATRIX_TILE_WIDTH = 320;
+            const uint16_t MATRIX_TILE_HEIGHT= 240;
         #endif
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
