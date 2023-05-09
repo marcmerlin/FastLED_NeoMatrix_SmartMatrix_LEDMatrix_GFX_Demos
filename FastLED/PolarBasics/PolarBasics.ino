@@ -8,12 +8,9 @@
 // Creative Commons Attribution 
 // License CC BY-NC 3.0
 
-#include <FastLED.h>
-#include <FLOAT.h>
-
-#define WIDTH  16                       // how many LEDs are in one row?
-#define HEIGHT 16                       // how many rows?
-#define NUM_LEDS ((WIDTH) * (HEIGHT))
+#include "neomatrix_config.h"
+#define WIDTH mw
+#define HEIGHT mh
 
 float runtime;                          // elapse ms since startup
 float newdist, newangle;                // parameters for image reconstruction
@@ -41,7 +38,7 @@ float center_y = (num_y / 2) - 0.5;     // (can also be outside of the actual xy
 //float center_x = 20;                  // the reference point for polar coordinates
 //float center_y = 20;                
 
-CRGB leds[WIDTH * HEIGHT];               // framebuffer
+#define leds matrixleds
 
 float theta   [WIDTH] [HEIGHT];          // look-up table for all angles
 float distance[WIDTH] [HEIGHT];          // look-up table for all distances
@@ -59,19 +56,21 @@ float angle_c, angle_d, angle_e, angle_f;                           // angle off
 float noise_angle_c, noise_angle_d, noise_angle_e, noise_angle_f;   // angles based on linear noise travel
 float dir_c, dir_d, dir_e, dir_f;                                   // direction multiplicators
 
+float map_float(float x, float in_min, float in_max, float out_min, float out_max);
+void report_performance();
+void render_polar_lookup_table();
+void render_vignette_table(float filter_radius);
+void calculate_oscillators();
+float render_pixel();
+void write_pixel_to_framebuffer();
 
 
 void setup() {
-
-  Serial.begin(115200);                 // check serial monitor for current fps count
+  matrix_setup();
   
   // Teensy users: make sure to use the hardware SPI pins 11 & 13
   // for best performance
   
-  FastLED.addLeds<APA102, 11, 13, BGR, DATA_RATE_MHZ(12)>(leds, NUM_LEDS); 
-  
-  // FastLED.addLeds<NEOPIXEL, 13>(leds, NUM_LEDS);   
- 
   render_polar_lookup_table();          // precalculate all polar coordinates 
                                         // to improve the framerate
   render_vignette_table(9.5);           // the number is the desired radius in pixel
@@ -129,7 +128,7 @@ void loop() {
   }
 
   // BRING IT ON! SHOW WHAT YOU GOT!
-  FastLED.show();
+  matrix->show();
 
   // check serial monitor for current performance data
   EVERY_N_MILLIS(500) report_performance();
@@ -289,17 +288,12 @@ void write_pixel_to_framebuffer() {
      
       // write the rendered pixel into the framebutter
       leds[XY(x, y)] = finalcolor;
+      // Instead of the FastLED way ^^^, the Adafruit::GFX way vvv
+      //matrix->drawPixel(x,y, finalcolor);
 }
 
 
 // find the right led index
-
-uint16_t XY(uint8_t x, uint8_t y) {
-  if (y & 1)                             // check last bit
-    return (y + 1) * WIDTH - 1 - x;      // reverse every second line for a serpentine lled layout
-  else
-    return y * WIDTH + x;                // use this equation only for a line by line led layout
-}                                        // remove the previous 3 lines of code in this case
 
 
 // make it look nicer - expand low brightness values and compress high brightness values,
