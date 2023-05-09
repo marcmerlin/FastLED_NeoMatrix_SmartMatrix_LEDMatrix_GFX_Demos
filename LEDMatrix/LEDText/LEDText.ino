@@ -1,11 +1,14 @@
 #define LEDMATRIX
+#ifndef ARDUINOONPC
 // Replace this with another backend if you wish
 #define ILI9341
+#endif
 #include "neomatrix_config.h"
 #include <LEDText.h>
 //#include <Font12x16.h>
-#include <ComicSansP24.h>
 //#include <FontMatrise.h>
+//#include <ComicSansP24.h>
+#include <font36.h>
 
 
 cLEDText ScrollingMsg;
@@ -30,11 +33,14 @@ void setup()
     matrix->clear();
 
     //ScrollingMsg.SetFont(MatriseFontData);
-    ScrollingMsg.SetFont(ComicSansP24Data);
+    //ScrollingMsg.SetFont(ComicSansP24Data);
+    //ScrollingMsg.SetFont(FontArial59x56Data);
+    ScrollingMsg.SetFont(FontArialP59x56Data);
     ScrollingMsg.Init(&ledmatrix, mw, ScrollingMsg.FontHeight() + 1, 0, 0);
+    //ScrollingMsg.Init(&ledmatrix, mw, mh, 0, 0);
     ScrollingMsg.SetText((unsigned char *)TxtDemo, sizeof(TxtDemo) - 1);
     ScrollingMsg.SetTextColrOptions(COLR_RGB | COLR_SINGLE, 0xff, 0x00, 0xff);
-    Options = INSTANT_OPTIONS_MODE;
+    //Options = INSTANT_OPTIONS_MODE;
     ScrollingMsg.SetOptionsChangeMode(Options);
 }
 
@@ -44,7 +50,7 @@ void loop()
     if (ScrollingMsg.UpdateText() == -1)
     {
 	ScrollingMsg.SetText((unsigned char *)TxtDemo, sizeof(TxtDemo) - 1);
-	Options ^= INSTANT_OPTIONS_MODE;
+	//Options ^= INSTANT_OPTIONS_MODE;
 	ScrollingMsg.SetOptionsChangeMode(Options);
     }
     else
