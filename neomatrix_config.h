@@ -17,6 +17,7 @@ but SmartMatrix is sufficiently different to need its own exceptions and handlin
 the other libraries define their own FastLED CRGB buffer (RGB888) ).
 
 Backends you should choose from (define 1):
+- FRAMEBUFFER (dumb framebuffer that doens't display anywhere)
 - SMARTMATRIX (if you are using the old SMARTMATRIX3, also define SMARTMATRIXV3)
 - ILI9341
 - ST7735_128b160
@@ -64,7 +65,7 @@ to use, set the define before you include the file.
 // chip and do a hardcoded define that works for me, but is unlikely to be what you are also
 // using, so really you want to define your driver above, or one will be picked for you and
 // it'll probably be the wrong one :)
-#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC)
+#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC) && !defined(FRAMEBUFFER)
     #ifdef ESP8266
     //#define SSD1331
     //#define SSD1331_ROTATE 1
@@ -141,7 +142,13 @@ uint32_t tft_spi_speed;
     #define FASTLED_ALLOW_INTERRUPTS 1
     // Newer Samguyver ESP32 FastLED has a new I2S implementation that can be
     // better (or worse) than then default RMT which only supports 8 channels.
-    #define FASTLED_ESP32_I2S
+    // I'm getting brightness issues on LED strips with I2S when outputting to a matrix too
+    //#define FASTLED_ESP32_I2S
+
+    // https://github.com/FastLED/FastLED/blob/master/src/platforms/esp/32/clockless_rmt_esp32.h
+    // Trying random options to see if they help with my dual output setup on ESP32
+    #define FASTLED_RMT_MAX_CHANNELS 4
+    #define FASTLED_ESP32_FLASH_LOCK 1
     #pragma message "Please use https://github.com/samguyer/FastLED.git if stock FastLED is unstable with ESP32"
 #endif
 #include <FastLED.h>
@@ -183,16 +190,23 @@ uint32_t tft_spi_speed;
     }
 #elif defined(ESP32)
     #define FS_PREFIX ""
+    //#define ESP32LITTLEFS
+    #define ESP32FATFS
     #ifdef ESP32FATFS
         #include "FFat.h"
         #define FSO FFat
         #define FSOFAT
-    #else
-        // LittleFS is more memory efficient than FatFS
+    #elif defined(ESP32LITTLEFS) // Out of tree LITTLEFS for older ESP32 core
         #include "FS.h"
         #include <LittleFS.h>
         #define FSO LittleFS
         #define FSOLITTLEFS
+    #else // default LittleFS in newer ESP32 core
+        // LittleFS is more memory efficient than FatFS
+        #include "FS.h"
+        #include <LittleFS.h>
+        #define FSO LittleFS
+        #define FSOLittleFS
     #endif
     #if gif_size == 64
         #define GIF_DIRECTORY FS_PREFIX "/gifs64"
@@ -298,6 +312,8 @@ uint32_t tft_spi_speed;
     #include <FastLED_NeoMatrix.h>
     #define FASTLED_NEOMATRIX
 
+    #define NUM_LEDS_PER_STRIP 256
+
     uint8_t matrix_brightness = 64;
     // Used by LEDMatrix
     const uint16_t MATRIX_TILE_WIDTH = 8; // width of EACH NEOPIXEL MATRIX (not total display)
@@ -397,6 +413,31 @@ uint32_t tft_spi_speed;
         NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
 
+//----------------------------------------------------------------------------
+#elif defined(FRAMEBUFFER)
+    #include <Framebuffer_GFX.h>
+    uint8_t matrix_brightness = 255;
+
+    #pragma message "Dumb Framebuffer for ESP32 with 64x96 resolution"
+    const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
+    const uint16_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
+
+    // Used by LEDMatrix
+    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+    #ifdef LEDMATRIX
+    // cLEDMatrix defines
+    cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+    #endif
+    CRGB *matrixleds;
+
+    void show_callback() {};
+    Framebuffer_GFX *matrix = new Framebuffer_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, show_callback);
+
+
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
     // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
@@ -909,8 +950,8 @@ uint32_t tft_spi_speed;
             const uint16_t MATRIX_TILE_HEIGHT=  96;
         #else
             #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
-            const uint16_t MATRIX_TILE_WIDTH = 128;
-            const uint16_t MATRIX_TILE_HEIGHT= 192;
+            const uint16_t MATRIX_TILE_WIDTH = 320;
+            const uint16_t MATRIX_TILE_HEIGHT= 240;
         #endif
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
@@ -952,6 +993,10 @@ uint32_t tft_spi_speed;
         #pragma message "M128BY192 read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 128;
         const uint16_t MATRIX_TILE_HEIGHT= 192;
+    #elif GFXDISPLAY_M128BY192_4_3_Zmap
+	#pragma message "M128BY192_4_3_Zmap read from /root/NM/gfxdisplay"
+	const uint16_t MATRIX_TILE_WIDTH = 128;
+	const uint16_t MATRIX_TILE_HEIGHT= 192;
     #elif GFXDISPLAY_M128BY192_4_3
 	#pragma message "M128BY192_4_3 read from /root/NM/gfxdisplay"
 	const uint16_t MATRIX_TILE_WIDTH = 128;
@@ -1076,10 +1121,10 @@ void *mallocordie(const char *varname, uint32_t req, bool psram=true) {
     if (psram) {
         mem = ps_malloc(req);
     } else {
-        mem = malloc(req);
+        mem = calloc(1, req);
     }
 #else
-    mem = malloc(req);
+    mem = calloc(1, req);
 #endif
 
     if (mem) {
@@ -1113,8 +1158,17 @@ uint16_t text_width(char *text, Adafruit_GFX *gfx = NULL) {
 }
 
 uint16_t text_xcenter(char *text, Adafruit_GFX *gfx = NULL) {
+    uint8_t fudge = 0;
+
     if (!gfx) gfx = matrix;
-    return((gfx->width() - text_width(text, gfx)) / 2);
+    // workaround for bug in adafruit::gfx that returns a width too large?
+    if (gfx->width() == 24) fudge = 2;
+    //Serial.print(gfx->width() );
+    //Serial.print(" ");
+    //Serial.print(text_width(text, gfx));
+    //Serial.print(" ");
+    //Serial.println((gfx->width() - text_width(text, gfx)) / 2);
+    return(fudge + (gfx->width() - text_width(text, gfx)) / 2);
 }
 
 void matrix_setup(bool initserial=true, int reservemem = 40000) {
@@ -1180,7 +1234,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #ifdef ESP8266
         FastLED.addLeds<WS2811_PORTA,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
         #else
-        FastLED.addLeds<WS2811_PORTD,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
+            FastLED.addLeds<WS2812B,14, GRB>(matrixleds,0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
+            FastLED.addLeds<WS2812B,12, GRB>(matrixleds,1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
+            FastLED.addLeds<WS2812B,15, GRB>(matrixleds,2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
         #endif
         Serial.print("Neomatrix parallel output, total LEDs: ");
         Serial.println(NUMMATRIX);
@@ -1222,9 +1278,16 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
 
     //============================================================================================
+    #elif defined(FRAMEBUFFER)
+        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Framebuffer GFX output, total LEDs: ");
+        Serial.println(NUMMATRIX);
+
+    //============================================================================================
     #elif defined(SMARTMATRIX)
         matrix_gamma = 1; // SmartMatrix should be good by default.
         matrixLayer.addLayer(&backgroundLayer);
+        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix GFX output, total LEDs: ");
+        Serial.println(NUMMATRIX);
         // SmartMatrix takes all the RAM it can get its hands on. Get it to leave some
         // free RAM so that other libraries can work too.
         #ifdef ESP32
@@ -1232,21 +1295,17 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #else
             matrixLayer.begin();
         #endif
-        // This sets the neomatrix and LEDMatrix pointers
-        show_callback();
         matrixLayer.setRefreshRate(240);
         backgroundLayer.enableColorCorrection(true);
-        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix GFX output, total LEDs: ");
-        Serial.println(NUMMATRIX);
         // Quick hello world test
         #ifndef DISABLE_MATRIX_TEST
             Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Grey Demo");
             backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
             // backgroundLayer.swapBuffers();
-            show_callback();
             delay(1000);
         #endif
-        Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Init Done");
+        // This sets the neomatrix and LEDMatrix pointers
+        show_callback();
 
     //============================================================================================
     #elif defined(LINUX_RENDERER_X11)
