@@ -936,6 +936,14 @@ uint32_t tft_spi_speed;
             #pragma message "M128BY192 read from /root/NM/gfxdisplay"
             const uint16_t MATRIX_TILE_WIDTH = 128;
             const uint16_t MATRIX_TILE_HEIGHT= 192;
+	#elif GFXDISPLAY_M288BY192_9_3_Zmap
+	    #pragma message "M288BY192_9_3_Zmap read from /root/NM/gfxdisplay"
+	    const uint16_t MATRIX_TILE_WIDTH = 288;
+	    const uint16_t MATRIX_TILE_HEIGHT= 192;
+	#elif GFXDISPLAY_M128BY192_4_3_Zmap
+	    #pragma message "M128BY192_4_3_Zmap read from /root/NM/gfxdisplay"
+	    const uint16_t MATRIX_TILE_WIDTH = 128;
+	    const uint16_t MATRIX_TILE_HEIGHT= 192;
         #elif GFXDISPLAY_M128BY192_4_3
             #pragma message "M128BY192_4_3 read from /root/NM/gfxdisplay"
             const uint16_t MATRIX_TILE_WIDTH = 128;
@@ -989,6 +997,10 @@ uint32_t tft_spi_speed;
         #pragma message "M128BY192 read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 128;
         const uint16_t MATRIX_TILE_HEIGHT= 192;
+    #elif GFXDISPLAY_M288BY192_9_3_Zmap
+	#pragma message "M288BY192_9_3_Zmap read from /root/NM/gfxdisplay"
+	const uint16_t MATRIX_TILE_WIDTH = 288;
+	const uint16_t MATRIX_TILE_HEIGHT= 192;
     #elif GFXDISPLAY_M128BY192_4_3_Zmap
 	#pragma message "M128BY192_4_3_Zmap read from /root/NM/gfxdisplay"
 	const uint16_t MATRIX_TILE_WIDTH = 128;
@@ -997,6 +1009,10 @@ uint32_t tft_spi_speed;
 	#pragma message "M128BY192_4_3 read from /root/NM/gfxdisplay"
 	const uint16_t MATRIX_TILE_WIDTH = 128;
 	const uint16_t MATRIX_TILE_HEIGHT= 192;
+    #elif GFXDISPLAY_M64BY96
+	#pragma message "M64Y96 read from /root/NM/gfxdisplay"
+	const uint16_t MATRIX_TILE_WIDTH =  64;
+	const uint16_t MATRIX_TILE_HEIGHT=  96;
     #else
         #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
         const uint16_t MATRIX_TILE_WIDTH = 128;
@@ -1394,6 +1410,21 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.pwm_dither_bits = 1;
             //defaults.led_rgb_sequence = "RBG";
             defaults.pixel_mapper_config = "V-mapper;Rotate:90";
+        #elif GFXDISPLAY_M288BY192_9_3_Zmap
+            defaults.rows = 32;
+            defaults.cols = 64;
+            defaults.chain_length = 9;
+            defaults.parallel = 3;
+            defaults.pwm_lsb_nanoseconds = 100;
+            defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+	    // or 520Hz with lsb_ns at 50 not 100
+	    // but things are 1/3rd as bright so
+	    // we go back to 0 for 333Hz with 50ns
+            defaults.pwm_dither_bits = 1;
+            //defaults.led_rgb_sequence = "RBG";
+            defaults.pixel_mapper_config = "V-mapper:Z;Rotate:90";
         #else
             defaults.rows = 64;
             defaults.cols = 128;
