@@ -1424,7 +1424,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.chain_length = 9;
             defaults.parallel = 3;
             defaults.pwm_lsb_nanoseconds = 100;
-            defaults.pwm_bits = 7;
+            defaults.pwm_bits = 6;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
 	    // or 520Hz with lsb_ns at 50 not 100
@@ -1432,7 +1432,8 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    // we go back to 0 for 333Hz with 50ns
             defaults.pwm_dither_bits = 1;
             //defaults.led_rgb_sequence = "RBG";
-            defaults.pixel_mapper_config = "V-mapper:Z;Rotate:90";
+	    // Note that rotate is too slow on rPi3
+            defaults.pixel_mapper_config = "V-mapper:Z;Rotate:270";
         #elif GFXDISPLAY_M288BY192_9_3_Zmap
             defaults.rows = 32;
             defaults.cols = 64;
