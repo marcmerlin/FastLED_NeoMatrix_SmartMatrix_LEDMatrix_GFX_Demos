@@ -1351,10 +1351,13 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 128;
             defaults.chain_length = 4;
             defaults.parallel = 3;
+            // 50 is faster but makes the screen dimmer
             defaults.pwm_lsb_nanoseconds = 100;
+            // lower color depth definitely helps refresh
             defaults.pwm_bits = 7;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
+            // 1 is also an option
             defaults.pwm_dither_bits = 2;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
