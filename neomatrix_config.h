@@ -104,6 +104,8 @@ to use, set the define before you include the file.
     // Those defines (including RPIRGBPANEL) come from makeNativeArduino.mk
     #if defined(RPI4)
 	#pragma message "Detected ARDUINOONPC on rPi4, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
+    #elif defined(RPI02W)
+	#pragma message "Detected ARDUINOONPC on rPi0 2 W, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
     #elif defined(RPI3)
 	#pragma message "Detected ARDUINOONPC on rPi3, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
     #elif defined(RPILT3)
@@ -1495,7 +1497,11 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    #if GFXDISPLAY_M128BY128ABC
             	ropt.gpio_slowdown = 4;
 	    #else
-            	ropt.gpio_slowdown = 1;
+		#if RPI02W
+		    ropt.gpio_slowdown = 2;
+		#else
+		    ropt.gpio_slowdown = 1;
+		#endif
 	    #endif
 	#endif
 	// stay root (useful for accessing /dev/ttyUSB0 and others)
