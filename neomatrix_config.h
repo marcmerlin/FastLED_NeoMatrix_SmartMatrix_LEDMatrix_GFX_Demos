@@ -151,7 +151,7 @@ uint32_t tft_spi_speed;
     // Trying random options to see if they help with my dual output setup on ESP32
     #define FASTLED_RMT_MAX_CHANNELS 4
     #define FASTLED_ESP32_FLASH_LOCK 1
-    #pragma message "Please use https://github.com/samguyer/FastLED.git if stock FastLED is unstable with ESP32"
+    //#pragma message "Please use https://github.com/samguyer/FastLED.git if stock FastLED is unstable with ESP32"
 #endif
 #include <FastLED.h>
 
@@ -178,19 +178,17 @@ uint32_t tft_spi_speed;
 // ESP32: https://github.com/me-no-dev/arduino-esp32fs-plugin
 // https://github.com/marcmerlin/esp32_fatfsimage/blob/master/README.md
 #if defined(ESP8266)
+    #define gif_size 32
     #define FS_PREFIX ""
     #include <FS.h>
     #define FSO SPIFFS
     #define FSOSPIFFS
-    #if gif_size == 64
-        #define GIF_DIRECTORY FS_PREFIX "/gifs64/"
-    #else
-        #define GIF_DIRECTORY FS_PREFIX "/gifs/"
-    #endif
+    #define GIF_DIRECTORY FS_PREFIX "/gifs/"
     extern "C" {
         #include "user_interface.h"
     }
 #elif defined(ESP32)
+    #define gif_size 64
     #define FS_PREFIX ""
     //#define ESP32LITTLEFS
     #define ESP32FATFS
@@ -996,7 +994,6 @@ uint32_t tft_spi_speed;
     #define min(a,b) ((a<b)?(a):(b))
     #define max(a,b) ((a>b)?(a):(b))
     #include <led-matrix.h>
-    #undef gif_size
     #define gif_size 192
 
     uint8_t matrix_brightness = 255;
