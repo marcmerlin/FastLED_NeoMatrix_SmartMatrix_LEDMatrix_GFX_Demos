@@ -325,8 +325,13 @@ uint32_t tft_spi_speed;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
+#ifdef ESP8266
     cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#else
+    cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
+        MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+#endif
     #endif
     CRGB *matrixleds;
 
@@ -1264,9 +1269,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #ifdef ESP8266
         FastLED.addLeds<WS2811_PORTA,3>(matrixleds, NUMMATRIX/MATRIX_TILE_H).setCorrection(TypicalLEDStrip);
         #else
-            FastLED.addLeds<WS2812B,14, GRB>(matrixleds,0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
-            FastLED.addLeds<WS2812B,12, GRB>(matrixleds,1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
-            FastLED.addLeds<WS2812B,15, GRB>(matrixleds,2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0x333333);
+            FastLED.addLeds<WS2812B,14, GRB>(matrixleds,0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0xAAAAAA);
+            FastLED.addLeds<WS2812B,12, GRB>(matrixleds,1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0xAAAAAA);
+            FastLED.addLeds<WS2812B,15, GRB>(matrixleds,2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(0xAAAAAA);
         #endif
         Serial.print("Neomatrix parallel output, total LEDs: ");
         Serial.println(NUMMATRIX);
@@ -1309,7 +1314,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
     //============================================================================================
     #elif defined(FRAMEBUFFER)
-        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Framebuffer GFX output, total LEDs: ");
+        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Dummy Framebuffer GFX output, total LEDs: ");
         Serial.println(NUMMATRIX);
 
     //============================================================================================
