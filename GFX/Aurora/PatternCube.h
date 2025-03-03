@@ -200,7 +200,7 @@ class PatternCube : public AuroraDrawable {
         e = edge + i;
         if (!e->visible) {
           //backgroundLayer.drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, color);
-          matrix->drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, color);
+          matrix->drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, 0);
         }
       }
 
@@ -214,7 +214,7 @@ class PatternCube : public AuroraDrawable {
         if (e->visible)
         {
           //backgroundLayer.drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, color);
-          matrix->drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, color);
+          matrix->drawLine(screen[e->x].x, screen[e->x].y, screen[e->y].x, screen[e->y].y, 0);
         }
       }
       matrix->setPassThruColor();

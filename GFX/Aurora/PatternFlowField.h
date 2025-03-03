@@ -70,7 +70,7 @@ class PatternFlowField : public AuroraDrawable {
 
         //backgroundLayer.drawPixel(boid->location.x, boid->location.y, effects.ColorFromCurrentPalette(angle + hue)); // color
         //effects.Pixel(boid->location.x, boid->location.y, color); // color
-        CRGB color = effects.ColorFromCurrentPalette(effects.ColorFromCurrentPalette(angle + hue));
+        CRGB color = effects.ColorFromCurrentPalette(angle + hue);
         matrix->drawPixel(boid->location.x, boid->location.y, color);
 
         if (boid->location.x < 0 || boid->location.x >= MATRIX_WIDTH ||
