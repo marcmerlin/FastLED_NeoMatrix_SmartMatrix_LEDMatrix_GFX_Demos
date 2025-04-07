@@ -1525,7 +1525,13 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             	ropt.gpio_slowdown = 4;
 	    #elif GFXDISPLAY_M128BY192ABC
             	ropt.gpio_slowdown = 2;
+		#if RPI02W
+#pragma message "slowdown 3 for ABC"
+		    ropt.gpio_slowdown = 3;
+		#else
 #pragma message "slowdown 2 for ABC"
+		    ropt.gpio_slowdown = 2;
+		#endif
 	    #else
 		#if RPI02W
 		    ropt.gpio_slowdown = 2;
