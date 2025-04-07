@@ -945,6 +945,10 @@ uint32_t tft_spi_speed;
             #pragma message "M128BY192 read from /root/NM/gfxdisplay"
             const uint16_t MATRIX_TILE_WIDTH = 128;
             const uint16_t MATRIX_TILE_HEIGHT= 192;
+        #elif GFXDISPLAY_M128BY192ABC
+            #pragma message "M128BY192ABC read from /root/NM/gfxdisplay"
+            const uint16_t MATRIX_TILE_WIDTH = 128;
+            const uint16_t MATRIX_TILE_HEIGHT= 192;
 	#elif GFXDISPLAY_M288BY192_9_3_Zmap_Rot
 	    #pragma message "M288BY192_9_3_Zmap_Rot read from /root/NM/gfxdisplay"
 	    const uint16_t MATRIX_TILE_WIDTH = 288;
@@ -1011,6 +1015,10 @@ uint32_t tft_spi_speed;
         const uint16_t MATRIX_TILE_HEIGHT= 128;
     #elif GFXDISPLAY_M128BY192
         #pragma message "M128BY192 read from /root/NM/gfxdisplay"
+        const uint16_t MATRIX_TILE_WIDTH = 128;
+        const uint16_t MATRIX_TILE_HEIGHT= 192;
+    #elif GFXDISPLAY_M128BY192ABC
+        #pragma message "M128BY192ABC read from /root/NM/gfxdisplay"
         const uint16_t MATRIX_TILE_WIDTH = 128;
         const uint16_t MATRIX_TILE_HEIGHT= 192;
     #elif GFXDISPLAY_M288BY192_9_3_Zmap_Rot
@@ -1419,6 +1427,23 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.pwm_dither_bits = 1;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
+        #elif GFXDISPLAY_M128BY192ABC
+            defaults.rows = 64;
+            defaults.cols = 128;
+            defaults.chain_length = 1;
+            defaults.parallel = 3;
+	    // 100->50: 180Hz to 333Hz refresh
+            defaults.pwm_lsb_nanoseconds = 100;
+            defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+	    // or 520Hz with lsb_ns at 50 not 100
+	    // but things are 1/3rd as bright so
+	    // we go back to 0 for 333Hz with 50ns
+            defaults.pwm_dither_bits = 1;
+            defaults.led_rgb_sequence = "RGB";
+            defaults.panel_type = "FM6126A";
+	    defaults.row_address_type = 5;
         #elif GFXDISPLAY_M128BY192_4_3_Zmap
             defaults.rows = 32;
             defaults.cols = 64;
@@ -1498,6 +1523,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	#else
 	    #if GFXDISPLAY_M128BY128ABC
             	ropt.gpio_slowdown = 4;
+	    #elif GFXDISPLAY_M128BY192ABC
+            	ropt.gpio_slowdown = 2;
+#pragma message "slowdown 2 for ABC"
 	    #else
 		#if RPI02W
 		    ropt.gpio_slowdown = 2;
