@@ -1547,6 +1547,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         while (rgbmatrix == NULL) Serial.println("RGBMatrix did not initialize");
         matrix->setMatrix(rgbmatrix);
         Serial.println("RGBPanel RGBMatrix initialized");
+	if (defaults.row_address_type != 1) {
+	    Serial.printf("\n\n>>>> Panel Addrssing (likely ABC): %d and slowdown %d <<<<\n\n", defaults.row_address_type, ropt.gpio_slowdown);
+	}
 
     //============================================================================================
     #elif defined(M5STACK)
