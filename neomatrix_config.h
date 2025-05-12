@@ -1416,14 +1416,8 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 128;
             defaults.chain_length = 1;
             defaults.parallel = 3;
-	    // 100->50: 180Hz to 333Hz refresh
-            defaults.pwm_lsb_nanoseconds = 70;
+            defaults.pwm_lsb_nanoseconds = 50;
             defaults.pwm_bits = 7;
-	    // Time dithering of lower bits
-	    // 2 changes speed from 400Hz (from 160Hz)
-	    // or 520Hz with lsb_ns at 50 not 100
-	    // but things are 1/3rd as bright so
-	    // we go back to 0 for 333Hz with 50ns
             defaults.pwm_dither_bits = 1;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
