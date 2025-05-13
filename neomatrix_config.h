@@ -1521,7 +1521,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             	ropt.gpio_slowdown = 2;
 		#if RPI02W
 #pragma message "slowdown 2 for ABC on Pi0 2w"
-		    ropt.gpio_slowdown = 2;
+		    ropt.gpio_slowdown = 3;
 		#else
 #pragma message "slowdown 2 for ABC"
 		    ropt.gpio_slowdown = 2;
