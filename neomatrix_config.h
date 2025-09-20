@@ -1719,12 +1719,12 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #endif // HAS_TFT
         before = millis();
         for (uint16_t i=0; i<5; i++) { 
-            matrix->fillScreen(0xFC00);
+            matrix->fillScreen(0x0003);
             matrix->show();
             #ifdef HAS_TFT
                 if (gfx_scale != 1) matrix->show(0, mh);
             #endif
-            matrix->fillScreen(0x003F);
+            matrix->fillScreen(0x000F);
             matrix->show();
             #ifdef HAS_TFT
                 if (gfx_scale != 1) matrix->show(0, mh);
