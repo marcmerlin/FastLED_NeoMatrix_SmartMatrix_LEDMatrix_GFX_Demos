@@ -29,7 +29,7 @@ Backends you should choose from (define 1):
 - ARDUINOONPC is auto defined by https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix
   - On ARM, we assume rPi and define RPIRGBPANEL
   - Elsewhere, we assume rendering on linux/X11
-    - LINUX_RENDERER_X11 is the default with ArduinoOnPc-FastLED-GFX-LEDMatrix
+    - LINUX_RENDERER_X11 is the default with ArduinoOnPc-FastLED-GFX-LEDMatrix. It is slow!
     - LINUX_RENDERER_SDL can be defined in ArduinoOnPc-FastLED-GFX-LEDMatrix's Makefile
 
 // For TFTs, there is original support from adafruit, but https://github.com/moononournation/Arduino_GFX/
@@ -112,7 +112,7 @@ to use, set the define before you include the file.
 	#pragma message "Detected ARDUINOONPC on pre-rPi3, RPIRGBPANEL defined and will use FastLED_RPIRGBPanel_GFX"
     #else
 	#ifndef LINUX_RENDERER_SDL
-	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 FastLED_TFTWrapper_GFX Rendering"
+	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 Rendering via FastLED_ArduinoGFX_TFT. >>> This is Slow, are you sure yo udon't want LINUX_RENDERER_SDL? <<< "
 	    #define LINUX_RENDERER_X11
 	#else
 	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_SDL FastLED_NeoMatrix Rendering."
@@ -246,6 +246,64 @@ uint32_t tft_spi_speed;
         #define GIF_DIRECTORY FS_PREFIX "/gifs/"
     #endif
 #endif
+
+
+
+
+//============================================================================
+//         Matrix creation and Init based on Defines setup higher up
+//============================================================================
+// Ideally should not need to edit anything past here, unless you're creating
+// a new Matrix type
+//============================================================================
+
+#if defined(RPIRGBPANEL) || defined(LINUX_RENDERER_SDL) || defined(LINUX_RENDERER_X11)
+   #ifdef GFXDISPLAY_M384BY256
+       #pragma message "M384BY256 read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 384;
+       const uint16_t MATRIX_TILE_HEIGHT= 256;
+   #elif GFXDISPLAY_M192BY160
+       #pragma message "M192BY160 read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 192;
+       const uint16_t MATRIX_TILE_HEIGHT= 160;
+   #elif GFXDISPLAY_M128BY128ABC
+       #pragma message "M128BY128ABC read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 128;
+       const uint16_t MATRIX_TILE_HEIGHT= 128;
+   #elif GFXDISPLAY_M128BY192
+       #pragma message "M128BY192 read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 128;
+       const uint16_t MATRIX_TILE_HEIGHT= 192;
+   #elif GFXDISPLAY_M128BY192ABC
+       #pragma message "M128BY192ABC read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 128;
+       const uint16_t MATRIX_TILE_HEIGHT= 192;
+   #elif GFXDISPLAY_M288BY192_9_3_Zmap_Rot
+       #pragma message "M288BY192_9_3_Zmap_Rot read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 288;
+       const uint16_t MATRIX_TILE_HEIGHT= 192;
+   #elif GFXDISPLAY_M288BY192_9_3_Zmap
+       #pragma message "M288BY192_9_3_Zmap read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 192;
+       const uint16_t MATRIX_TILE_HEIGHT= 288;
+   #elif GFXDISPLAY_M128BY192_4_3_Zmap
+       #pragma message "M128BY192_4_3_Zmap read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 128;
+       const uint16_t MATRIX_TILE_HEIGHT= 192;
+   #elif GFXDISPLAY_M128BY192_4_3
+       #pragma message "M128BY192_4_3 read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 128;
+       const uint16_t MATRIX_TILE_HEIGHT= 192;
+   #elif GFXDISPLAY_M64BY96
+       #pragma message "M64Y96 read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH =  64;
+       const uint16_t MATRIX_TILE_HEIGHT=  96;
+   #else
+       #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
+       const uint16_t MATRIX_TILE_WIDTH = 320;
+       const uint16_t MATRIX_TILE_HEIGHT= 240;
+   #endif
+#endif 
 
 //============================================================================
 // Matrix defines (SMARTMATRIX vs NEOMATRIX and size)
@@ -897,8 +955,6 @@ uint32_t tft_spi_speed;
     #include <FastLED_TFTWrapper_GFX.h>
 
     uint8_t matrix_brightness = 255;
-    const uint16_t MATRIX_TILE_WIDTH = 64;
-    const uint16_t MATRIX_TILE_HEIGHT= 96;
     //
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
@@ -912,7 +968,7 @@ uint32_t tft_spi_speed;
     CRGB *matrixleds;
 
     TFT_LinuxWrapper *tft = new TFT_LinuxWrapper(MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT);
-    FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, mw, mh, tft);
+    FastLED_TFTWrapper_GFX *matrix = new FastLED_TFTWrapper_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT , tft);
 
 //----------------------------------------------------------------------------
 #elif defined(LINUX_RENDERER_SDL)
@@ -929,51 +985,6 @@ uint32_t tft_spi_speed;
     #else
         #undef gif_size
         #define gif_size 192
-        #ifdef GFXDISPLAY_M384BY256
-            #pragma message "M384BY256 read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH = 384;
-            const uint16_t MATRIX_TILE_HEIGHT= 256;
-        #elif GFXDISPLAY_M192BY160
-            #pragma message "M192BY160 read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH = 192;
-            const uint16_t MATRIX_TILE_HEIGHT= 160;
-        #elif GFXDISPLAY_M128BY128ABC
-            #pragma message "M128BY128ABC read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH = 128;
-            const uint16_t MATRIX_TILE_HEIGHT= 128;
-        #elif GFXDISPLAY_M128BY192
-            #pragma message "M128BY192 read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH = 128;
-            const uint16_t MATRIX_TILE_HEIGHT= 192;
-        #elif GFXDISPLAY_M128BY192ABC
-            #pragma message "M128BY192ABC read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH = 128;
-            const uint16_t MATRIX_TILE_HEIGHT= 192;
-	#elif GFXDISPLAY_M288BY192_9_3_Zmap_Rot
-	    #pragma message "M288BY192_9_3_Zmap_Rot read from /root/NM/gfxdisplay"
-	    const uint16_t MATRIX_TILE_WIDTH = 288;
-	    const uint16_t MATRIX_TILE_HEIGHT= 192;
-	#elif GFXDISPLAY_M288BY192_9_3_Zmap
-	    #pragma message "M288BY192_9_3_Zmap read from /root/NM/gfxdisplay"
-	    const uint16_t MATRIX_TILE_WIDTH = 192;
-	    const uint16_t MATRIX_TILE_HEIGHT= 288;
-	#elif GFXDISPLAY_M128BY192_4_3_Zmap
-	    #pragma message "M128BY192_4_3_Zmap read from /root/NM/gfxdisplay"
-	    const uint16_t MATRIX_TILE_WIDTH = 128;
-	    const uint16_t MATRIX_TILE_HEIGHT= 192;
-        #elif GFXDISPLAY_M128BY192_4_3
-            #pragma message "M128BY192_4_3 read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH = 128;
-            const uint16_t MATRIX_TILE_HEIGHT= 192;
-        #elif GFXDISPLAY_M64BY96
-            #pragma message "M64Y96 read from /root/NM/gfxdisplay"
-            const uint16_t MATRIX_TILE_WIDTH =  64;
-            const uint16_t MATRIX_TILE_HEIGHT=  96;
-        #else
-            #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
-            const uint16_t MATRIX_TILE_WIDTH = 320;
-            const uint16_t MATRIX_TILE_HEIGHT= 240;
-        #endif
     #endif
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
@@ -1001,51 +1012,6 @@ uint32_t tft_spi_speed;
     #define gif_size 192
 
     uint8_t matrix_brightness = 255;
-    #ifdef GFXDISPLAY_M384BY256
-        #pragma message "M384BY256 read from /root/NM/gfxdisplay"
-        const uint16_t MATRIX_TILE_WIDTH = 384;
-        const uint16_t MATRIX_TILE_HEIGHT= 256;
-    #elif GFXDISPLAY_M192BY160
-        #pragma message "M192BY160 read from /root/NM/gfxdisplay"
-        const uint16_t MATRIX_TILE_WIDTH = 192;
-        const uint16_t MATRIX_TILE_HEIGHT= 160;
-    #elif GFXDISPLAY_M128BY128ABC
-        #pragma message "M128BY128ABC read from /root/NM/gfxdisplay"
-        const uint16_t MATRIX_TILE_WIDTH = 128;
-        const uint16_t MATRIX_TILE_HEIGHT= 128;
-    #elif GFXDISPLAY_M128BY192
-        #pragma message "M128BY192 read from /root/NM/gfxdisplay"
-        const uint16_t MATRIX_TILE_WIDTH = 128;
-        const uint16_t MATRIX_TILE_HEIGHT= 192;
-    #elif GFXDISPLAY_M128BY192ABC
-        #pragma message "M128BY192ABC read from /root/NM/gfxdisplay"
-        const uint16_t MATRIX_TILE_WIDTH = 128;
-        const uint16_t MATRIX_TILE_HEIGHT= 192;
-    #elif GFXDISPLAY_M288BY192_9_3_Zmap_Rot
-	#pragma message "M288BY192_9_3_Zmap_Rot read from /root/NM/gfxdisplay"
-	const uint16_t MATRIX_TILE_WIDTH = 288;
-	const uint16_t MATRIX_TILE_HEIGHT= 192;
-    #elif GFXDISPLAY_M288BY192_9_3_Zmap
-	#pragma message "M288BY192_9_3_Zmap read from /root/NM/gfxdisplay"
-	const uint16_t MATRIX_TILE_WIDTH = 192;
-	const uint16_t MATRIX_TILE_HEIGHT= 288;
-    #elif GFXDISPLAY_M128BY192_4_3_Zmap
-	#pragma message "M128BY192_4_3_Zmap read from /root/NM/gfxdisplay"
-	const uint16_t MATRIX_TILE_WIDTH = 128;
-	const uint16_t MATRIX_TILE_HEIGHT= 192;
-    #elif GFXDISPLAY_M128BY192_4_3
-	#pragma message "M128BY192_4_3 read from /root/NM/gfxdisplay"
-	const uint16_t MATRIX_TILE_WIDTH = 128;
-	const uint16_t MATRIX_TILE_HEIGHT= 192;
-    #elif GFXDISPLAY_M64BY96
-	#pragma message "M64Y96 read from /root/NM/gfxdisplay"
-	const uint16_t MATRIX_TILE_WIDTH =  64;
-	const uint16_t MATRIX_TILE_HEIGHT=  96;
-    #else
-        #pragma message "Please write M384BY256 or equivalent to /root/NM/gfxdisplay (see ../../makeNativeArduino.mk)"
-        const uint16_t MATRIX_TILE_WIDTH = 128;
-        const uint16_t MATRIX_TILE_HEIGHT= 192;
-    #endif
 
     // Used by LEDMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
