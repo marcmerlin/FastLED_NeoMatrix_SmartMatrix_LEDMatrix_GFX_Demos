@@ -1325,6 +1325,9 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         FastLED.addLeds<SDL, mw, mh>(matrixleds, NUMMATRIX);
         Serial.print("Neomatrix on top of SDL. Please use '+' on numeric keypad for brighter, total LEDs: ");
         Serial.println(NUMMATRIX);
+        Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        Serial.println(">>> export FASTLED_SCALE=[1-10] for bigger/smaller size <<<");
+        Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
     //============================================================================================
     #elif defined(RPIRGBPANEL)
