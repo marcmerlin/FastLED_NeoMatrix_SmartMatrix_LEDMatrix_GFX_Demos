@@ -300,7 +300,7 @@ uint32_t tft_spi_speed;
        const uint16_t MATRIX_TILE_WIDTH = 128;
        const uint16_t MATRIX_TILE_HEIGHT= 192;
    #elif GFXDISPLAY_M208BY128_13_2_Vmap_Rot
-       #pragma message "M192BY128_4_3_Umap_Rot read from /root/NM/gfxdisplay"
+       #pragma message "M208BY128_13_2_Vmap_Rot read from /root/NM/gfxdisplay"
        const uint16_t MATRIX_TILE_WIDTH = 208;
        const uint16_t MATRIX_TILE_HEIGHT= 128;
    #elif GFXDISPLAY_M128BY192_4_3
