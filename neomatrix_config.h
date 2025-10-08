@@ -1546,7 +1546,16 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
         rgb_matrix::RuntimeOptions ropt;
 	#ifdef RPI4
-	    ropt.gpio_slowdown = 5;
+	    ropt.gpio_slowdown = 4;
+            // Patterns full of white can cause screen wide flashes
+            // with slowdown 5 due to clock/data de-sync
+            #if M128BY208_13_2_Vmap
+                ropt.gpio_slowdown = 6;
+            #elif GFXDISPLAY_M208BY128_13_2_Vmap_Rot
+                // not used, just here for demo
+                ropt.gpio_slowdown = 8;
+            #endif
+
 	#else
 	    #if GFXDISPLAY_M128BY128ABC
             	ropt.gpio_slowdown = 4;
