@@ -1466,7 +1466,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    // we go back to 0 for 333Hz with 50ns
             defaults.pwm_dither_bits = 1;
             //defaults.led_rgb_sequence = "RBG";
-            defaults.pixel_mapper_config = "U-mapper;Rotate:90";
+            defaults.pixel_mapper_config = "V-mapper;Rotate:90";
         #elif GFXDISPLAY_M128BY192_4_3
             defaults.rows = 32;
             defaults.cols = 64;
