@@ -115,6 +115,11 @@ to use, set the define before you include the file.
 	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 Rendering via FastLED_ArduinoGFX_TFT. >>> This is Slow, are you sure yo udon't want LINUX_RENDERER_SDL? <<< "
 	    #define LINUX_RENDERER_X11
 	#else
+
+            // Should be defined in ArduinoOnPc-FastLED-GFX-LEDMatrix/examples/Makefile
+            #ifndef LINUX_RENDERER_SDL_SCALE
+                #define LINUX_RENDERER_SDL_SCALE 4
+            #endif
 	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_SDL FastLED_NeoMatrix Rendering."
 	    #pragma message "Comment out LINUX_RENDERER_SDL for X11 rendering instead of SDL. Use + for brighter."
 	#endif
@@ -1322,10 +1327,12 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 
     //============================================================================================
     #elif defined(LINUX_RENDERER_SDL)
-        FastLED.addLeds<SDL, mw, mh>(matrixleds, NUMMATRIX);
+        FastLED.addLeds<SDL, mw, mh, LINUX_RENDERER_SDL_SCALE>(matrixleds, NUMMATRIX);
         Serial.print("Neomatrix on top of SDL. Please use '+' on numeric keypad for brighter, total LEDs: ");
         Serial.println(NUMMATRIX);
         Serial.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        Serial.print("Using LINUX_RENDERER_SDL_SCALE from Makefile: ");
+        Serial.println(LINUX_RENDERER_SDL_SCALE);
         Serial.println(">>> export FASTLED_SCALE=[1-10] for bigger/smaller size <<<");
         Serial.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
