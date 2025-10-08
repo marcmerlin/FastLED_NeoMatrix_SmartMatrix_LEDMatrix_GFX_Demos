@@ -1544,7 +1544,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 64;
             defaults.chain_length = 13;
             defaults.parallel = 2;
-            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
@@ -1559,7 +1559,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 64;
             defaults.chain_length = 13;
             defaults.parallel = 2;
-            defaults.pwm_lsb_nanoseconds = 50;
+            defaults.pwm_lsb_nanoseconds = 100;
             defaults.pwm_bits = 7;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
@@ -1632,7 +1632,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    ropt.gpio_slowdown = 4;
             // Patterns full of white can cause screen wide flashes
             // with slowdown 5 due to clock/data de-sync
-            #if M128BY208_13_2_Vmap
+            #if GFXDISPLAY_M128BY208_13_2_Vmap
                 ropt.gpio_slowdown = 6;
             #elif GFXDISPLAY_M208BY128_13_2_Vmap_Rot
                 // not used, just here for demo
@@ -1667,9 +1667,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         while (rgbmatrix == NULL) Serial.println("RGBMatrix did not initialize");
         matrix->setMatrix(rgbmatrix);
         Serial.println("RGBPanel RGBMatrix initialized");
-	if (defaults.row_address_type != 0) {
-	    Serial.printf("\n\n>>>> Panel Addrssing (likely ABC): %d and slowdown %d <<<<\n\n", defaults.row_address_type, ropt.gpio_slowdown);
-	}
+        Serial.printf("\n>>>> Panel Addressing: %d and slowdown %d <<<<\n\n", defaults.row_address_type, ropt.gpio_slowdown);
 
     //============================================================================================
     #elif defined(M5STACK)
