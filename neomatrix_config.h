@@ -563,7 +563,7 @@ uint32_t tft_spi_speed;
     #error Unknown architecture (not ESP32 or teensy 3.5/6 or teensy 4.0, please write a panel config)
     #endif
 
-    // Used by LEDMatrix
+    // Used by LEDMatrix, do not change from 1 for SmartMatrix
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
@@ -581,7 +581,8 @@ uint32_t tft_spi_speed;
     SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
 
     #ifdef LEDMATRIX
-    // cLEDMatrix defines
+    // cLEDMatrix creation, don't allocate memory since we will feed it the framebuffer
+    // created by SmartMatrix at runtime ledmatrix(false)
     cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
@@ -596,6 +597,7 @@ uint32_t tft_spi_speed;
     //    backgroundLayer.swapBuffers(false);
         backgroundLayer.swapBuffers(true);
         //matrixleds = (CRGB *)backgroundLayer.getRealBackBuffer());
+        // Get pointer to new SM framebuffer to write in
         matrixleds = (CRGB *)backgroundLayer.backBuffer();
         matrix->newLedsPtr(matrixleds);
     #ifdef LEDMATRIX
@@ -1320,12 +1322,17 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
         #endif
         matrixLayer.setRefreshRate(240);
         backgroundLayer.enableColorCorrection(true);
+        
+        // This used to work, now running this causes crash on teensy v4, didn't have the time
+        // to check why
+        #if 0
         // Quick hello world test
         #ifndef DISABLE_MATRIX_TEST
             Serial.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SmartMatrix Grey Demo");
             backgroundLayer.fillScreen( {0x80, 0x80, 0x80} );
             // backgroundLayer.swapBuffers();
             delay(1000);
+        #endif
         #endif
         // This sets the neomatrix and LEDMatrix pointers
         show_callback();
@@ -1555,7 +1562,6 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
                 // not used, just here for demo
                 ropt.gpio_slowdown = 8;
             #endif
-
 	#else
 	    #if GFXDISPLAY_M128BY128ABC
             	ropt.gpio_slowdown = 4;
