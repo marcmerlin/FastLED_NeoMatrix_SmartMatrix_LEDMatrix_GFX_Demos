@@ -607,6 +607,82 @@ uint32_t tft_spi_speed;
     }
 
 //----------------------------------------------------------------------------
+#elif defined(SMARTMATRIXMCE)
+// MCE is the same as SMARTMATRIX later down in setup(), so we don't duplicate
+// the code and after these defines here, we behave the same
+#define SMARTMATRIX
+// https://community.pixelmatix.com/t/smartmatrix-library-4-0-changes-to-matrixhardware-includes/709/9
+#if defined( __IMXRT1062__) // Teensy 4.0/4.1
+//#include <MatrixHardware_Teensy4_ShieldV4Adapter.h> // Teensy 4 Adapter attached to SmartLED Shield for Teensy 3 (V4)
+#pragma message "SmartMatrix for Teensy 4.x"
+#include <MatrixHardware_Teensy4_ShieldV5.h>        // SmartLED Shield for Teensy 4 (V5)
+#else
+#include <MatrixHardware_Teensy3_ShieldV4.h>        // SmartLED Shield for Teensy 3 (V4)
+#pragma message "SmartMatrix for Teensy 3.6"
+//#include <MatrixHardware_Teensy3_ShieldV1toV3.h>    // SmartMatrix Shield for Teensy 3 V1-V3
+#endif
+#include <SmartMatrix.h>
+
+#include <SmartMatrix_GFX.h>
+uint8_t matrix_brightness = 255;
+
+#pragma message "Compiling for Teensy"
+//p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5
+// use the following for p4 and p5
+//const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;
+
+// p10  p10  p10  p10 p10  p10  p10  p10  p10  p10  p10  p10  p10  p10  p10  p10   p10  p10  p10
+// use for p10
+//const uint8_t kPanelType = SMARTMATRIX_HUB75_16ROW_MOD8SCAN; //for common 16x32 panels
+
+//p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3
+// use with p2 p3
+const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
+
+
+// Used by LEDMatrix
+const uint8_t MATRIX_TILE_H     = 1;  // ledmatrix compat, leave at 1
+const uint8_t MATRIX_TILE_V     = 1;  // ledmatrix compat, leave at 1
+const uint8_t MATRIX_TILE_WIDTH = 128;
+const uint8_t MATRIX_TILE_HEIGHT= 192;
+
+
+/// SmartMatrix Defines
+
+#define COLOR_DEPTH 24       // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
+const uint8_t kMatrixWidth =  MATRIX_TILE_WIDTH *  MATRIX_TILE_H;
+const uint8_t kMatrixHeight = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
+const uint8_t kRefreshDepth = 16;       // known working: 12, 24, 36, 48  normal to use 24  lower = brighter
+const uint8_t kDmaBufferRows = 2;       // known working: 2-4, use 2 to save memory, more to keep from dropping frames and automatically lowering refresh rate
+const uint8_t kMatrixOptions = (SMARTMATRIX_OPTIONS_NONE);      // see http://docs.pixelmatix.com/SmartMatrix for options
+const uint8_t kBackgroundLayerOptions = (SM_BACKGROUND_OPTIONS_NONE);
+
+SMARTMATRIX_ALLOCATE_BUFFERS(matrixLayer, kMatrixWidth, kMatrixHeight, kRefreshDepth, kDmaBufferRows, kPanelType, kMatrixOptions);
+SMARTMATRIX_ALLOCATE_BACKGROUND_LAYER(backgroundLayer, kMatrixWidth, kMatrixHeight, COLOR_DEPTH, kBackgroundLayerOptions);
+
+#ifdef LEDMATRIX
+// cLEDMatrix defines
+cLEDMatrix < MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+           MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS > ledmatrix(false);
+#endif
+CRGB *matrixleds;
+
+void show_callback();
+SmartMatrix_GFX *matrix = new SmartMatrix_GFX(matrixleds, kMatrixWidth, kMatrixHeight, show_callback);
+
+// Sadly this callback function must be copied around with this init code
+void show_callback() {
+  backgroundLayer.swapBuffers(true);
+  //matrixleds = (CRGB *)backgroundLayer.getRealBackBuffer());
+  matrixleds = (CRGB *)backgroundLayer.backBuffer();
+  matrix->newLedsPtr(matrixleds);
+#ifdef LEDMATRIX
+  ledmatrix.SetLEDArray(matrixleds);
+#endif
+  matrix->showfps();
+}
+
+//----------------------------------------------------------------------------
 #elif defined(M5STACK)
     #define HAS_TFT
 
