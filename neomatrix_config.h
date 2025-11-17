@@ -1487,7 +1487,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.chain_length = 1;
             defaults.parallel = 2;
             defaults.pwm_lsb_nanoseconds = 50;
-            defaults.pwm_bits = 5;
+            defaults.pwm_bits = 6;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
 	    // or 520Hz with lsb_ns at 50 not 100
@@ -1496,7 +1496,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.pwm_dither_bits = 1;
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
-	    defaults.row_address_type = 3;
+	    defaults.row_address_type = 5;
         #elif GFXDISPLAY_M128BY192
             defaults.rows = 64;
             defaults.cols = 128;
