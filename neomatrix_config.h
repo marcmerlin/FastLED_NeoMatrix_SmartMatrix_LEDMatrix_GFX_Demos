@@ -267,6 +267,10 @@ uint32_t tft_spi_speed;
        #pragma message "M384BY256 read from /root/NM/gfxdisplay"
        const uint16_t MATRIX_TILE_WIDTH = 384;
        const uint16_t MATRIX_TILE_HEIGHT= 256;
+   #elif GFXDISPLAY_M64BY64_multi4
+       #pragma message "M64BY64_multi4 read from /root/NM/gfxdisplay"
+       const uint16_t MATRIX_TILE_WIDTH = 64;
+       const uint16_t MATRIX_TILE_HEIGHT= 64;
    #elif GFXDISPLAY_M192BY160
        #pragma message "M192BY160 read from /root/NM/gfxdisplay"
        const uint16_t MATRIX_TILE_WIDTH = 192;
@@ -1453,6 +1457,22 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
     	    defaults.pixel_mapper_config = "V-mapper";
+        #elif GFXDISPLAY_M64BY64_multi4
+            defaults.rows = 16;
+            defaults.cols = 32;
+            defaults.chain_length = 4;
+            defaults.parallel = 2;
+            // 50 is faster but makes the screen dimmer
+            defaults.pwm_lsb_nanoseconds = 100;
+            // lower color depth definitely helps refresh
+            defaults.pwm_bits = 7;
+	    // Time dithering of lower bits
+	    // 2 changes speed from 400Hz (from 160Hz)
+            // 1 is also an option
+            defaults.pwm_dither_bits = 2;
+            defaults.led_rgb_sequence = "RBG";
+    	    defaults.pixel_mapper_config = "V-mapper";
+    	    defaults.multiplexing = 4;
         #elif GFXDISPLAY_M192BY160
             defaults.rows = 32;
             defaults.cols = 64;
