@@ -1470,7 +1470,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    // 2 changes speed from 400Hz (from 160Hz)
             // 1 is also an option
             defaults.pwm_dither_bits = 2;
-            defaults.led_rgb_sequence = "RBG";
+            defaults.led_rgb_sequence = "RGB";
     	    defaults.pixel_mapper_config = "V-mapper";
     	    defaults.multiplexing = 4;
         #elif GFXDISPLAY_M192BY160
