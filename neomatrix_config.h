@@ -1688,7 +1688,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    #endif
 	#elif RPI4
 	    ropt.gpio_slowdown = 4;
-	#elfif RPI02W
+	#elif RPI02W
 	    ropt.gpio_slowdown = 2;
 	#else
 	    ropt.gpio_slowdown = 1;
