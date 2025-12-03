@@ -1613,7 +1613,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.cols = 64;
             defaults.chain_length = 8;
             defaults.parallel = 3;
-            defaults.pwm_lsb_nanoseconds = 100;
+            defaults.pwm_lsb_nanoseconds = 50;
             defaults.pwm_bits = 6;
 	    // Time dithering of lower bits
 	    // 2 changes speed from 400Hz (from 160Hz)
@@ -1675,7 +1675,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    // not used, just here for demo
 	    ropt.gpio_slowdown = 8;
 	#elif GFXDISPLAY_M192BY256_8_3_Zmap
-	    ropt.gpio_slowdown = 6;
+	    ropt.gpio_slowdown = 2;
 	#elif GFXDISPLAY_M128BY128ABC
 	    ropt.gpio_slowdown = 4;
 	#elif GFXDISPLAY_M192BY128_4_3_Umap_Rot 
