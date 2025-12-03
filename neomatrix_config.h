@@ -1675,7 +1675,8 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
 	    // not used, just here for demo
 	    ropt.gpio_slowdown = 8;
 	#elif GFXDISPLAY_M192BY256_8_3_Zmap
-	    ropt.gpio_slowdown = 2;
+	    // cube works at 2, but real code needs 3
+	    ropt.gpio_slowdown = 3;
 	#elif GFXDISPLAY_M128BY128ABC
 	    ropt.gpio_slowdown = 4;
 	#elif GFXDISPLAY_M192BY128_4_3_Umap_Rot 
