@@ -386,6 +386,12 @@ uint32_t tft_spi_speed;
     //     zig-zag order, the orientation of the matrices in alternate rows
     //     will be rotated 180 degrees (this is normal -- simplifies wiring).
     //   See example below for these values in action.
+    //
+    // Note that matrixleds can be a global static array, in which case the definition
+    // below works, but global static arrays cannot get as much RAM on ESP32 as malloc'ed
+    // RAM at runtime in setup, so it's now preferable to pass a NULL value here, which will
+    // make the code crash if you use matrix without calling matrix->newLedsPtr(matrixleds)
+    // after it's gotten a proper malloc'ed value (this replaces the pointer inside Framebuffer_GFX)
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
         NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
@@ -444,6 +450,12 @@ uint32_t tft_spi_speed;
     //     zig-zag order, the orientation of the matrices in alternate rows
     //     will be rotated 180 degrees (this is normal -- simplifies wiring).
     //   See example below for these values in action.
+    //
+    // Note that matrixleds can be a global static array, in which case the definition
+    // below works, but global static arrays cannot get as much RAM on ESP32 as malloc'ed
+    // RAM at runtime in setup, so it's now preferable to pass a NULL value here, which will
+    // make the code crash if you use matrix without calling matrix->newLedsPtr(matrixleds)
+    // after it's gotten a proper malloc'ed value (this replaces the pointer inside Framebuffer_GFX)
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V,
       NEO_MATRIX_TOP     + NEO_MATRIX_RIGHT +
         NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG +
@@ -468,6 +480,12 @@ uint32_t tft_spi_speed;
     #endif
     CRGB *matrixleds;
 
+    //
+    // Note that matrixleds can be a global static array, in which case the definition
+    // below works, but global static arrays cannot get as much RAM on ESP32 as malloc'ed
+    // RAM at runtime in setup, so it's now preferable to pass a NULL value here, which will
+    // make the code crash if you use matrix without calling matrix->newLedsPtr(matrixleds)
+    // after it's gotten a proper malloc'ed value (this replaces the pointer inside Framebuffer_GFX)
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, MATRIX_TILE_H, MATRIX_TILE_V,
       NEO_MATRIX_BOTTOM     + NEO_MATRIX_RIGHT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG +
@@ -497,6 +515,12 @@ uint32_t tft_spi_speed;
     // cLEDMatrix defines
     cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX> ledmatrix(false);
     #endif
+    //
+    // Note that matrixleds can be a global static array, in which case the definition
+    // below works, but global static arrays cannot get as much RAM on ESP32 as malloc'ed
+    // RAM at runtime in setup, so it's now preferable to pass a NULL value here, which will
+    // make the code crash if you use matrix without calling matrix->newLedsPtr(matrixleds)
+    // after it's gotten a proper malloc'ed value (this replaces the pointer inside Framebuffer_GFX)
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
         NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
         NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG );
@@ -555,25 +579,25 @@ uint32_t tft_spi_speed;
     #ifdef ESP32
     #pragma message "SmartMatrix for ESP32 with 64x32 16 scan panel and 64x96 resolution"
     const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
-    const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
-    const uint16_t MATRIX_TILE_HEIGHT= 96; // height of each matrix
+    const uint16_t MATRIX_TILE_WIDTH = 64; // width of full matrix after it's been merged by SmartMatrix
+    const uint16_t MATRIX_TILE_HEIGHT= 96; // height of full matrix after it's been merged by SmartMatrix
     #elif defined(__MK66FX1M0__) // my teensy 3.6 is connected to a 64x64 panel
     #pragma message "SmartMatrix for Teensy with 64x64 32 scan panel"
     //const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;   // use SMARTMATRIX_HUB75_16ROW_MOD8SCAN for common 16x32 panels
     const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
-    const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
-    const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
+    const uint16_t MATRIX_TILE_WIDTH = 64;
+    const uint16_t MATRIX_TILE_HEIGHT= 64;
     #elif defined(__IMXRT1062__) // teensy v.4
     const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
-    const uint16_t MATRIX_TILE_WIDTH = 64; // width of EACH NEOPIXEL MATRIX (not total display)
-    const uint16_t MATRIX_TILE_HEIGHT= 64; // height of each matrix
+    const uint16_t MATRIX_TILE_WIDTH = 64;
+    const uint16_t MATRIX_TILE_HEIGHT= 64;
     #else
     #error Unknown architecture (not ESP32 or teensy 3.5/6 or teensy 4.0, please write a panel config)
     #endif
 
     // Used by LEDMatrix, do not change from 1 for SmartMatrix
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
 
     /// SmartMatrix Defines
     #define COLOR_DEPTH 24         // known working: 24, 48 - If the sketch uses type `rgb24` directly, COLOR_DEPTH must be 24
@@ -617,7 +641,8 @@ uint32_t tft_spi_speed;
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIXMCE)
 // MCE is the same as SMARTMATRIX later down in setup(), so we don't duplicate
-// the code and after these defines here, we behave the same
+// the code and after these defines here, we behave the same. 
+// This is for Mark Estes. Other people can ignore :)
 #define SMARTMATRIX
 // https://community.pixelmatix.com/t/smartmatrix-library-4-0-changes-to-matrixhardware-includes/709/9
 #if defined( __IMXRT1062__) // Teensy 4.0/4.1
@@ -635,22 +660,16 @@ uint32_t tft_spi_speed;
 uint8_t matrix_brightness = 255;
 
 #pragma message "Compiling for Teensy"
-//p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5  p4  p5
-// use the following for p4 and p5
 //const uint8_t kPanelType = SMARTMATRIX_HUB75_32ROW_MOD16SCAN;
 
-// p10  p10  p10  p10 p10  p10  p10  p10  p10  p10  p10  p10  p10  p10  p10  p10   p10  p10  p10
-// use for p10
 //const uint8_t kPanelType = SMARTMATRIX_HUB75_16ROW_MOD8SCAN; //for common 16x32 panels
 
-//p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3  p2  p3
-// use with p2 p3
 const uint8_t kPanelType = SMARTMATRIX_HUB75_64ROW_MOD32SCAN;
 
 
 // Used by LEDMatrix
-const uint8_t MATRIX_TILE_H     = 1;  // ledmatrix compat, leave at 1
-const uint8_t MATRIX_TILE_V     = 1;  // ledmatrix compat, leave at 1
+const uint8_t MATRIX_TILE_H     = 1;  // LEDMATRIX compat, leave at 1
+const uint8_t MATRIX_TILE_V     = 1;  // LEDMATRIX compat, leave at 1
 const uint8_t MATRIX_TILE_WIDTH = 128;
 const uint8_t MATRIX_TILE_HEIGHT= 192;
 
@@ -701,9 +720,9 @@ void show_callback() {
     const uint16_t MATRIX_TILE_WIDTH = 320;
     const uint16_t MATRIX_TILE_HEIGHT= 240;
     //
-    // Used by LEDMatrix
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+    // Used by LEDMatrix for non Neopixel arrays, LEDMAtrix isn't doing layout, leave at 1
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -816,8 +835,10 @@ void show_callback() {
     // templates prevents being able to get the screen size at runtime. This is why templates must die
     const uint16_t MATRIX_TILE_WIDTH =  mw;
     const uint16_t MATRIX_TILE_HEIGHT = mh;
-    const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
+
+    // Used by LEDMatrix for non Neopixel arrays, LEDMAtrix isn't doing layout, leave at 1
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
     #ifdef LEDMATRIX
     cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,  MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
@@ -914,8 +935,10 @@ void show_callback() {
     // templates prevents being able to get the screen size at runtime. This is why templates must die
     const uint16_t MATRIX_TILE_WIDTH =  mw;
     const uint16_t MATRIX_TILE_HEIGHT = mh;
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+    // Used by LEDMatrix for non Neopixel arrays, LEDMAtrix isn't doing layout, leave at 1
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
     #ifdef LEDMATRIX
     // cLEDMatrix defines
     cLEDMatrix<-MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
@@ -1029,8 +1052,10 @@ void show_callback() {
     // templates prevents being able to get the screen size at runtime. This is why templates must die
     const uint16_t MATRIX_TILE_WIDTH =  mw;
     const uint16_t MATRIX_TILE_HEIGHT = mh;
-    const uint8_t MATRIX_TILE_H     = 1; // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1; // number of matrices arranged vertically
+
+    // Used by LEDMatrix for non Neopixel arrays, LEDMAtrix isn't doing layout, leave at 1
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
 
 
     #ifdef LEDMATRIX
@@ -1058,10 +1083,11 @@ void show_callback() {
     #include <FastLED_TFTWrapper_GFX.h>
 
     uint8_t matrix_brightness = 255;
-    //
-    // Used by LEDMatrix
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+
+    // Used by LEDMatrix for non Neopixel arrays, LEDMAtrix isn't doing layout, leave at 1
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
@@ -1098,6 +1124,12 @@ void show_callback() {
     cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
         MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
     #endif
+    //
+    // Note that matrixleds can be a global static array, in which case the definition
+    // below works, but global static arrays cannot get as much RAM on ESP32 as malloc'ed
+    // RAM at runtime in setup, so it's now preferable to pass a NULL value here, which will
+    // make the code crash if you use matrix without calling matrix->newLedsPtr(matrixleds)
+    // after it's gotten a proper malloc'ed value (this replaces the pointer inside Framebuffer_GFX)
     FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
         NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS );
 
@@ -1116,9 +1148,9 @@ void show_callback() {
 
     uint8_t matrix_brightness = 255;
 
-    // Used by LEDMatrix
-    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
-    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+    // Used by LEDMatrix for non Neopixel arrays, LEDMAtrix isn't doing layout, leave at 1
+    const uint8_t MATRIX_TILE_H     = 1;
+    const uint8_t MATRIX_TILE_V     = 1;
 
     #ifdef LEDMATRIX
     // cLEDMatrix defines
