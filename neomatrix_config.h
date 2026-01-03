@@ -61,11 +61,17 @@ to use, set the define before you include the file.
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //#define M24BY24
 
+// Let's allow a custom include here that can contain a single line like
+// #define ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64
+#if __has_include("neomatrix_config_whichdefine.h")
+    #include "neomatrix_config_whichdefine.h"
+#endif
+
 // If you did not define something above, right here ^^^ the code below will look at the
 // chip and do a hardcoded define that works for me, but is unlikely to be what you are also
 // using, so really you want to define your driver above, or one will be picked for you and
 // it'll probably be the wrong one :)
-#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC) && !defined(FRAMEBUFFER)
+#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC) && !defined(FRAMEBUFFER) && !defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64)
     #ifdef ESP8266
     //#define SSD1331
     //#define SSD1331_ROTATE 1
@@ -550,6 +556,89 @@ uint32_t tft_spi_speed;
 
 
 //----------------------------------------------------------------------------
+// mapping2 is a placeholder to show you what's common to the lib and pin definitions
+#elif defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64) || defined(ESP32_HUB75_MATRIXPANEL_S3_MAPPING2)
+    #include <FastLED_ESP32-HUB75-MatrixPanel_FrameBuffer_GFX.h>
+    // Common code in matrix_setup() below
+    #define ESP32_HUB75_MATRIXPANEL
+
+    #ifdef ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64
+        // Step 1) Provide the size of each individual physical panel LED Matrix panel that is chained (or not) together
+        #define PANEL_RES_X 64 // Number of pixels wide of each INDIVIDUAL panel module. 
+        #define PANEL_RES_Y 64 // Number of pixels tall of each INDIVIDUAL panel module.
+        
+        // Step 2) Provide details of the physical panel chaining that is in place.
+        #define NUM_ROWS 1 // Number of rows of chained INDIVIDUAL PANELS
+        #define NUM_COLS 1 // Number of INDIVIDUAL PANELS per ROW
+        #define PANEL_CHAIN NUM_ROWS*NUM_COLS    // total number of panels chained one to another
+        
+        // Step 3) How are the panels chained together?
+        #define PANEL_CHAIN_TYPE CHAIN_TOP_RIGHT_DOWN
+        
+        // Refer to: https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA/tree/master/examples/VirtualMatrixPanel
+        //      and: https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA/blob/master/doc/VirtualMatrixPanel.pdf
+        #define VPANEL_W PANEL_RES_X*NUM_COLS
+        #define VPANEL_H PANEL_RES_Y*NUM_ROWS
+        
+        // Step 4) Pin definitions
+        // custom pin mapping (this one is Adafruit Matrixportal ESP32S3
+        #define R1 42
+        #define G1 41
+        #define B1 40
+        #define R2 38
+        #define G2 39
+        #define B2 37
+        #define CH_A 45
+        #define CH_B 36
+        #define CH_C 48
+        #define CH_D 35
+        #define CH_E 21
+        #define CLK 2
+        #define LAT 47
+        #define OE  14
+    #else
+        #error "please define pins for new ESP32_HUB75_MATRIXPANEL mapping"
+    #endif
+
+    // Below is common code for all ESP32_HUB75_MatrixPanel mappings, you shoulnd't have to edit it
+    #ifdef LEDMATRIX
+    // Please use https://github.com/marcmerlin/LEDMatrix/ at least as recent as
+    // https://github.com/marcmerlin/LEDMatrix/commit/597ce703e924d45b2e676d6558c4c74a8ebc6991
+    // or https://github.com/Jorgen-VikingGod/LEDMatrix/commit/a11e74c8cd5b933021b6e15eb067280a52691449
+    // zero copy/no malloc code to work.
+        #include <LEDMatrix.h>
+    #endif
+
+    HUB75_I2S_CFG::i2s_pins _pins={R1, G1, B1, R2, G2, B2, CH_A, CH_B, CH_C, CH_D, CH_E, LAT, OE, CLK};
+
+    /// Please ignore the "TILE" part, for externally managed framebuffers like RGBPanels,
+    /// the resolution is coded here.
+    const uint16_t MATRIX_TILE_WIDTH = VPANEL_W;
+    const uint16_t MATRIX_TILE_HEIGHT= VPANEL_H;
+
+    // and these are used by LEDMatrix for Neopixel Matrices but do not change from 1 for RGBPanels
+    const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
+    const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
+
+    uint8_t matrix_brightness = 255;
+
+    MatrixPanel_I2S_DMA *hub75matrix = nullptr;
+    VirtualMatrixPanel  *virtualDisp = nullptr;
+
+    #ifdef LEDMATRIX
+        // cLEDMatrix creation, don't allocate memory since we will feed it the framebuffer
+        // created by SmartMatrix at runtime ledmatrix(false)
+        cLEDMatrix<MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_MATRIX,
+            MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_BLOCKS> ledmatrix(false);
+    #endif
+    CRGB *matrixleds = nullptr;
+
+    // Neither matrixleds point to anything useful yet because on ESP32 not as much
+    // RAM is available as static array allocation in global space, as RAM you can
+    // get via malloc in setup (or even ps_malloc to use PSRAM as needed).
+    // So we'll call Framebuffer_GFX->newLedsPtr and setvirtdisp to set those pointers correctly
+    // Same thing with hub75matrix, which is passed so we can call brightness
+    FastLED_ESP32_HUB75_MatrixPanel_FrameBuffer_GFX *matrix = new FastLED_ESP32_HUB75_MatrixPanel_FrameBuffer_GFX(matrixleds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, virtualDisp, hub75matrix);
 //----------------------------------------------------------------------------
 #elif defined(SMARTMATRIX)
     // CHANGEME for ESP32, see MatrixHardware_ESP32_V0.h in SmartMatrix/src
@@ -1164,7 +1253,7 @@ void show_callback() {
 
 //============================================================================
 #else
-    #error "Please write a matrix config or choose one of the definitions above. If you have a FastLED matrix, define M24BY24 at the top of this file"
+    #error "Please write a matrix config or choose one of the definitions above. If you have a FastLED matrix, define something like M24BY24 at the top of this file"
 #endif
 
 //============================================================================
@@ -1180,11 +1269,11 @@ const uint16_t MATRIX_HEIGHT = MATRIX_TILE_HEIGHT * MATRIX_TILE_V;
 // If the actual display is bigger than the framebuffer (this is needed
 // for TFTs which require more FB RAM than you can get on chips like ESP32)
 #ifdef HAS_TFT
-uint8_t gfx_scale = (tftw*tfth)/(mw*mh);
+    uint8_t gfx_scale = (tftw*tfth)/(mw*mh);
 #else
 // Used by NeoMatrix
-const uint16_t mw = MATRIX_WIDTH;
-const uint16_t mh = MATRIX_HEIGHT;
+    const uint16_t mw = MATRIX_WIDTH;
+    const uint16_t mh = MATRIX_HEIGHT;
 #endif
 
 // Used by some demos
@@ -1417,6 +1506,36 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             Serial.println(NUMMATRIX);
         #endif // ESP32
         matrix_gamma = 2.4; // higher number is darker, needed for Neomatrix more than SmartMatrix
+
+    //============================================================================================
+    #elif defined(ESP32_HUB75_MATRIXPANEL)
+        Serial.print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ESP32_HUB75_MatrixPanel, total LEDs: ");
+        Serial.println(NUMMATRIX);
+
+        Serial.println("HUB75 Matrix Init");
+        // Configure your matrix setup here
+        HUB75_I2S_CFG mxconfig(PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN);
+
+        mxconfig.gpio = _pins;
+
+        // OK, now we can create our matrix object
+        hub75matrix = new MatrixPanel_I2S_DMA(mxconfig);
+
+        // Allocate memory and start DMA display
+        if (! hub75matrix->begin()) die ("****** !KABOOM! I2S memory allocation failed ***********");
+        matrix->sethub75matrix(hub75matrix);
+
+        // create VirtualDisplay object based on our newly created dma_display object
+        virtualDisp = new VirtualMatrixPanel((*hub75matrix), NUM_ROWS, NUM_COLS, PANEL_RES_X, PANEL_RES_Y, PANEL_CHAIN_TYPE);
+        // Same comment as setfb above.
+        matrix->setvirtdisp(virtualDisp);
+
+        Serial.print("MATRIX_WIDTH: ");  Serial.println(PANEL_RES_X*PANEL_CHAIN);
+        Serial.print("MATRIX_HEIGHT: "); Serial.println(PANEL_RES_Y);
+        Serial.println("VIRTUAL PANEL WIDTH " + String(VPANEL_W));
+        Serial.println("VIRTUAL PANEL HEIGHT " + String(VPANEL_H));
+
+        Serial.println("HUB75 Virtual Matrix Init Done");
 
     //============================================================================================
     #elif defined(FRAMEBUFFER)
