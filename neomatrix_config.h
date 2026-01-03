@@ -1628,6 +1628,10 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.led_rgb_sequence = "RGB";
     	    defaults.pixel_mapper_config = "V-mapper";
     	    defaults.multiplexing = 4;
+            // default debug value, take it down to less to remove flickering if needed
+            // https://github.com/hzeller/rpi-rgb-led-matrix/issues/483
+            // https://github.com/ProjectCodeKw/rpi-rgb-led-matrix/commit/e4405f90e0842e54970601b03386ac68c283d377
+            defaults.limit_refresh_rate_hz = 500;
         #elif GFXDISPLAY_M192BY160
             defaults.rows = 32;
             defaults.cols = 64;
@@ -1816,6 +1820,10 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             defaults.led_rgb_sequence = "RBG";
             defaults.panel_type = "FM6126A";
         #endif
+        // default debug value, take it down to less to remove flickering if needed
+        // https://github.com/hzeller/rpi-rgb-led-matrix/issues/483
+        // https://github.com/ProjectCodeKw/rpi-rgb-led-matrix/commit/e4405f90e0842e54970601b03386ac68c283d377
+        // defaults.limit_refresh_rate_hz = 200;
 
         rgb_matrix::RuntimeOptions ropt;
 	// Patterns full of white can cause screen wide flashes
