@@ -50,9 +50,18 @@ As of this writing, you can run on top of
 - https://github.com/marcmerlin/SmartMatrix_GFX/
 - https://github.com/marcmerlin/FastLED_SPITFT_GFX (SSD1331, ILI9341, and ST7735 TFTs)
 - https://github.com/marcmerlin/ArduinoOnPc-FastLED-GFX-LEDMatrix (which itself supports 3 more drivers)
+- https://github.com/marcmerlin/FastLED_ESP32-HUB75-MatrixPanel_FrameBuffer_GFX/ (Hub75 RGB Panels on ESP32)
 
 If you are using some of the other backends, I'll assume that you can set the correct define in neomatrix_config
-For instance for //#define M24BY24 and replace with #define SMARTMATRIX if that's the backend you want.
+For instance for //#define M24BY24 and replace with #define SMARTMATRIX if that's the backend you want
+or a new approach is to look at
+https://github.com/marcmerlin/FastLED_ESP32-HUB75-MatrixPanel_FrameBuffer_GFX/blob/ca2179ae541377d4225edfa02b10d00b54de9313/neomatrix_config.h#L66
+and use an external file to put a single #define ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64 
+```
+#if __has_include("neomatrix_config_whichdefine.h")
+    #include "neomatrix_config_whichdefine.h"
+#endif
+```
 
 History
 -------
