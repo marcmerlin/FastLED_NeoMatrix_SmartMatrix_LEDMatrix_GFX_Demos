@@ -184,6 +184,7 @@ void setup()
   digitalWrite(LATCHB, LOW);
 #endif
 
+#if 0
   Serial.println("Reset");
   Serial.println("scalerW, iscalerW");
   Serial.println(scalerW);
@@ -191,6 +192,7 @@ void setup()
   Serial.println("scalerH, iscalerH");
   Serial.println(scalerH);
   Serial.println(iscalerH);
+#endif
   // don't re-init the serial port.
   matrix_setup(false);
 
