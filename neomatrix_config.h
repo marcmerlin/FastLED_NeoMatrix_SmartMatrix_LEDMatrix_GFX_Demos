@@ -59,52 +59,16 @@ to use, set the define before you include the file.
 // Are all those defines confusing? Then look at neomatrix_config_tftonly.h with all the defines
 // taken out and a single backend hardcoded.
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+// Yes, you can simply define the backend you want here, or before you include this file
 //#define M24BY24
 
-// Let's allow a custom include here that can contain a single line like
+// But let's allow a custom include here that can contain a single line like
 // #define ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64
 #if __has_include("neomatrix_config_whichdefine.h")
     #include "neomatrix_config_whichdefine.h"
 #endif
 
-// If you did not define something above, right here ^^^ the code below will look at the
-// chip and do a hardcoded define that works for me, but is unlikely to be what you are also
-// using, so really you want to define your driver above, or one will be picked for you and
-// it'll probably be the wrong one :)
-#if !defined(M24BY24) && !defined(M32BY8X3) && !defined(M16BY16T4) && !defined(M64BY64) && !defined(SMARTMATRIX) && !defined(SSD1331) && !defined(ST7735_128b128) && !defined(ST7735_128b160) && !defined(ILI9341) && !defined(ARDUINOONPC) && !defined(FRAMEBUFFER) && !defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64)
-    #ifdef ESP8266
-    //#define SSD1331
-    //#define SSD1331_ROTATE 1
-    // ESP8266 shirt with neopixel strips
-    #define M32BY8X3
-    //#define M16BY16T4
-    #endif
-
-    #ifdef ESP32
-    //#define ILI9341
-    //#define ST7735_128b160
-    //#define ST7735_128b128
-    //#define SSD1331
-    //#define SSD1331_ROTATE 1
-    #define SMARTMATRIX
-    //#define M64BY64
-    #endif
-
-    // Teensy 3.6
-    #ifdef __MK66FX1M0__
-    #define ILI9341
-    // If instead you are using the old SmartMatrix V3, define those 2
-    //#define SMARTMATRIX3
-    // And with SmartMatrix (v4), only this define is needed.
-    //#define SMARTMATRIX
-    #endif
-
-    // Teensy v.4
-    #ifdef __IMXRT1062__
-    //#define SMARTMATRIX3
-    #define SMARTMATRIX
-    #endif
-#endif
 
 #if defined(ARDUINOONPC)
     // Those defines (including RPIRGBPANEL) come from makeNativeArduino.mk
@@ -121,7 +85,6 @@ to use, set the define before you include the file.
 	    #pragma message "Detected ARDUINOONPC. Using LINUX_RENDERER_X11 Rendering via FastLED_ArduinoGFX_TFT. >>> This is Slow, are you sure you don't want LINUX_RENDERER_SDL? <<< "
 	    #define LINUX_RENDERER_X11
 	#else
-
             // Should be defined in ArduinoOnPc-FastLED-GFX-LEDMatrix/examples/Makefile
             #ifndef LINUX_RENDERER_SDL_SCALE
                 #define LINUX_RENDERER_SDL_SCALE 4
@@ -583,7 +546,7 @@ uint32_t tft_spi_speed;
 
 //----------------------------------------------------------------------------
 // mapping2 is a placeholder to show you what's common to the lib and pin definitions
-#elif defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64) || defined(ESP32_HUB75_MATRIXPANEL_S3_MAPPING2)
+#elif defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64BY64) || defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64Y32X2)
     #include <FastLED_ESP32-HUB75-MatrixPanel_FrameBuffer_GFX.h>
     // Common code in matrix_setup() below
     #define ESP32_HUB75_MATRIXPANEL
@@ -622,11 +585,58 @@ uint32_t tft_spi_speed;
         #define CLK 2
         #define LAT 47
         #define OE  14
+
+        uint8_t matrix_brightness = 255;
+    #elif defined(ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64Y32X2)
+        // Step 1) Provide the size of each individual physical panel LED Matrix panel that is chained (or not) together
+        #define PANEL_RES_X 64 // Number of pixels wide of each INDIVIDUAL panel module. 
+        #define PANEL_RES_Y 32 // Number of pixels tall of each INDIVIDUAL panel module.
+        
+        // Step 2) Provide details of the physical panel chaining that is in place.
+        #define NUM_ROWS 2 // Number of rows of chained INDIVIDUAL PANELS
+        #define NUM_COLS 1 // Number of INDIVIDUAL PANELS per ROW
+        #define PANEL_CHAIN NUM_ROWS*NUM_COLS    // total number of panels chained one to another
+        
+        // Step 3) How are the panels chained together?
+        #define PANEL_CHAIN_TYPE CHAIN_TOP_RIGHT_DOWN
+        
+        // Refer to: https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA/tree/master/examples/VirtualMatrixPanel
+        //      and: https://github.com/mrcodetastic/ESP32-HUB75-MatrixPanel-DMA/blob/master/doc/VirtualMatrixPanel.pdf
+        #define VPANEL_W PANEL_RES_X*NUM_COLS
+        #define VPANEL_H PANEL_RES_Y*NUM_ROWS
+        
+        // Step 4) Pin definitions
+        // custom pin mapping (this one is Adafruit Matrixportal ESP32S3
+        #define R1 42
+        #define G1 41
+        #define B1 40
+        #define R2 38
+        #define G2 39
+        #define B2 37
+        #define CH_A 45
+        #define CH_B 36
+        #define CH_C 48
+        #define CH_D 35
+        #define CH_E 21
+        #define CLK 2
+        #define LAT 47
+        #define OE  14
+
+        // I have bigger panels that take more power and get powered from USB-C, run at 70%
+        // to prevent reboots.
+        uint8_t matrix_brightness = 70;
     #else
         #error "please define pins for new ESP32_HUB75_MATRIXPANEL mapping"
     #endif
 
-    // Below is common code for all ESP32_HUB75_MatrixPanel mappings, you shoulnd't have to edit it
+    // Step 5, how do you adjust RGB LED order for weird panels?
+    // the underlying library does not have an option for this, but you can just
+    // swap the pin numbers above for 2 colors and it'll do the same thing.
+    // Unfortunately color order can be different across different panels on the
+    // same hardware, so you may have to use multiple definitions like ESP32_HUB75_MATRIXPANEL_S3_PORTAL_64Y32X2
+    // to support other color orders.
+
+    // Below is common code for all ESP32_HUB75_MatrixPanel mappings, you shouldn't have to edit it
     #ifdef LEDMATRIX
     // Please use https://github.com/marcmerlin/LEDMatrix/ at least as recent as
     // https://github.com/marcmerlin/LEDMatrix/commit/597ce703e924d45b2e676d6558c4c74a8ebc6991
@@ -659,7 +669,7 @@ uint32_t tft_spi_speed;
     #endif
     CRGB *matrixleds = nullptr;
 
-    // Neither matrixleds point to anything useful yet because on ESP32 not as much
+    // matrixleds doesn't point to anything useful yet because on ESP32 not as much
     // RAM is available as static array allocation in global space, as RAM you can
     // get via malloc in setup (or even ps_malloc to use PSRAM as needed).
     // So we'll call Framebuffer_GFX->newLedsPtr and setvirtdisp to set those pointers correctly
@@ -1279,7 +1289,7 @@ void show_callback() {
 
 //============================================================================
 #else
-    #error "Please write a matrix config or choose one of the definitions above. If you have a FastLED matrix, define something like M24BY24 at the top of this file"
+    #error "Please write a matrix config or choose one of the definitions above. If you have a FastLED matrix, define something like M24BY24 at the top of this file. Or put your define in neomatrix_config_whichdefine.h"
 #endif
 
 //============================================================================
@@ -2044,9 +2054,15 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
     // CRGB color = CRGB(matrix->gamma[red], matrix->gamma[green], matrix->gamma[blue]);
     matrix->precal_gamma(matrix_gamma);
 
+    // Some implementations like ESP32_HUB75_MATRIXPANEL may have random unallocated memory
+    // in the framebuffer, so we clear that here
+    matrix->fillScreen(0x0000);
+    matrix->show();
+
 // LEDMatrix alignment is tricky, this test helps make sure things are aligned correctly
     #ifndef DISABLE_MATRIX_TEST
         #ifdef LEDMATRIX
+            // This is meant to help layout panels in the right order and orientation
             Serial.println("LEDMatrix Test");
             ledmatrix.DrawLine (0, 0, ledmatrix.Width() - 1, ledmatrix.Height() - 1, CRGB(0, 255, 0));
             ledmatrix.DrawPixel(0, 0, CRGB(255, 0, 0));
@@ -2108,7 +2124,7 @@ void matrix_setup(bool initserial=true, int reservemem = 40000) {
             #ifdef HAS_TFT
                 if (gfx_scale != 1) matrix->show(0, mh);
             #endif
-            matrix->fillScreen(0x000F);
+            matrix->fillScreen(0x000A);
             matrix->show();
             #ifdef HAS_TFT
                 if (gfx_scale != 1) matrix->show(0, mh);
