@@ -656,8 +656,6 @@ uint32_t tft_spi_speed;
     const uint8_t MATRIX_TILE_H     = 1;  // number of matrices arranged horizontally
     const uint8_t MATRIX_TILE_V     = 1;  // number of matrices arranged vertically
 
-    uint8_t matrix_brightness = 255;
-
     MatrixPanel_I2S_DMA *hub75matrix = nullptr;
     VirtualMatrixPanel  *virtualDisp = nullptr;
 
